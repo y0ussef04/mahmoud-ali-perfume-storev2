@@ -1,33 +1,20 @@
-import { IBM_Plex_Sans_Arabic, Aref_Ruqaa, Cinzel } from 'next/font/google';
+import { IBM_Plex_Sans_Arabic } from 'next/font/google';
 import './globals.css';
 
-const body = IBM_Plex_Sans_Arabic({
+const ibmPlexSansArabic = IBM_Plex_Sans_Arabic({
   subsets: ['arabic', 'latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  variable: '--f-body',
-  display: 'swap',
-});
-
-const display = Aref_Ruqaa({
-  subsets: ['arabic', 'latin'],
-  weight: ['400', '700'],
-  variable: '--f-display',
-  display: 'swap',
-});
-
-const mark = Cinzel({
-  subsets: ['latin'],
-  variable: '--f-mark',
+  weight: ['400', '600'],
+  variable: '--f-sans',
   display: 'swap',
 });
 
 export const metadata = {
   title: {
-    default: "Mahmoud-Ali's store",
-    template: "%s · Mahmoud-Ali's store",
+    default: 'محمود علي للعطور — عطور خليجية أصلية',
+    template: '%s · محمود علي للعطور',
   },
   description:
-    'كاتالوج كامل بأسعار وأحجام واضحة لعطور خليجية أصلية ١٠٠٪. اطلب في دقيقة، ادفع عند الاستلام أو بالكارت أو بالتحويل.',
+    'عطور إماراتية وسعودية أصلية ١٠٠٪ في مصر. أسعار واضحة بدون رسائل خاصة، طلب فورى ودفع عند الاستلام أو بالتحويل.',
   keywords: [
     'عطور خليجية',
     'عطور إماراتية',
@@ -36,26 +23,24 @@ export const metadata = {
     'العربية للعود',
     'دهن عود',
     'مخلط',
-    'عطور أصلية مصر',
+    'محمود علي للعطور',
   ],
   openGraph: {
     type: 'website',
     locale: 'ar_EG',
-    siteName: "Mahmoud-Ali's store",
-    title: "Mahmoud-Ali's store",
+    siteName: 'متجر محمود علي للعطور',
+    title: 'محمود علي للعطور — عطور خليجية أصلية',
     description: 'عطور إماراتية وسعودية أصلية ١٠٠٪ — أسعار واضحة وتوصيل لكل مصر.',
   },
   robots: { index: true, follow: true },
 };
 
 export const viewport = {
-  themeColor: '#000000',
+  themeColor: '#FAFAF8',
   width: 'device-width',
   initialScale: 1,
 };
 
-// بيتزرق قبل أي رسم عشان مايحصلش وميض (FOUC) وقت تحميل الثيم الداكن.
-// بيقرا تفضيل المستخدم من localStorage، وإلا بيمشي على تفضيل النظام.
 const THEME_INIT = `(function(){try{var t=localStorage.getItem('theme');var d=t==='dark'||(t!=='light'&&window.matchMedia('(prefers-color-scheme: dark)').matches);var e=document.documentElement;e.classList.toggle('dark',d);e.style.colorScheme=d?'dark':'light';}catch(_){}})();`;
 
 export default function RootLayout({ children }) {
@@ -63,13 +48,15 @@ export default function RootLayout({ children }) {
     <html
       lang="ar"
       dir="rtl"
-      className={`${body.variable} ${display.variable} ${mark.variable}`}
+      className={`${ibmPlexSansArabic.variable} font-sans`}
       suppressHydrationWarning
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT }} />
       </head>
-      <body>{children}</body>
+      <body className="bg-[#FAFAF8] text-[#1A1814] antialiased selection:bg-[#C9A84C]/20 dark:bg-[#111009] dark:text-white min-h-screen flex flex-col">
+        {children}
+      </body>
     </html>
   );
 }

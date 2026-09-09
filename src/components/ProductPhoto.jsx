@@ -1,19 +1,14 @@
 import Image from 'next/image';
 
-/**
- * صورة العطر — وموجودة كمان لما مافيش صورة.
- * بدعم الحجم المصغر والتحكم في الأبعاد لتفادي تضخم الكارت.
- */
 export default function ProductPhoto({
   product: p,
   priority = false,
-  sizes = '(min-width: 1024px) 16rem, (min-width: 640px) 30vw, 45vw',
+  sizes = '(min-width: 1024px) 18rem, (min-width: 640px) 30vw, 45vw',
   className = '',
-  aspect = 'aspect-[16/10] max-h-28 sm:max-h-36',
 }) {
-  const box = `relative ${aspect} w-full overflow-hidden bg-lacquer/20 ${className}`;
+  const box = `relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-[#FAFAF8] dark:bg-[#1C1A14] ${className}`;
 
-  if (p.cover) {
+  if (p?.cover) {
     return (
       <div className={box}>
         <Image
@@ -22,13 +17,13 @@ export default function ProductPhoto({
           fill
           sizes={sizes}
           priority={priority}
-          className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+          className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-300"
         />
       </div>
     );
   }
 
-  const initials = (p.name_en || p.name_ar || '')
+  const initials = (p?.name_en || p?.name_ar || '')
     .trim()
     .split(/\s+/)
     .slice(0, 2)
@@ -37,22 +32,20 @@ export default function ProductPhoto({
 
   return (
     <div
-      className={box}
+      className={`${box} flex items-center justify-center`}
       style={{
         backgroundImage: `linear-gradient(160deg,
-          ${p.spine_top || '#C9A45C'}22 0%,
-          ${p.spine_heart || '#8E3E44'}2E 52%,
-          ${p.spine_base || '#3A2318'}3D 100%)`,
+          ${p?.spine_top || '#C9A84C'}22 0%,
+          ${p?.spine_heart || '#B85B6C'}2E 52%,
+          ${p?.spine_base || '#1A1814'}3D 100%)`,
       }}
     >
       <span
         aria-hidden="true"
-        className="absolute inset-0 flex items-center justify-center font-mark
-                   text-[2.2rem] tracking-wide3 text-oud/25"
+        className="font-bold text-2xl tracking-widest text-[#1A1814]/30 dark:text-white/30 uppercase"
       >
-        {initials.toUpperCase()}
+        {initials || 'MA'}
       </span>
     </div>
   );
 }
-

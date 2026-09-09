@@ -2,124 +2,83 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { useState } from 'react';
 import Logo from '@/components/Logo';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useCart } from '@/lib/cart';
 
-const NAV = [
+const NAV_LINKS = [
   { href: '/', label: 'الرئيسية' },
-  { href: '/products', label: 'كل العطور' },
-  { href: '/track', label: 'تتبع أوردر' },
+  { href: '/products', label: 'الكاتالوج' },
+  { href: '/track', label: 'تتبع الأوردر' },
 ];
 
 export default function Header({ announcement = '' }) {
   const { count, setOpen } = useCart();
   const pathname = usePathname();
-  const [menu, setMenu] = useState(false);
 
   return (
     <>
       {announcement ? (
-        <div className="bg-lacquer text-center text-xs2 tracking-wide2 text-brass-gilt">
-          <p className="mx-auto max-w-wrap px-4 py-2">{announcement}</p>
+        <div className="bg-[#1A1814] text-center text-xs py-2 px-4 text-[#C9A84C] font-semibold border-b border-[#2E2B22]">
+          <p className="max-w-6xl mx-auto">{announcement}</p>
         </div>
       ) : null}
 
-      <header className="sticky top-0 z-40 border-b border-hair bg-lacquer/95 backdrop-blur">
-        <div className="mx-auto flex max-w-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2.5 sm:py-3">
-          <Link href="/" aria-label="الرئيسية" className="shrink-0 flex items-center">
-            <Logo size={36} tone="onDark" textClassName="hidden sm:flex" />
+      <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#1C1A14]/90 backdrop-blur-md border-b border-[#E8E6E1] dark:border-[#2E2B22]">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          {/* Logo (RTL: Visual Right / End) */}
+          <Link href="/" aria-label="الصفحة الرئيسية" className="shrink-0 flex items-center">
+            <Logo size={36} tone="onLight" />
           </Link>
 
-          {/* التنقّل — شاشات كبيرة */}
-          <nav className="mx-auto hidden items-center gap-1 md:flex">
-            {NAV.map((n) => {
-              const on = n.href === '/' ? pathname === '/' : pathname.startsWith(n.href);
+          {/* Desktop Nav Links (Center) */}
+          <nav className="hidden md:flex items-center gap-8">
+            {NAV_LINKS.map((n) => {
+              const active = n.href === '/' ? pathname === '/' : pathname.startsWith(n.href);
               return (
                 <Link
                   key={n.href}
                   href={n.href}
-                  aria-current={on ? 'page' : undefined}
-                  className={`px-4 py-2 text-xs1 tracking-wide2 transition-colors ${
-                    on
-                      ? 'text-brass-gilt'
-                      : 'text-brass/70 hover:text-brass-gilt'
+                  aria-current={active ? 'page' : undefined}
+                  className={`text-sm font-semibold transition-colors duration-150 relative py-1 ${
+                    active
+                      ? 'text-[#1A1814] dark:text-white'
+                      : 'text-[#6B6760] hover:text-[#1A1814] dark:text-[#A09C94] dark:hover:text-white'
                   }`}
                 >
                   {n.label}
-                  {on ? (
-                    <span className="mt-1.5 block h-px bg-brass-gilt" aria-hidden="true" />
+                  {active ? (
+                    <span className="absolute bottom-0 inset-x-0 h-0.5 bg-[#C9A84C] rounded-full" />
                   ) : null}
                 </Link>
               );
             })}
           </nav>
 
-          <div className="flex items-center gap-1.5 sm:gap-2">
-            {/* تبديل الثيم */}
+          {/* Cart & Theme Toggle (RTL: Visual Left / Start) */}
+          <div className="flex items-center gap-3">
             <ThemeToggle />
 
-            {/* العربة */}
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="relative inline-flex items-center border border-brass/45 px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs1 tracking-wide2
-                         text-brass-gilt transition-colors hover:bg-brass/15"
-              style={{ borderRadius: 2 }}
+              aria-label="فتح عربة التسوق"
+              className="relative inline-flex items-center justify-center gap-2 bg-[#1A1814] hover:bg-[#2D2921] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-150 active:scale-[0.97] min-h-[44px]"
             >
               <span>العربة</span>
-              <span
-                aria-hidden={count === 0}
-                className={`ms-1.5 sm:ms-2 inline-block min-w-5 sm:min-w-6 border border-brass/45 px-1 sm:px-1.5 py-0.5 text-xs2 text-center num ${
-                  count > 0 ? 'bg-brass-gilt text-lacquer font-bold' : 'text-brass/60'
-                }`}
-              >
-                {count}
+              <span className="relative flex items-center justify-center">
+                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                {count > 0 ? (
+                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#C9A84C] text-white text-[10px] font-semibold rounded-full flex items-center justify-center num">
+                    {count}
+                  </span>
+                ) : null}
               </span>
-              <span className="sr-only">
-                {count > 0 ? `${count} قطعة في العربة` : 'العربة فاضية'}
-              </span>
-            </button>
-
-            {/* زر القائمة — موبايل */}
-            <button
-              type="button"
-              onClick={() => setMenu((v) => !v)}
-              aria-expanded={menu}
-              aria-label="القائمة"
-              className="border border-brass/45 p-2 text-brass-gilt md:hidden"
-              style={{ borderRadius: 2 }}
-            >
-              <span className="block h-px w-4 sm:w-5 bg-current" />
-              <span className="mt-1.5 block h-px w-4 sm:w-5 bg-current" />
-              <span className="mt-1.5 block h-px w-4 sm:w-5 bg-current" />
             </button>
           </div>
         </div>
-
-        {/* التنقّل — موبايل */}
-        {menu ? (
-          <nav className="border-t border-brass/25 md:hidden">
-            {NAV.map((n) => {
-              const on = n.href === '/' ? pathname === '/' : pathname.startsWith(n.href);
-              return (
-                <Link
-                  key={n.href}
-                  href={n.href}
-                  aria-current={on ? 'page' : undefined}
-                  onClick={() => setMenu(false)}
-                  className={`block border-b border-brass/15 px-5 py-3.5 text-xs1
-                             tracking-wide2 transition-colors ${
-                    on ? 'text-brass-gilt' : 'text-brass/70 hover:text-brass-gilt'
-                  }`}
-                >
-                  {n.label}
-                </Link>
-              );
-            })}
-          </nav>
-        ) : null}
       </header>
     </>
   );

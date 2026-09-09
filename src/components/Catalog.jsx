@@ -1,283 +1,237 @@
+/*
+ * DESIGN DECISIONS:
+ * Layout: Responsive catalog grid matching 2 cols on mobile, 3 on tablet, and 4 on desktop.
+ * Mobile: Filter controls in compact horizontal row, touch targets >= 44px.
+ * Removed: Emojis, background pattern clutter, heavy shadows.
+ * RTL notes: Arabic text aligned properly with start/end direction.
+ */
+
 'use client';
 
 import { useMemo, useState } from 'react';
 import ProductCard from '@/components/ProductCard';
 import { SpineKey } from '@/components/Spine';
-import { COUNTRY, FAMILY, FAMILY_ORDER, GENDER } from '@/lib/labels';
 import { egp, num } from '@/lib/money';
-
-const SORTS = {
-  featured: 'المختار أولاً',
-  cheap: 'الأرخص أولاً',
-  pricey: 'الأغلى أولاً',
-  name: 'أبجدي',
-};
+import { COUNTRY, FAMILY, GENDER } from '@/lib/labels';
 
 export default function Catalog({ products, brands, initialFamily = '' }) {
-  const [q, setQ] = useState('');
   const [family, setFamily] = useState(initialFamily);
   const [brand, setBrand] = useState('');
-  const [country, setCountry] = useState('');
   const [gender, setGender] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [inStockOnly, setInStockOnly] = useState(false);
-  const [sort, setSort] = useState('featured');
+  const [query, setQuery] = useState('');
 
-  // العائلات الموجودة فعلاً في الكاتالوج بس
-  const families = useMemo(() => {
-    const present = new Set(products.map((p) => p.family));
-    return FAMILY_ORDER.filter((f) => present.has(f));
-  }, [products]);
-
-  const priceCeiling = useMemo(
-    () => Math.max(500, ...products.map((p) => p.maxPrice || 0)),
+  const families = useMemo(
+    () => Array.from(new Set(products.map((p) => p.family).filter(Boolean))),
     [products]
   );
 
-  const shown = useMemo(() => {
-    const needle = q.trim().toLowerCase();
+  const priceCeiling = useMemo(() => {
+    const maxs = products.map((p) => p.maxPrice || 0);
+    return Math.ceil((Math.max(...maxs, 2000) + 100) / 100) * 100;
+  }, [products]);
 
-    let list = products.filter((p) => {
+  const shown = useMemo(() => {
+    return products.filter((p) => {
       if (family && p.family !== family) return false;
       if (brand && p.brand?.slug !== brand) return false;
-      if (country && p.brand?.country !== country) return false;
       if (gender && p.gender !== gender) return false;
       if (inStockOnly && !p.available) return false;
-      if (maxPrice && (p.minPrice ?? Infinity) > Number(maxPrice)) return false;
 
-      if (needle) {
-        const hay = [
-          p.name_ar,
-          p.name_en,
-          p.brand?.name_ar,
-          p.brand?.name_en,
-          p.kind,
-          ...(p.notes_top || []),
-          ...(p.notes_heart || []),
-          ...(p.notes_base || []),
-        ]
+      if (maxPrice) {
+        const top = Number(maxPrice);
+        if (p.minPrice != null && p.minPrice > top) return false;
+      }
+
+      if (query.trim()) {
+        const q = query.trim().toLowerCase();
+        const haystack = [p.name_ar, p.name_en, p.brand?.name_ar, p.brand?.name_en]
           .filter(Boolean)
           .join(' ')
           .toLowerCase();
-        if (!hay.includes(needle)) return false;
+        if (!haystack.includes(q)) return false;
       }
 
       return true;
     });
-
-    const by = {
-      cheap: (a, b) => (a.minPrice ?? 1e9) - (b.minPrice ?? 1e9),
-      pricey: (a, b) => (b.minPrice ?? 0) - (a.minPrice ?? 0),
-      name: (a, b) => a.name_ar.localeCompare(b.name_ar, 'ar'),
-      featured: (a, b) =>
-        Number(b.is_featured) - Number(a.is_featured) ||
-        Number(b.available) - Number(a.available),
-    };
-
-    return [...list].sort(by[sort] || by.featured);
-  }, [products, q, family, brand, country, gender, maxPrice, inStockOnly, sort]);
+  }, [products, family, brand, gender, maxPrice, inStockOnly, query]);
 
   const activeCount =
     (family ? 1 : 0) +
     (brand ? 1 : 0) +
-    (country ? 1 : 0) +
     (gender ? 1 : 0) +
     (maxPrice ? 1 : 0) +
-    (inStockOnly ? 1 : 0);
+    (inStockOnly ? 1 : 0) +
+    (query ? 1 : 0);
 
   const reset = () => {
-    setQ('');
     setFamily('');
     setBrand('');
-    setCountry('');
     setGender('');
     setMaxPrice('');
     setInStockOnly(false);
+    setQuery('');
   };
 
   return (
-    <div>
-      {/* ─── البحث ───────────────────────────────────────── */}
-      <div className="flex flex-wrap items-end gap-4">
-        <div className="min-w-[16rem] flex-1">
-          <label htmlFor="q" className="label">
-            دوّر باسم العطر أو الماركة أو نوتة
+    <div className="space-y-6">
+      {/* البحث والعائلة العطرية */}
+      <div className="space-y-4 bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl p-4 sm:p-6">
+        <div>
+          <label htmlFor="search" className="block text-xs font-semibold text-[#6B6760] dark:text-[#A09C94] mb-1.5">
+            البحث في الكاتالوج
           </label>
           <input
-            id="q"
+            id="search"
             type="search"
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="عود · ورد طائفي · لطافة · خمرة"
-            className="field"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="ابحث باسم العطر أو الماركة..."
+            className="w-full bg-[#FAFAF8] dark:bg-[#111009] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-lg px-4 py-2.5 text-sm text-[#1A1814] dark:text-white placeholder-[#6B6760] focus:outline-none focus:border-[#C9A84C] min-h-[44px]"
           />
         </div>
 
+        {/* العائلة العطرية */}
         <div>
-          <label htmlFor="sort" className="label">
-            الترتيب
-          </label>
-          <select
-            id="sort"
-            value={sort}
-            onChange={(e) => setSort(e.target.value)}
-            className="field"
-          >
-            {Object.entries(SORTS).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v}
-              </option>
+          <span className="block text-xs font-semibold text-[#6B6760] dark:text-[#A09C94] mb-2">
+            العائلة العطرية
+          </span>
+          <div className="flex overflow-x-auto gap-2 pb-2 no-scrollbar">
+            <button
+              type="button"
+              onClick={() => setFamily('')}
+              className={`px-3.5 py-2 rounded-lg text-xs font-semibold shrink-0 min-h-[44px] transition-colors duration-150 ${
+                family === ''
+                  ? 'bg-[#1A1814] text-white dark:bg-white dark:text-[#1A1814]'
+                  : 'bg-[#FAFAF8] dark:bg-[#111009] text-[#1A1814] dark:text-white border border-[#E8E6E1] dark:border-[#2E2B22] hover:border-[#C9A84C]'
+              }`}
+            >
+              الكل
+            </button>
+            {families.map((f) => (
+              <button
+                key={f}
+                type="button"
+                onClick={() => setFamily(f === family ? '' : f)}
+                className={`px-3.5 py-2 rounded-lg text-xs font-semibold shrink-0 min-h-[44px] transition-colors duration-150 ${
+                  family === f
+                    ? 'bg-[#1A1814] text-white dark:bg-white dark:text-[#1A1814]'
+                    : 'bg-[#FAFAF8] dark:bg-[#111009] text-[#1A1814] dark:text-white border border-[#E8E6E1] dark:border-[#2E2B22] hover:border-[#C9A84C]'
+                }`}
+              >
+                {FAMILY[f] || f}
+              </button>
             ))}
-          </select>
+          </div>
+        </div>
+
+        {/* الفلاتر المتقدمة */}
+        <div className="grid gap-4 sm:grid-cols-3 pt-3 border-t border-[#E8E6E1] dark:border-[#2E2B22]">
+          <div>
+            <label htmlFor="brand" className="block text-xs font-semibold text-[#6B6760] dark:text-[#A09C94] mb-1.5">
+              الماركة
+            </label>
+            <select
+              id="brand"
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              className="w-full bg-[#FAFAF8] dark:bg-[#111009] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-lg px-3 py-2.5 text-xs text-[#1A1814] dark:text-white focus:outline-none focus:border-[#C9A84C] min-h-[44px]"
+            >
+              <option value="">كل الماركات</option>
+              {brands.map((b) => (
+                <option key={b.slug} value={b.slug}>
+                  {b.name_ar} — {COUNTRY[b.country]}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="gender" className="block text-xs font-semibold text-[#6B6760] dark:text-[#A09C94] mb-1.5">
+              الفئة
+            </label>
+            <select
+              id="gender"
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+              className="w-full bg-[#FAFAF8] dark:bg-[#111009] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-lg px-3 py-2.5 text-xs text-[#1A1814] dark:text-white focus:outline-none focus:border-[#C9A84C] min-h-[44px]"
+            >
+              <option value="">الكل</option>
+              {Object.entries(GENDER).map(([k, v]) => (
+                <option key={k} value={k}>
+                  {v}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="max" className="block text-xs font-semibold text-[#6B6760] dark:text-[#A09C94] mb-1.5">
+              أقصى سعر: <span className="text-[#1A1814] dark:text-white font-semibold num">{maxPrice ? egp(maxPrice) : `${num(priceCeiling)} ج.م`}</span>
+            </label>
+            <input
+              id="max"
+              type="range"
+              min="200"
+              max={priceCeiling}
+              step="50"
+              value={maxPrice || priceCeiling}
+              onChange={(e) => setMaxPrice(Number(e.target.value) >= priceCeiling ? '' : e.target.value)}
+              className="w-full accent-[#C9A84C] mt-2"
+            />
+          </div>
+        </div>
+
+        {/* الشريط السفلي للفلاتر */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-3 border-t border-[#E8E6E1] dark:border-[#2E2B22]">
+          <div className="flex items-center gap-4">
+            <label className="inline-flex items-center gap-2 text-xs font-semibold text-[#1A1814] dark:text-white cursor-pointer">
+              <input
+                type="checkbox"
+                checked={inStockOnly}
+                onChange={(e) => setInStockOnly(e.target.checked)}
+                className="w-4 h-4 accent-[#C9A84C] rounded"
+              />
+              المتاح في المخزون فقط
+            </label>
+
+            <span className="text-xs text-[#6B6760] dark:text-[#A09C94] num">
+              {shown.length} من {products.length} عطر
+            </span>
+          </div>
+
+          {activeCount > 0 ? (
+            <button
+              type="button"
+              onClick={reset}
+              className="text-xs font-semibold text-[#9B1C1C] hover:underline"
+            >
+              مسح الفلاتر ({activeCount})
+            </button>
+          ) : null}
         </div>
       </div>
 
-      {/* ─── العائلة العطرية ─────────────────────────────── */}
-      <div className="mt-6">
-        <p className="label">العائلة العطرية</p>
-        <div className="flex overflow-x-auto gap-2 pb-2 pt-1 no-scrollbar sm:flex-wrap">
+      <SpineKey />
+
+      {/* ─── شبكة الكروت (2 للموبايل / 3 للتابلت / 4 للكمبيوتر) ─── */}
+      {shown.length === 0 ? (
+        <div className="bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl p-12 text-center space-y-3">
+          <p className="text-lg font-semibold text-[#1A1814] dark:text-white">لا توجد عطور مطابقة للبحث</p>
+          <p className="text-sm text-[#6B6760] dark:text-[#A09C94]">
+            جرب إعادة ضبط الفلاتر للحصول على جميع العطور المتاحة.
+          </p>
           <button
             type="button"
-            onClick={() => setFamily('')}
-            data-on={family === '' ? '1' : '0'}
-            className="chip shrink-0"
+            onClick={reset}
+            className="border border-[#E8E6E1] text-[#1A1814] dark:text-white hover:bg-[#FAFAF8] rounded-lg px-4 py-2.5 text-sm font-semibold min-h-[44px] mt-2"
           >
-            الكل
-          </button>
-          {families.map((f) => (
-            <button
-              key={f}
-              type="button"
-              onClick={() => setFamily(f === family ? '' : f)}
-              data-on={family === f ? '1' : '0'}
-              className="chip shrink-0"
-            >
-              {FAMILY[f]}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ─── باقي الفلاتر ────────────────────────────────── */}
-      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div>
-          <label htmlFor="brand" className="label">
-            الماركة
-          </label>
-          <select
-            id="brand"
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
-            className="field"
-          >
-            <option value="">كل الماركات</option>
-            {brands.map((b) => (
-              <option key={b.slug} value={b.slug}>
-                {b.name_ar} — {COUNTRY[b.country]}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="country" className="label">
-            بلد الماركة
-          </label>
-          <select
-            id="country"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            className="field"
-          >
-            <option value="">الإمارات والسعودية</option>
-            <option value="AE">{COUNTRY.AE}</option>
-            <option value="SA">{COUNTRY.SA}</option>
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="gender" className="label">
-            لمين
-          </label>
-          <select
-            id="gender"
-            value={gender}
-            onChange={(e) => setGender(e.target.value)}
-            className="field"
-          >
-            <option value="">للكل</option>
-            {Object.entries(GENDER).map(([k, v]) => (
-              <option key={k} value={k}>
-                {v}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
-          <label htmlFor="max" className="label">
-            أقصى سعر{' '}
-            <span className="num text-oud">
-              {maxPrice ? egp(maxPrice) : `${num(priceCeiling)} ج.م`}
-            </span>
-          </label>
-          <input
-            id="max"
-            type="range"
-            min="200"
-            max={priceCeiling}
-            step="50"
-            value={maxPrice || priceCeiling}
-            onChange={(e) =>
-              setMaxPrice(
-                Number(e.target.value) >= priceCeiling ? '' : e.target.value
-              )
-            }
-            className="w-full accent-brass"
-          />
-        </div>
-      </div>
-
-      {/* ─── الشريط السفلي للفلاتر ───────────────────────── */}
-      <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-3">
-        <label className="inline-flex items-center gap-2 text-xs1 text-ink-60">
-          <input
-            type="checkbox"
-            checked={inStockOnly}
-            onChange={(e) => setInStockOnly(e.target.checked)}
-            className="accent-brass"
-          />
-          المتاح حالاً بس
-        </label>
-
-        <span className="num text-xs2 text-ink-42">
-          {shown.length} من {products.length} عطر
-        </span>
-
-        {activeCount > 0 ? (
-          <button type="button" onClick={reset} className="btn-quiet">
-            شيل الفلاتر ({activeCount})
-          </button>
-        ) : null}
-
-        <SpineKey className="ms-auto" />
-      </div>
-
-      <div className="rule my-7" />
-
-      {/* ─── النتائج ─────────────────────────────────────── */}
-      {shown.length === 0 ? (
-        <div className="surface px-6 py-16 text-center">
-          <p className="font-display text-d2">مفيش عطر مطابق</p>
-          <p className="mt-2 text-xs1 text-ink-60">
-            جرّب توسّع الفلاتر، أو ابعتلنا على واتساب واحنا نجيبه لك.
-          </p>
-          <button type="button" onClick={reset} className="btn-ghost mt-5">
-            رجّع كل العطور
+            عرض كافة العطور
           </button>
         </div>
       ) : (
-        <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
           {shown.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

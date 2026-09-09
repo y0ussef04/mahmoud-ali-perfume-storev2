@@ -2,76 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ══════════════════════════════════════════════════════════
-   الأساسات
-   ══════════════════════════════════════════════════════════ */
 @layer base {
-  /* ─── توكنز اللايت (الوضع الافتراضي) ───────────────────────
-     القيم دي مطابقة تماماً للألوان القديمة، فاللايت مود شكله
-     مايتغيّرش ولا بكسل. القنوات "R G B" عشان مُعدِّلات الشفافية. */
   :root {
     color-scheme: light;
-
-    /* ثوابت الهوية */
-    --c-lacquer: 0 0 0;
-    --c-brass: 169 131 78;
-    --c-brass-light: 201 164 92;
-    --c-brass-gilt: 228 196 140;
-    --c-frost: 223 228 227;
-    --c-espresso: 46 33 27;
-
-    /* أسطح ونصوص بتتقلب في الدارك */
-    --c-page: 223 228 227;
-    --c-glass: 238 241 240;
-    --c-elevated: 255 255 255;
-    --c-oud: 46 33 27;
-    --c-garnet: 138 59 63;
-    --c-sage: 74 97 85;
-
-    /* حشو مصمت للشارات (حالة الأوردر/التوست) — ثابت في الثيمين عشان
-       النص الأبيض يفضل واضح فوقه؛ مابيتقلبش زي garnet/sage النصّيّين.
-       متعرّف في :root بس لأنه ثابت، و .dark بيورّثه من غير override. */
-    --c-success-solid: 74 97 85;
-    --c-danger-solid: 138 59 63;
-
-    /* شفافية ثابتة */
-    --c-ink-60: rgba(46, 33, 27, 0.62);
-    --c-ink-42: rgba(46, 33, 27, 0.42);
-    --c-hair: rgba(169, 131, 78, 0.34);
-    --c-hair-soft: rgba(46, 33, 27, 0.14);
-
-    /* نسيج النقط الورقي */
-    --dot: rgba(46, 33, 27, 0.028);
   }
 
-  /* ─── توكنز الدارك — أسود دافئ عودي مش رمادي بارد ──────────
-     الأسود والبرونز ثوابت الهوية فبيفضلوا؛ الأسطح والنصوص بس
-     اللي بتتقلب. النص أوف-وايت دافئ عشان يوازن البرونز. */
   .dark {
     color-scheme: dark;
-
-    /* ثوابت الهوية — نفس قيم اللايت */
-    --c-lacquer: 0 0 0;
-    --c-brass: 169 131 78;
-    --c-brass-light: 201 164 92;
-    --c-brass-gilt: 228 196 140;
-    --c-frost: 223 228 227; /* يفضل فاتح فوق الكروم الأسود */
-    --c-espresso: 46 33 27; /* حبر الكروم الداكن — ثابت */
-
-    /* الأسطح بتتدرّج: صفحة → كارت → مرتفع */
-    --c-page: 18 15 13;
-    --c-glass: 30 26 22;
-    --c-elevated: 40 33 27;
-    --c-oud: 236 234 230; /* النص الأساسي — أوف-وايت دافئ */
-    --c-garnet: 214 130 133; /* مرفوع للتباين على الغامق */
-    --c-sage: 143 179 162;
-
-    --c-ink-60: rgba(236, 234, 230, 0.6);
-    --c-ink-42: rgba(236, 234, 230, 0.4);
-    --c-hair: rgba(201, 164, 92, 0.28);
-    --c-hair-soft: rgba(236, 234, 230, 0.13);
-
-    --dot: rgba(236, 234, 230, 0.03);
   }
 
   * {
@@ -80,32 +17,25 @@
 
   html {
     scroll-behavior: smooth;
+    direction: rtl;
   }
 
   body {
-    @apply bg-page font-body text-oud antialiased;
+    @apply bg-[#FAFAF8] text-[#1A1814] font-sans antialiased dark:bg-[#111009] dark:text-white;
     font-size: 1rem;
     line-height: 1.7;
-    /* نسيج ورقي خفيف جداً — بيمنع الإحساس بالفلات الميت */
-    background-image: radial-gradient(var(--dot) 1px, transparent 1px);
-    background-size: 22px 22px;
-    transition: background-color 0.25s ease, color 0.25s ease;
   }
 
-  h1,
-  h2,
-  h3 {
-    @apply font-display font-normal;
-    line-height: 1.2;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold text-[#1A1814] dark:text-white;
+    line-height: 1.3;
   }
 
-  /* تركيز واضح للكيبورد بدون هالة زرقاء المتصفح */
   :focus-visible {
-    outline: 2px solid rgb(var(--c-brass));
+    outline: 2px solid #C9A84C;
     outline-offset: 2px;
   }
 
-  /* إخفاء أسهم input[type=number] */
   input[type='number'] {
     -moz-appearance: textfield;
   }
@@ -116,136 +46,11 @@
   }
 
   ::selection {
-    background: rgba(169, 131, 78, 0.28);
+    background: rgba(201, 168, 76, 0.25);
   }
 }
 
-/* ══════════════════════════════════════════════════════════
-   مكوّنات متكرّرة
-   ══════════════════════════════════════════════════════════ */
-@layer components {
-  /* ─── عمود الرائحة — التوقيع البصري للمشروع ───────────────
-     ٣ شرايح لون رأسية: المقدمة / القلب / القاعدة */
-  .spine {
-    position: absolute;
-    inset-block: 0;
-    inset-inline-start: 0;
-    width: 5px;
-    background: linear-gradient(
-      to bottom,
-      var(--nt) 0 33.33%,
-      var(--nh) 33.33% 66.66%,
-      var(--nb) 66.66% 100%
-    );
-  }
-
-  /* ─── الأسطح ────────────────────────────────────────────── */
-  .surface {
-    @apply border border-hair-soft bg-glass transition-all duration-300;
-  }
-
-  .card {
-    @apply relative border border-hair-soft bg-glass transition-all duration-300 ease-out;
-    border-radius: 4px;
-  }
-  .card:hover {
-    border-color: rgb(var(--c-brass) / 0.55);
-    box-shadow: 0 14px 36px -16px rgba(0, 0, 0, 0.22);
-    transform: translateY(-3px);
-  }
-
-  /* ─── الأزرار ───────────────────────────────────────────── */
-  .btn {
-    @apply inline-flex items-center justify-center gap-2 border px-5 py-3
-           text-xs1 font-medium tracking-wide2 transition-all duration-200 ease-out
-           disabled:cursor-not-allowed disabled:opacity-45 active:scale-[0.98];
-    border-radius: 2px;
-  }
-  .btn-solid {
-    @apply btn border-lacquer bg-lacquer text-brass-gilt shadow-sm hover:shadow-md;
-  }
-  .btn-solid:hover:not(:disabled) {
-    @apply bg-espresso border-brass/40;
-  }
-  .btn-ghost {
-    @apply btn border-hair bg-transparent text-oud;
-  }
-  .btn-ghost:hover:not(:disabled) {
-    background: rgba(169, 131, 78, 0.12);
-    @apply border-brass/60;
-  }
-  .btn-quiet {
-    @apply btn border-transparent px-2 py-1 text-xs2 text-ink-60 underline
-           decoration-hair underline-offset-4 hover:text-brass transition-colors;
-  }
-
-  /* ─── الحقول ────────────────────────────────────────────── */
-  .field {
-    @apply block w-full border border-hair-soft bg-elevated px-3 py-2.5 text-base
-           text-oud placeholder:text-ink-42;
-    border-radius: 2px;
-  }
-  .field:focus {
-    @apply border-brass outline-none;
-    box-shadow: 0 0 0 3px rgba(169, 131, 78, 0.14);
-  }
-  .field[aria-invalid='true'] {
-    @apply border-garnet;
-  }
-
-  .label {
-    @apply mb-1.5 block text-xs2 tracking-wide2 text-ink-60;
-  }
-
-  .err {
-    @apply mt-1 block text-xs2 text-garnet;
-  }
-
-  /* ─── فاصل معدني رفيع ───────────────────────────────────── */
-  .rule {
-    height: 1px;
-    /* متماثل، فاتجاهه مايفرقش مع RTL */
-    background: linear-gradient(
-      to right,
-      transparent,
-      rgba(169, 131, 78, 0.42),
-      transparent
-    );
-  }
-
-  /* ─── شريحة/تاج ─────────────────────────────────────────── */
-  .chip {
-    @apply inline-flex items-center gap-1.5 border border-hair px-3 py-1.5
-           text-xs2 tracking-wide2 text-ink-60 transition-colors;
-    border-radius: 2px;
-  }
-  .chip[data-on='1'] {
-    @apply border-lacquer bg-lacquer text-brass-gilt;
-  }
-
-  /* ─── جدول الأدمن ───────────────────────────────────────── */
-  .tbl {
-    @apply w-full border-collapse text-xs1;
-  }
-  .tbl th {
-    @apply border-b border-hair px-3 py-2.5 text-start text-xs2 font-medium
-           tracking-wide2 text-ink-60;
-    white-space: nowrap;
-  }
-  .tbl td {
-    @apply border-b border-hair-soft px-3 py-3 align-middle;
-  }
-  .tbl tbody tr:hover {
-    background: rgba(169, 131, 78, 0.055);
-  }
-
-  /* أرقام مصفوفة رأسياً — مهم في الجداول المالية */
-  .num {
-    font-variant-numeric: tabular-nums;
-    font-feature-settings: 'tnum';
-  }
-
-  /* إخفاء شريط التمرير للسلايدر على الموبايل */
+@layer utilities {
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
@@ -253,62 +58,8 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
-}
-
-/* ══════════════════════════════════════════════════════════
-   الطباعة — للفاتورة وبوليصة الشحن
-   ══════════════════════════════════════════════════════════ */
-@media print {
-  @page {
-    size: A5;
-    margin: 8mm;
-  }
-
-  /* الطباعة دايماً بألوان فاتحة — الفاتورة تتطبع حبر غامق على ورق أبيض
-     حتى لو العميل فاتح الدارك مود. القيم دي بتغلب .dark لأنها بعده وبنفس
-     الأولوية، والوسائط print مابتغيّرش الأولوية. */
-  :root,
-  .dark {
-    color-scheme: light;
-    --c-page: 255 255 255;
-    --c-glass: 255 255 255;
-    --c-elevated: 255 255 255;
-    --c-oud: 46 33 27;
-    --c-garnet: 138 59 63;
-    --c-sage: 74 97 85;
-    --c-ink-60: rgba(46, 33, 27, 0.62);
-    --c-ink-42: rgba(46, 33, 27, 0.42);
-    --c-hair: rgba(169, 131, 78, 0.34);
-    --c-hair-soft: rgba(46, 33, 27, 0.14);
-    --dot: transparent;
-  }
-
-  body {
-    background: #fff !important;
-    background-image: none !important;
-  }
-
-  .no-print {
-    display: none !important;
-  }
-
-  .print-sheet {
-    box-shadow: none !important;
-    border: none !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    max-width: none !important;
-  }
-}
-
-/* احترام تفضيل تقليل الحركة */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
+  .num {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
   }
 }
