@@ -77,11 +77,11 @@ export default function CartDrawer({ freeShipThreshold = 1500 }) {
 
   return (
     <>
-      {/* Overlay: bg-black/40 backdrop-blur-sm */}
+      {/* Overlay: bg-black/50 backdrop-blur-sm */}
       <div
         onClick={() => setOpen(false)}
         aria-hidden="true"
-        className={`fixed inset-0 z-50 bg-black/40 backdrop-blur-sm transition-opacity duration-200 ${
+        className={`fixed inset-0 z-[60] bg-black/50 backdrop-blur-sm transition-opacity duration-200 ${
           open ? 'opacity-100' : 'pointer-events-none opacity-0'
         }`}
       />
@@ -93,7 +93,7 @@ export default function CartDrawer({ freeShipThreshold = 1500 }) {
         aria-modal="true"
         aria-label="عربة التسوق"
         aria-hidden={!open}
-        className={`fixed top-0 bottom-0 left-0 z-50 flex w-[90vw] max-w-sm flex-col bg-white dark:bg-[#1C1A14] border-e border-[#E8E6E1] dark:border-[#2E2B22] shadow-2xl transition-transform duration-200 ease-out ${
+        className={`fixed top-0 bottom-0 left-0 z-[60] flex w-[90vw] max-w-sm flex-col bg-white dark:bg-[#1C1A14] border-e border-[#E8E6E1] dark:border-[#2E2B22] shadow-2xl transition-transform duration-200 ease-out ${
           open ? 'translate-x-0' : '-translate-x-full pointer-events-none'
         }`}
       >
@@ -203,7 +203,7 @@ export default function CartDrawer({ freeShipThreshold = 1500 }) {
               ))}
             </ul>
 
-            <footer className="border-t border-[#E8E6E1] dark:border-[#2E2B22] p-5 space-y-3 bg-[#FAFAF8] dark:bg-[#111009]">
+            <footer className="border-t border-[#E8E6E1] dark:border-[#2E2B22] p-5 pb-20 sm:pb-6 space-y-3 bg-[#FAFAF8] dark:bg-[#111009] shrink-0">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-[#6B6760]">المجموع الإجمالي</span>
                 <span className="num font-semibold text-base text-[#1A1814] dark:text-white">{egp(subtotal)}</span>
@@ -212,9 +212,9 @@ export default function CartDrawer({ freeShipThreshold = 1500 }) {
               <Link
                 href="/checkout"
                 onClick={() => setOpen(false)}
-                className="w-full bg-[#1A1814] hover:bg-[#2D2921] text-white text-sm font-semibold py-3 rounded-lg transition-colors duration-150 active:scale-[0.97] min-h-[44px] flex items-center justify-center"
+                className="w-full bg-[#C9A84C] hover:bg-[#8B6914] text-white text-sm font-semibold py-3.5 rounded-lg transition-colors duration-150 active:scale-[0.97] min-h-[48px] flex items-center justify-center shadow-sm"
               >
-                متابعة وإتمام الطلب
+                متابعة وإتمام الطلب ({egp(subtotal)})
               </Link>
             </footer>
           </>

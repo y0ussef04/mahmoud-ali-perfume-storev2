@@ -657,7 +657,7 @@ export default function Checkout({ rates, settings }) {
         ) : null}
 
         {/* ─── الأزرار ─────────────────────────────────── */}
-        <div className="mt-8 flex flex-wrap items-center gap-3">
+        <div className="mt-8 flex flex-wrap items-center gap-3 pb-20 md:pb-0">
           {step > 1 ? (
             <button type="button" onClick={back} disabled={busy} className="btn-ghost">
               رجوع

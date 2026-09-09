@@ -16,7 +16,7 @@ export default function StoreShell({ settings, children }) {
   return (
     <CartProvider>
       <Header settings={settings} announcement={settings?.announcement || ''} freeShipThreshold={settingNum(settings?.free_ship_threshold, 1500)} />
-      <main className="min-h-[60vh] pb-16 md:pb-0">{children}</main>
+      <main className="min-h-[60vh] pb-24 md:pb-8">{children}</main>
       <CartDrawer freeShipThreshold={settingNum(settings?.free_ship_threshold, 1500)} />
       <MobileQuickBar waNumber={settings?.wa_number || ''} />
       <Toast />
