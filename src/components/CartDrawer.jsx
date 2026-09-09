@@ -86,15 +86,15 @@ export default function CartDrawer({ freeShipThreshold = 1500 }) {
         }`}
       />
 
-      {/* Drawer Panel: Slide from Right side (RTL Start) */}
+      {/* Drawer Panel: Slide from Left side */}
       <aside
         ref={panel}
         role="dialog"
         aria-modal="true"
         aria-label="عربة التسوق"
         aria-hidden={!open}
-        className={`fixed top-0 bottom-0 right-0 z-50 flex w-[90vw] max-w-sm flex-col bg-white dark:bg-[#1C1A14] border-s border-[#E8E6E1] dark:border-[#2E2B22] shadow-2xl transition-transform duration-200 ease-out ${
-          open ? 'translate-x-0' : 'translate-x-full pointer-events-none'
+        className={`fixed top-0 bottom-0 left-0 z-50 flex w-[90vw] max-w-sm flex-col bg-white dark:bg-[#1C1A14] border-e border-[#E8E6E1] dark:border-[#2E2B22] shadow-2xl transition-transform duration-200 ease-out ${
+          open ? 'translate-x-0' : '-translate-x-full pointer-events-none'
         }`}
       >
         <header className="flex items-center justify-between border-b border-[#E8E6E1] dark:border-[#2E2B22] px-5 py-4">

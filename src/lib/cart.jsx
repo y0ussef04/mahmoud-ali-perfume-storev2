@@ -53,10 +53,9 @@ export function CartProvider({ children }) {
         return next;
       });
 
-      notify(`${v.name} — ${v.label} أضيف للعربة`);
-      setOpen(true);
+      // لا نفتح العربة تلقائياً ولا نظهر توست سفلي — نكتفي بتفاعل الزر نفسه
     },
-    [notify]
+    []
   );
 
   const setQty = useCallback((variantId, qty) => {
