@@ -1,0 +1,33 @@
+# ══════════════════════════════════════════════════════════════════
+#  محمود علي للعطور — تشغيل الأبب بأمر واحد (للتعلّم والتجربة المحلّية)
+#
+#  الأبب بس اللي بيتشغّل هنا، وبيوصّل بـ Supabase السحابي بتاعك.
+#  مفيش داتابيز جوه — ده أبسط وأسهل مسار.
+#
+#  الخطوات:
+#    ١) اعمل ملف اسمه .env جنب الملف ده وحط فيه المتغيرات (تحت مكتوب مثال)
+#    ٢) شغّل:  docker compose up --build
+#    ٣) افتح:  http://localhost:3000
+#
+#  محتوى .env المفروض يبقى كده:
+#    NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+#    NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOi...
+#    NEXT_PUBLIC_SITE_URL=http://localhost:3000
+#    SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOi...
+# ══════════════════════════════════════════════════════════════════
+
+services:
+  web:
+    build:
+      context: .
+      # متغيرات NEXT_PUBLIC لازم تتحرق وقت البناء — فبنمرّرها كـ build args
+      args:
+        NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+        NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+        NEXT_PUBLIC_SITE_URL: ${NEXT_PUBLIC_SITE_URL}
+    ports:
+      - "3000:3000"
+    # مفتاح الخدمة السرّي بيتحطّ وقت التشغيل بس — مابيتحرقش في الصورة
+    environment:
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+    restart: unless-stopped

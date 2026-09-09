@@ -1,0 +1,7 @@
+# كل محركات البحث مسموح لها تفهرس المتجر
+User-agent: *
+Allow: /
+
+# منطقة الأدمن والـ API مش للفهرسة
+Disallow: /admin
+Disallow: /api
