@@ -4,6 +4,7 @@ import AddToCart from '@/components/AddToCart';
 import Gallery from '@/components/Gallery';
 import ProductCard from '@/components/ProductCard';
 import Spine, { NoteLadder, Strength } from '@/components/Spine';
+import OlfactoryPyramid from '@/components/OlfactoryPyramid';
 import { getProduct, getProducts, getRelated, getSettings } from '@/lib/queries';
 import { egp } from '@/lib/money';
 import { settingNum } from '@/lib/totals';
@@ -95,10 +96,11 @@ export default async function ProductPage({ params }) {
             </div>
           ) : null}
 
-          {/* سلّم النوتات */}
-          {p.notes_base?.length ? (
+          {/* الهرم العطري وسلّم النوتات */}
+          {p.notes_base?.length || p.notes_top?.length ? (
             <section className="mt-8">
-              <h2 className="font-display text-d2">إزاي بيتفتّح على الجلد</h2>
+              <h2 className="font-display text-d2">تركيبة العطر والنوتات</h2>
+              <OlfactoryPyramid top={p.notes_top} heart={p.notes_heart} base={p.notes_base} />
               <div className="mt-3">
                 <NoteLadder product={p} />
               </div>

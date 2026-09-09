@@ -2,17 +2,16 @@ import Image from 'next/image';
 
 /**
  * صورة العطر — وموجودة كمان لما مافيش صورة.
- * البديل مش مربع رمادي: بنرسم تدرّج من ألوان عمود الرائحة نفسه
- * وناخد أول حرفين من الاسم اللاتيني. كده الكاتالوج يفضل متناسق
- * حتى لو محمود لسه مارفعش صور لكل عطر.
+ * بدعم الحجم المصغر والتحكم في الأبعاد لتفادي تضخم الكارت.
  */
 export default function ProductPhoto({
   product: p,
   priority = false,
-  sizes = '(min-width: 1024px) 24rem, (min-width: 640px) 45vw, 92vw',
+  sizes = '(min-width: 1024px) 16rem, (min-width: 640px) 30vw, 45vw',
   className = '',
+  aspect = 'aspect-[16/10] max-h-28 sm:max-h-36',
 }) {
-  const box = `relative aspect-square w-full overflow-hidden bg-glass ${className}`;
+  const box = `relative ${aspect} w-full overflow-hidden bg-lacquer/20 ${className}`;
 
   if (p.cover) {
     return (
@@ -23,7 +22,7 @@ export default function ProductPhoto({
           fill
           sizes={sizes}
           priority={priority}
-          className="object-cover"
+          className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
         />
       </div>
     );
@@ -49,10 +48,11 @@ export default function ProductPhoto({
       <span
         aria-hidden="true"
         className="absolute inset-0 flex items-center justify-center font-mark
-                   text-[2.6rem] tracking-wide3 text-oud/25"
+                   text-[2.2rem] tracking-wide3 text-oud/25"
       >
         {initials.toUpperCase()}
       </span>
     </div>
   );
 }
+

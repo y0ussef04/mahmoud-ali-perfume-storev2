@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import ProductCard from '@/components/ProductCard';
+import ReviewsSection from '@/components/ReviewsSection';
 import { Mark } from '@/components/Logo';
 import { SpineKey } from '@/components/Spine';
 import { getProducts, getSettings, getShippingRates } from '@/lib/queries';
@@ -135,6 +136,9 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      {/* ══════════════ آراء العملاء ══════════════ */}
+      <ReviewsSection reviews={settings.customer_reviews} />
 
       {/* ══════════════ الشحن والدفع ══════════════ */}
       <section className="border-y border-hair-soft bg-glass">

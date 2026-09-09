@@ -135,12 +135,12 @@ export default function Catalog({ products, brands, initialFamily = '' }) {
       {/* ─── العائلة العطرية ─────────────────────────────── */}
       <div className="mt-6">
         <p className="label">العائلة العطرية</p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex overflow-x-auto gap-2 pb-2 pt-1 no-scrollbar sm:flex-wrap">
           <button
             type="button"
             onClick={() => setFamily('')}
             data-on={family === '' ? '1' : '0'}
-            className="chip"
+            className="chip shrink-0"
           >
             الكل
           </button>
@@ -150,7 +150,7 @@ export default function Catalog({ products, brands, initialFamily = '' }) {
               type="button"
               onClick={() => setFamily(f === family ? '' : f)}
               data-on={family === f ? '1' : '0'}
-              className="chip"
+              className="chip shrink-0"
             >
               {FAMILY[f]}
             </button>
@@ -277,7 +277,7 @@ export default function Catalog({ products, brands, initialFamily = '' }) {
           </button>
         </div>
       ) : (
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-4 sm:gap-5 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {shown.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

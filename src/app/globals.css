@@ -141,40 +141,42 @@
 
   /* ─── الأسطح ────────────────────────────────────────────── */
   .surface {
-    @apply border border-hair-soft bg-glass;
+    @apply border border-hair-soft bg-glass transition-all duration-300;
   }
 
   .card {
-    @apply relative border border-hair-soft bg-glass transition duration-200;
+    @apply relative border border-hair-soft bg-glass transition-all duration-300 ease-out;
+    border-radius: 4px;
   }
   .card:hover {
-    border-color: rgb(var(--c-brass) / 0.5);
-    box-shadow: 0 12px 32px -20px rgba(0, 0, 0, 0.5);
-    transform: translateY(-2px);
+    border-color: rgb(var(--c-brass) / 0.55);
+    box-shadow: 0 14px 36px -16px rgba(0, 0, 0, 0.22);
+    transform: translateY(-3px);
   }
 
   /* ─── الأزرار ───────────────────────────────────────────── */
   .btn {
     @apply inline-flex items-center justify-center gap-2 border px-5 py-3
-           text-xs1 font-medium tracking-wide2 transition-colors
-           disabled:cursor-not-allowed disabled:opacity-45;
+           text-xs1 font-medium tracking-wide2 transition-all duration-200 ease-out
+           disabled:cursor-not-allowed disabled:opacity-45 active:scale-[0.98];
     border-radius: 2px;
   }
   .btn-solid {
-    @apply btn border-lacquer bg-lacquer text-brass-gilt;
+    @apply btn border-lacquer bg-lacquer text-brass-gilt shadow-sm hover:shadow-md;
   }
   .btn-solid:hover:not(:disabled) {
-    @apply bg-espresso;
+    @apply bg-espresso border-brass/40;
   }
   .btn-ghost {
     @apply btn border-hair bg-transparent text-oud;
   }
   .btn-ghost:hover:not(:disabled) {
-    background: rgba(169, 131, 78, 0.1);
+    background: rgba(169, 131, 78, 0.12);
+    @apply border-brass/60;
   }
   .btn-quiet {
     @apply btn border-transparent px-2 py-1 text-xs2 text-ink-60 underline
-           decoration-hair underline-offset-4;
+           decoration-hair underline-offset-4 hover:text-brass transition-colors;
   }
 
   /* ─── الحقول ────────────────────────────────────────────── */
@@ -241,6 +243,15 @@
   .num {
     font-variant-numeric: tabular-nums;
     font-feature-settings: 'tnum';
+  }
+
+  /* إخفاء شريط التمرير للسلايدر على الموبايل */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 

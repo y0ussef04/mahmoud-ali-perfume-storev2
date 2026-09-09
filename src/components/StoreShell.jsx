@@ -3,6 +3,7 @@
 import { CartProvider } from '@/lib/cart';
 import Header from '@/components/Header';
 import CartDrawer from '@/components/CartDrawer';
+import MobileQuickBar from '@/components/MobileQuickBar';
 import Toast from '@/components/Toast';
 import { settingNum } from '@/lib/totals';
 
@@ -15,8 +16,9 @@ export default function StoreShell({ settings, children }) {
   return (
     <CartProvider>
       <Header announcement={settings?.announcement || ''} />
-      <main className="min-h-[60vh]">{children}</main>
+      <main className="min-h-[60vh] pb-16 md:pb-0">{children}</main>
       <CartDrawer freeShipThreshold={settingNum(settings?.free_ship_threshold, 1500)} />
+      <MobileQuickBar waNumber={settings?.wa_number || ''} />
       <Toast />
     </CartProvider>
   );

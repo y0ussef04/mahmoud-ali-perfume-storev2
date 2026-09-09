@@ -54,149 +54,141 @@ export default function ProductCard({ product: p }) {
 
   const allOut = p.variants.length > 0 && p.variants.every((v) => v.stock <= 0);
 
-  const canExpand = p.variants.length > 4;
-  const shownVariants = expanded ? p.variants : p.variants.slice(0, 4);
+  const canExpand = p.variants.length > 3;
+  const shownVariants = expanded ? p.variants : p.variants.slice(0, 3);
 
   return (
-    <article className="card group flex flex-col">
+    <article className="card group flex flex-col justify-between rounded-md overflow-hidden border border-hair-soft bg-glass/80 backdrop-blur-xs transition-all duration-300 ease-out hover:border-brass-gilt/70 hover:shadow-2xl hover:-translate-y-1 hover:bg-glass">
       <Spine product={p} />
 
-      {/* الصورة — aria-hidden عشان الاسم تحتيها لينك كفاية للقارئ الصوتي */}
+      {/* الصورة — مخصصة للهواتف وبأقصى تناسق */}
       <Link
         href={`/products/${p.slug}`}
         aria-hidden="true"
         tabIndex={-1}
-        className="ms-1.5 block"
+        className="ms-1 sm:ms-1.5 block relative group/img cursor-pointer overflow-hidden"
       >
-        <div className="relative overflow-hidden">
+        <div className="relative overflow-hidden bg-lacquer/30 rounded-t-sm">
           {/* شارة: نفاد المخزون له الأولوية، وإلا الخصم */}
           {allOut ? (
             <span
-              className="absolute top-0 z-10 m-3 border border-hair bg-glass px-2.5 py-1
-                         text-xs2 tracking-wide2 text-ink-60"
-              style={{ insetInlineStart: 0, borderRadius: 2 }}
+              className="absolute top-1.5 z-10 m-1.5 border border-hair bg-glass/90 backdrop-blur-xs px-1.5 py-0.5
+                         text-[10px] sm:text-xs2 tracking-wide2 text-ink-60 shadow-sm"
+              style={{ insetInlineStart: 0, borderRadius: 3 }}
             >
               نفد المخزون
             </span>
           ) : discountPct > 0 ? (
             <span
-              className="num absolute top-0 z-10 m-3 bg-lacquer px-2.5 py-1 text-xs2
-                         tracking-wide2 text-brass-gilt"
-              style={{ insetInlineStart: 0, borderRadius: 2 }}
+              className="num absolute top-1.5 z-10 m-1.5 bg-lacquer/90 backdrop-blur-xs border border-brass-gilt/40 px-1.5 py-0.5 text-[10px] sm:text-xs2
+                         tracking-wide2 text-brass-gilt font-bold shadow-md"
+              style={{ insetInlineStart: 0, borderRadius: 3 }}
             >
               خصم {discountPct}%
             </span>
           ) : null}
 
-          {/* تكبير خفيف عند المرور — بيتلغي مع تقليل الحركة */}
-          <div
-            className="transition-transform duration-500 ease-out
-                       group-hover:scale-[1.045] motion-reduce:transform-none"
-          >
-            <ProductPhoto product={p} />
+          {/* طبقة تفاعلية عند تحويم الماوس */}
+          <div className="absolute inset-0 z-10 bg-lacquer/20 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+            <span className="bg-brass-gilt/90 text-lacquer text-[11px] sm:text-xs2 font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-xs shadow-md transform translate-y-2 group-hover/img:translate-y-0 transition-transform duration-300">
+              استكشف العطر ➔
+            </span>
           </div>
+
+          <ProductPhoto product={p} aspect="aspect-[16/10] max-h-28 sm:max-h-36" />
         </div>
       </Link>
 
-      <div className="flex flex-1 flex-col ps-6 pe-5 py-5">
+      <div className="flex flex-1 flex-col px-2.5 sm:px-4 py-2 sm:py-3">
         {/* الماركة وبلدها */}
-        <p className="flex items-center gap-2 text-xs2 tracking-wide2 text-ink-42">
-          <span>{p.brand?.name_ar}</span>
+        <p className="flex items-center gap-1 text-[11px] sm:text-xs2 tracking-wide2 text-ink-42">
+          <span className="font-medium text-brass-gilt/90">{p.brand?.name_ar}</span>
           <span aria-hidden="true">·</span>
           <span>{COUNTRY[p.brand?.country] || ''}</span>
         </p>
 
         {/* الاسم */}
-        <h3 className="mt-1.5 font-display text-d2 leading-snug">
-          <Link href={`/products/${p.slug}`} className="hover:text-brass">
+        <h3 className="mt-0.5 font-display text-xs1 sm:text-d2 leading-snug font-medium group-hover:text-brass-gilt transition-colors">
+          <Link href={`/products/${p.slug}`}>
             {p.name_ar}
           </Link>
         </h3>
         {p.name_en ? (
-          <p className="font-mark text-xs2 tracking-wide2 text-ink-42">{p.name_en}</p>
+          <p className="font-mark text-[10px] sm:text-xs2 tracking-wide2 text-ink-42 line-clamp-1">{p.name_en}</p>
         ) : null}
 
-        {/* التصنيف */}
-        <p className="mt-2.5 text-xs2 text-ink-60">
-          {[p.kind || FAMILY[p.family], GENDER[p.gender], p.concentration]
+        {/* التصنيف والنوتات */}
+        <p className="mt-0.5 text-[11px] sm:text-xs2 text-ink-60 line-clamp-1">
+          {[p.kind || FAMILY[p.family], GENDER[p.gender]]
             .filter(Boolean)
             .join(' · ')}
         </p>
 
-        {/* النوتات — سطر واحد مختصر */}
-        {p.notes_base?.length ? (
-          <p className="mt-2 text-xs2 leading-relaxed text-ink-42">
-            {[...(p.notes_top || []), ...(p.notes_heart || []), ...(p.notes_base || [])]
-              .slice(0, 5)
-              .join(' · ')}
-          </p>
-        ) : null}
-
-        {/* سجلّ الأحجام — كل حجم بسعره */}
-        <div className="mt-4 border-t border-hair-soft pt-1">
+        {/* سجلّ الأحجام — التخطيط المتجاوب للهاتف */}
+        <div className="mt-2 border-t border-hair-soft/50 pt-1 flex-1 flex flex-col justify-end">
           {p.variants.length === 0 ? (
-            <p className="py-3 text-xs2 text-ink-42">مافيش أحجام مسجّلة.</p>
+            <p className="py-1 text-[11px] sm:text-xs2 text-ink-42">مافيش أحجام مسجّلة.</p>
           ) : (
             <>
-              <ul className="divide-y divide-hair-soft">
+              <ul className="divide-y divide-hair-soft/40">
                 {shownVariants.map((v) => {
-                const out = v.stock <= 0;
-                const low = !out && v.stock <= 3;
-                const off =
-                  v.compare_price && Number(v.compare_price) > Number(v.price);
-                const isAdded = added === v.id;
+                  const out = v.stock <= 0;
+                  const low = !out && v.stock <= 3;
+                  const off =
+                    v.compare_price && Number(v.compare_price) > Number(v.price);
+                  const isAdded = added === v.id;
 
-                return (
-                  <li key={v.id} className="flex items-center gap-3 py-2.5">
-                    <span className="w-24 shrink-0 text-xs1 text-oud">{v.label}</span>
+                  return (
+                    <li key={v.id} className="flex items-center gap-1 py-1 text-[11px] sm:text-xs1 transition-colors hover:bg-brass/5 px-0.5 rounded-xs">
+                      <span className="w-14 sm:w-20 shrink-0 text-[11px] sm:text-xs2 font-medium text-oud truncate">{v.label}</span>
 
-                    <span className="num flex-1 text-xs1">
-                      {egp(v.price)}
-                      {off ? (
-                        <span className="ms-2 text-xs2 text-ink-42 line-through">
-                          {egp(v.compare_price)}
+                      <span className="num flex-1 text-[11px] sm:text-xs1 font-bold text-brass-gilt">
+                        {egp(v.price)}
+                        {off ? (
+                          <span className="ms-0.5 text-[10px] sm:text-xs2 text-ink-42 line-through font-normal">
+                            {egp(v.compare_price)}
+                          </span>
+                        ) : null}
+                      </span>
+
+                      {out ? (
+                        <span className="shrink-0 text-[10px] sm:text-xs2 text-ink-42">خلص</span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => addVariant(v)}
+                          aria-label={`أضف ${p.name_ar} حجم ${v.label} للعربة`}
+                          className={`inline-flex shrink-0 items-center justify-center gap-0.5
+                                      border px-1.5 sm:px-2.5 py-0.5 text-[10px] sm:text-xs2 tracking-wide2
+                                      transition-all duration-200 active:scale-95 ${
+                                        isAdded
+                                          ? 'border-sage bg-sage/20 text-sage font-bold scale-105'
+                                          : 'border-hair/80 text-oud hover:border-brass-gilt hover:bg-brass-gilt hover:text-lacquer font-medium'
+                                      }`}
+                          style={{ borderRadius: 3, minWidth: '3.2rem' }}
+                        >
+                          {isAdded ? 'تمّت ✓' : '+ أضف'}
+                        </button>
+                      )}
+
+                      {low ? (
+                        <span className="num shrink-0 text-[10px] sm:text-xs2 text-garnet font-medium">
+                          باقي {v.stock}
                         </span>
                       ) : null}
-                    </span>
-
-                    {out ? (
-                      <span className="shrink-0 text-xs2 text-ink-42">خلص</span>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => addVariant(v)}
-                        aria-label={`أضف ${p.name_ar} حجم ${v.label} للعربة`}
-                        className={`inline-flex shrink-0 items-center justify-center gap-1
-                                    border px-3 py-1.5 text-xs2 tracking-wide2
-                                    transition-colors ${
-                                      isAdded
-                                        ? 'border-sage text-sage'
-                                        : 'border-hair text-oud hover:border-lacquer hover:bg-lacquer hover:text-brass-gilt'
-                                    }`}
-                        style={{ borderRadius: 2, minWidth: '4.5rem' }}
-                      >
-                        {isAdded ? 'تمّت ✓' : 'أضف'}
-                      </button>
-                    )}
-
-                    {low ? (
-                      <span className="num shrink-0 text-xs2 text-garnet">
-                        باقي {v.stock}
-                      </span>
-                    ) : null}
-                  </li>
-                );
+                    </li>
+                  );
                 })}
               </ul>
 
               {canExpand ? (
-                <div className="mt-3">
+                <div className="mt-1">
                   <button
                     type="button"
                     onClick={() => setExpanded((v) => !v)}
-                    className="btn-ghost w-full"
+                    className="btn-quiet w-full text-[10px] sm:text-xs2 py-0.5 hover:text-brass-gilt transition-colors"
                   >
-                    {expanded ? 'قلّل الأحجام' : 'عرض كل الأحجام'}
+                    {expanded ? 'إخفاء الأثر' : `عرض باقي الأحجام (+${p.variants.length - 3})`}
                   </button>
                 </div>
               ) : null}
@@ -204,13 +196,15 @@ export default function ProductCard({ product: p }) {
           )}
         </div>
 
-        <Link
-          href={`/products/${p.slug}`}
-          className="mt-4 self-start text-xs2 tracking-wide2 text-brass underline
-                     decoration-hair underline-offset-4 hover:text-oud"
-        >
-          النوتات والثبات بالتفصيل
-        </Link>
+        <div className="mt-1.5 pt-1 border-t border-hair-soft/30 flex items-center justify-between">
+          <Link
+            href={`/products/${p.slug}`}
+            className="text-[11px] sm:text-xs2 tracking-wide2 text-brass underline
+                       decoration-hair underline-offset-4 hover:text-brass-gilt transition-colors"
+          >
+            التفاصيل والنوتات ➔
+          </Link>
+        </div>
       </div>
     </article>
   );

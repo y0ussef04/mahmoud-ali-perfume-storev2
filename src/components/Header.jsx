@@ -27,9 +27,9 @@ export default function Header({ announcement = '' }) {
       ) : null}
 
       <header className="sticky top-0 z-40 border-b border-hair bg-lacquer/95 backdrop-blur">
-        <div className="mx-auto flex max-w-wrap items-center gap-4 px-4 py-3">
-          <Link href="/" aria-label="الرئيسية" className="shrink-0">
-            <Logo size={40} tone="onDark" />
+        <div className="mx-auto flex max-w-wrap items-center justify-between gap-2 sm:gap-4 px-3 sm:px-4 py-2.5 sm:py-3">
+          <Link href="/" aria-label="الرئيسية" className="shrink-0 flex items-center">
+            <Logo size={36} tone="onDark" textClassName="hidden sm:flex" />
           </Link>
 
           {/* التنقّل — شاشات كبيرة */}
@@ -56,7 +56,7 @@ export default function Header({ announcement = '' }) {
             })}
           </nav>
 
-          <div className="ms-auto flex items-center gap-2 md:ms-0">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {/* تبديل الثيم */}
             <ThemeToggle />
 
@@ -64,15 +64,15 @@ export default function Header({ announcement = '' }) {
             <button
               type="button"
               onClick={() => setOpen(true)}
-              className="relative border border-brass/45 px-4 py-2 text-xs1 tracking-wide2
+              className="relative inline-flex items-center border border-brass/45 px-2.5 sm:px-4 py-1.5 sm:py-2 text-xs1 tracking-wide2
                          text-brass-gilt transition-colors hover:bg-brass/15"
               style={{ borderRadius: 2 }}
             >
-              العربة
+              <span>العربة</span>
               <span
                 aria-hidden={count === 0}
-                className={`ms-2 inline-block min-w-6 border border-brass/45 px-1.5 text-xs2 num ${
-                  count > 0 ? 'bg-brass-gilt text-lacquer' : 'text-brass/60'
+                className={`ms-1.5 sm:ms-2 inline-block min-w-5 sm:min-w-6 border border-brass/45 px-1 sm:px-1.5 py-0.5 text-xs2 text-center num ${
+                  count > 0 ? 'bg-brass-gilt text-lacquer font-bold' : 'text-brass/60'
                 }`}
               >
                 {count}
@@ -88,12 +88,12 @@ export default function Header({ announcement = '' }) {
               onClick={() => setMenu((v) => !v)}
               aria-expanded={menu}
               aria-label="القائمة"
-              className="border border-brass/45 px-3 py-2 text-brass-gilt md:hidden"
+              className="border border-brass/45 p-2 text-brass-gilt md:hidden"
               style={{ borderRadius: 2 }}
             >
-              <span className="block h-px w-5 bg-current" />
-              <span className="mt-1.5 block h-px w-5 bg-current" />
-              <span className="mt-1.5 block h-px w-5 bg-current" />
+              <span className="block h-px w-4 sm:w-5 bg-current" />
+              <span className="mt-1.5 block h-px w-4 sm:w-5 bg-current" />
+              <span className="mt-1.5 block h-px w-4 sm:w-5 bg-current" />
             </button>
           </div>
         </div>

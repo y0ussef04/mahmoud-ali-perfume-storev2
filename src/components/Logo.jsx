@@ -102,14 +102,14 @@ export function Mark({ size = 44, className = '' }) {
  * القفل الكامل: علامة + اسم.
  * @param {'onDark'|'onLight'} tone
  */
-export default function Logo({ size = 40, tone = 'onDark', className = '' }) {
+export default function Logo({ size = 40, tone = 'onDark', className = '', textClassName = '' }) {
   const wordColor = tone === 'onDark' ? 'text-brass-gilt' : 'text-oud';
   const subColor = tone === 'onDark' ? 'text-brass' : 'text-ink-60';
 
   return (
-    <span className={`inline-flex items-center gap-3 ${className}`}>
+    <span className={`inline-flex items-center gap-2.5 ${className}`}>
       <Mark size={size} />
-      <span className="flex flex-col leading-none">
+      <span className={`flex-col leading-none ${textClassName || 'flex'}`}>
         <span
           className={`font-mark text-xs1 tracking-wide3 ${wordColor}`}
           style={{ fontWeight: 600 }}

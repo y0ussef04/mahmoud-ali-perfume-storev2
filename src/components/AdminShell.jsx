@@ -11,6 +11,7 @@ const NAV = [
   { href: '/admin', label: 'نظرة عامة', hint: 'الأرقام والرسوم' },
   { href: '/admin/orders', label: 'الأوردرات', hint: 'المتابعة والتأكيد' },
   { href: '/admin/products', label: 'العطور والمخزون', hint: 'الأسعار والكميات' },
+  { href: '/admin/reviews', label: 'آراء العملاء', hint: 'اسكرينات الشات والتقييمات' },
   { href: '/admin/coupons', label: 'أكواد الخصم', hint: 'العروض' },
   { href: '/admin/shipping', label: 'الشحن', hint: 'أسعار المحافظات' },
 ];
