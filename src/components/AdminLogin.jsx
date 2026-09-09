@@ -97,7 +97,7 @@ export default function AdminLogin() {
               htmlFor="a-email"
               className="mb-1.5 block text-xs2 tracking-wide2 text-brass"
             >
-              الإيميل
+              البريد الإلكتروني
             </label>
             <input
               id="a-email"
@@ -109,8 +109,8 @@ export default function AdminLogin() {
               dir="ltr"
               className="w-full border border-brass/40 bg-espresso/60 px-3.5 py-3 text-start
                          text-xs1 text-frost placeholder:text-frost/30
-                         focus:border-brass focus:outline-none"
-              placeholder="you@example.com"
+                         focus:border-brass focus:outline-none rounded-lg"
+              placeholder="admin@example.com"
             />
           </div>
 
@@ -119,7 +119,7 @@ export default function AdminLogin() {
               htmlFor="a-pass"
               className="mb-1.5 block text-xs2 tracking-wide2 text-brass"
             >
-              الباسورد
+              كلمة المرور
             </label>
             <div className="relative">
               <input
@@ -132,7 +132,7 @@ export default function AdminLogin() {
                 dir="ltr"
                 className="w-full border border-brass/40 bg-espresso/60 px-3.5 py-3 pe-16
                            text-start text-xs1 text-frost placeholder:text-frost/30
-                           focus:border-brass focus:outline-none"
+                           focus:border-brass focus:outline-none rounded-lg"
                 placeholder="••••••••"
               />
               <button
@@ -141,7 +141,7 @@ export default function AdminLogin() {
                 className="absolute inset-y-0 end-0 px-3 text-xs2 text-brass
                            hover:text-brass-gilt"
               >
-                {show ? 'اخفي' : 'اظهر'}
+                {show ? 'إخفاء' : 'إظهار'}
               </button>
             </div>
           </div>
@@ -149,7 +149,7 @@ export default function AdminLogin() {
           {error ? (
             <p
               role="alert"
-              className="border border-garnet bg-garnet/12 px-3.5 py-2.5 text-xs2 text-frost"
+              className="border border-garnet bg-garnet/12 px-3.5 py-2.5 text-xs2 text-frost rounded-lg"
             >
               {error}
             </p>
@@ -158,17 +158,17 @@ export default function AdminLogin() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full bg-brass px-4 py-3.5 text-xs1 tracking-wide2 text-lacquer
-                       transition-colors hover:bg-brass-gilt disabled:opacity-50"
+            className="w-full bg-brass px-4 py-3.5 text-xs1 tracking-wide2 text-lacquer font-bold rounded-lg
+                       transition-colors hover:bg-brass-gilt disabled:opacity-50 min-h-[44px]"
           >
-            {busy ? 'بيتحقّق…' : 'دخول'}
+            {busy ? 'جاري التحقق…' : 'تسجيل الدخول'}
           </button>
         </form>
 
         <p className="mt-8 text-center text-xs2 leading-relaxed text-frost/40">
-          الصفحة دي للإدارة بس. لو وصلتها بالغلط،{' '}
+          هذه الصفحة مخصصة لإدارة المتجر فقط.{' '}
           <Link href="/" className="text-brass underline underline-offset-4">
-            ارجع للمتجر
+            العودة للمتجر الرئيسي
           </Link>
           .
         </p>

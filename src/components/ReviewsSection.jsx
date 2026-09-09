@@ -71,14 +71,14 @@ export default function ReviewsSection({ reviews = [] }) {
     <section className="py-12 sm:py-16 lg:py-20 border-t border-[#E8E6E1] dark:border-[#2E2B22]">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center max-w-2xl mx-auto space-y-2 mb-10 sm:mb-12">
-          <span className="text-xs font-semibold text-[#C9A84C] tracking-wide">
-            تجارب حقيقية
+          <span className="text-xs font-semibold text-[#C9A84C] tracking-widest uppercase">
+            مصداقية وثقة
           </span>
           <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A1814] dark:text-white">
-            آراء عملاء محمود علي
+            تجارب وآراء العملاء
           </h2>
           <p className="text-sm text-[#6B6760] dark:text-[#A09C94]">
-            تقييمات واسكرينات حقيقية لعملاء جربوا عطورنا وأكدوا أصالة المنتج والفوحان.
+            انطباعات وتقييمات من عملاء اختبروا ثبات العطور وأصالتها.
           </p>
         </div>
 

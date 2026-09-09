@@ -143,8 +143,12 @@ function SettingsPanel({ initial }) {
               value={vals[f.key]}
               onChange={set(f.key)}
               inputMode={f.type === 'number' ? 'decimal' : f.type === 'phone' ? 'numeric' : 'text'}
+              min={f.type === 'number' ? '0' : undefined}
+              step={f.type === 'number' ? 'any' : undefined}
+              maxLength={f.key === 'announcement' ? 150 : f.type === 'phone' ? 12 : undefined}
               dir={f.type === 'text' ? 'rtl' : 'ltr'}
               className={f.type === 'text' ? 'field' : 'field text-start'}
+              placeholder={f.key === 'announcement' ? 'اكتب الإعلان هنا ليظهر متحركاً في الشريط الأعلى للموقع…' : undefined}
             />
             {f.hint ? (
               <p className="mt-1 text-xs2 leading-relaxed text-ink-42">{f.hint}</p>

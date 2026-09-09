@@ -344,9 +344,9 @@ export default function Checkout({ rates, settings }) {
         {/* ─── ① الشحن ─────────────────────────────────── */}
         {step === 1 ? (
           <section className="mt-7">
-            <h2 className="font-display text-d2">بيانات الشحن</h2>
+            <h2 className="font-display text-d2">بيانات الشحن والتوصيل</h2>
             <p className="mt-1.5 text-xs2 text-ink-60">
-              مافيش تسجيل. رقم الموبايل هو اللي بنتابع بيه الأوردر.
+              بدون الحاجة لإنشاء حساب. رقم الهاتف هو المعتمد لمتابعة الشحنة.
             </p>
 
             <div className="mt-6 grid gap-5 sm:grid-cols-2">
@@ -356,6 +356,8 @@ export default function Checkout({ rates, settings }) {
                   id="f-name"
                   value={form.name}
                   onChange={set('name')}
+                  required
+                  minLength={4}
                   aria-invalid={!!errors.name}
                   autoComplete="name"
                   className="field"
@@ -370,6 +372,9 @@ export default function Checkout({ rates, settings }) {
                   id="f-phone"
                   value={form.phone}
                   onChange={set('phone')}
+                  required
+                  pattern="^01[0125][0-9]{8}$"
+                  maxLength={11}
                   aria-invalid={!!errors.phone}
                   inputMode="numeric"
                   autoComplete="tel"
@@ -388,6 +393,8 @@ export default function Checkout({ rates, settings }) {
                   id="f-phone2"
                   value={form.phone2}
                   onChange={set('phone2')}
+                  pattern="^01[0125][0-9]{8}$"
+                  maxLength={11}
                   aria-invalid={!!errors.phone2}
                   inputMode="numeric"
                   dir="ltr"
@@ -403,6 +410,7 @@ export default function Checkout({ rates, settings }) {
                   id="f-governorate"
                   value={form.governorate}
                   onChange={set('governorate')}
+                  required
                   aria-invalid={!!errors.governorate}
                   className="field"
                 >
@@ -428,6 +436,8 @@ export default function Checkout({ rates, settings }) {
                   id="f-area"
                   value={form.area}
                   onChange={set('area')}
+                  required
+                  minLength={2}
                   aria-invalid={!!errors.area}
                   className="field"
                   placeholder="مدينة نصر"
@@ -443,6 +453,8 @@ export default function Checkout({ rates, settings }) {
                   id="f-street"
                   value={form.street}
                   onChange={set('street')}
+                  required
+                  minLength={8}
                   aria-invalid={!!errors.street}
                   autoComplete="street-address"
                   className="field"
@@ -466,7 +478,7 @@ export default function Checkout({ rates, settings }) {
 
               <div className="sm:col-span-2">
                 <label htmlFor="f-note" className="label">
-                  ملاحظة للأوردر <span className="text-ink-42">(اختياري)</span>
+                  ملاحظات الطلب <span className="text-ink-42">(اختياري)</span>
                 </label>
                 <textarea
                   id="f-note"
@@ -508,8 +520,7 @@ export default function Checkout({ rates, settings }) {
                 hint="فيزا وماستركارد ومحافظ. بنبعتلك لينك الدفع على واتساب بعد التأكيد خلال دقائق."
               >
                 <p className="text-xs2 leading-relaxed text-ink-60">
-                  بنجهز لينك الدفع الأونلاين (Paymob). بعد التأكيد بنبعتلك لينك دفع
-                  آمن على واتساب في دقايق، والأوردر بيتحجز باسمك لمدة ٢٤ ساعة.
+                  سيتم تجهيز رابط الدفع الإلكتروني الآمن (Paymob) وإرساله لكم عبر واتساب خلال دقائق، ويتم حجز الشحنة باسمكم لمدة ٢٤ ساعة.
                 </p>
               </PayOption>
 
@@ -669,10 +680,10 @@ export default function Checkout({ rates, settings }) {
               className="btn-solid ms-auto px-8 py-3.5"
             >
               {busy
-                ? 'بيتسجّل…'
+                ? 'جاري التسجيل…'
                 : couponBusy || couponStale
-                  ? 'بنحدّث الخصم…'
-                  : `أكّد الأوردر — ${egp(t.total)}`}
+                  ? 'جاري تحديث الخصم…'
+                  : `تأكيد الطلب — ${egp(t.total)}`}
             </button>
           )}
         </div>
@@ -681,7 +692,7 @@ export default function Checkout({ rates, settings }) {
       {/* ══════════════ العمود التاني: الملخّص ══════════════ */}
       <aside className="lg:sticky lg:top-24 lg:self-start">
         <div className="surface p-6">
-          <h2 className="font-display text-d1">ملخّص الأوردر</h2>
+          <h2 className="font-display text-d1">ملخص الطلب</h2>
 
           <ul className="mt-4 divide-y divide-hair-soft">
             {items.map((l) => (
@@ -884,18 +895,18 @@ function Done({ done, form, settings, rate }) {
   return (
     <div className="mx-auto max-w-2xl">
       <div className="surface px-6 py-10 text-center sm:px-10">
-        <p className="text-xs2 tracking-wide3 text-brass">تم تسجيل الأوردر</p>
+        <p className="text-xs2 tracking-wide3 text-brass">تم تسجيل الطلب بنجاح</p>
 
         <p className="num mt-4 font-mark text-d4" dir="ltr">
           {done.order_no}
         </p>
 
         <p className="mt-4 text-xs1 leading-relaxed text-ink-60">
-          احفظ الرقم ده. تقدر تتابع الأوردر من صفحة{' '}
+          يرجى حفظ هذا الرقم. يمكنك متابعة حالة الطلب في أي وقت من صفحة{' '}
           <Link href="/track" className="text-brass underline underline-offset-4">
-            تتبع أوردر
+            تتبع الطلب
           </Link>{' '}
-          برقم الأوردر ورقم موبايلك.
+          برقم الطلب ورقم هاتفك.
         </p>
 
         <div className="rule my-8" />
@@ -929,19 +940,18 @@ function Done({ done, form, settings, rate }) {
         <div className="mt-8 space-y-3">
           {done.method === 'card' ? (
             <p className="border border-brass/40 bg-brass/8 px-4 py-3 text-xs1 text-brass">
-              هنبعتلك لينك الدفع على واتساب في دقايق. الأوردر محجوز باسمك ٢٤ ساعة.
+              سيتم إرسال رابط الدفع الإلكتروني عبر واتساب خلال دقائق. الطلب محجوز باسمكم لمدة ٢٤ ساعة.
             </p>
           ) : null}
 
           {done.method === 'wallet' ? (
             <div className="border border-brass/40 bg-brass/8 px-4 py-3 text-xs1 text-brass">
-              <p>استلمنا صورة التحويل. بنراجعها وبنأكّد الأوردر في نفس اليوم.</p>
+              <p>تم استلام صورة التحويل بنجاح وجاري مراجعتها وتأكيد الطلب خلال اليوم.</p>
               <p className="num mt-2">
-                المبلغ المُعتمد على الأوردر ده: {egp(done.total)}
+                المبلغ المُعتمد للطلب: {egp(done.total)}
               </p>
               <p className="mt-1 leading-relaxed">
-                لو المبلغ اللي حوّلته مختلف، ابعتلنا على واتساب برقم الأوردر
-                وبنظبّطها.
+                في حال وجود أي اختلاف في المبلغ المحول يرجى التواصل معنا عبر واتساب برقم الطلب.
               </p>
             </div>
           ) : null}
@@ -953,7 +963,7 @@ function Done({ done, form, settings, rate }) {
               rel="noopener noreferrer"
               className="btn-solid w-full py-3.5"
             >
-              ابعت تفاصيل الأوردر على واتساب
+              إرسال تفاصيل الطلب عبر واتساب
             </a>
           ) : null}
 

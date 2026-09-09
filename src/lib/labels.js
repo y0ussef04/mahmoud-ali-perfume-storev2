@@ -87,7 +87,7 @@ export const FAMILY_ORDER = [
 export const GENDER = {
   men: 'رجالي',
   women: 'نسائي',
-  unisex: 'للرجال والستات',
+  unisex: 'مناسب للجنسين',
 };
 
 export const COUNTRY = {

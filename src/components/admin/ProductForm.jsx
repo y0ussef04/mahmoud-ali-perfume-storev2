@@ -149,7 +149,7 @@ export default function ProductForm({ product, brands }) {
         <div className="mt-5 grid gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="pf-ar" className="label">الاسم بالعربي</label>
-            <input id="pf-ar" value={f.name_ar} onChange={set('name_ar')} className="field" />
+            <input id="pf-ar" value={f.name_ar} onChange={set('name_ar')} required minLength={2} className="field" />
           </div>
 
           <div>
@@ -172,19 +172,22 @@ export default function ProductForm({ product, brands }) {
                 id="pf-slug"
                 value={f.slug}
                 onChange={set('slug')}
+                required
+                minLength={2}
+                pattern="[a-z0-9-]+"
                 dir="ltr"
                 className="field text-start font-mark"
               />
               <button type="button" onClick={autoSlug} className="btn-ghost shrink-0">
-                اقترح
+                توليد تلقائي
               </button>
             </div>
           </div>
 
           <div>
-            <label htmlFor="pf-brand" className="label">البراند</label>
-            <select id="pf-brand" value={f.brand_id} onChange={set('brand_id')} className="field">
-              <option value="">اختار</option>
+            <label htmlFor="pf-brand" className="label">دار العطور (الماركة)</label>
+            <select id="pf-brand" value={f.brand_id} onChange={set('brand_id')} required className="field">
+              <option value="">اختر الماركة</option>
               {brands.map((b) => (
                 <option key={b.id} value={b.id}>
                   {b.name_ar} ({b.country === 'AE' ? 'الإمارات' : 'السعودية'})
@@ -195,7 +198,7 @@ export default function ProductForm({ product, brands }) {
 
           <div>
             <label htmlFor="pf-family" className="label">العائلة العطرية</label>
-            <select id="pf-family" value={f.family} onChange={set('family')} className="field">
+            <select id="pf-family" value={f.family} onChange={set('family')} required className="field">
               {FAMILY_ORDER.map((k) => (
                 <option key={k} value={k}>{FAMILY[k]}</option>
               ))}
@@ -203,8 +206,8 @@ export default function ProductForm({ product, brands }) {
           </div>
 
           <div>
-            <label htmlFor="pf-gender" className="label">لمين</label>
-            <select id="pf-gender" value={f.gender} onChange={set('gender')} className="field">
+            <label htmlFor="pf-gender" className="label">الفئة المستهدفة</label>
+            <select id="pf-gender" value={f.gender} onChange={set('gender')} required className="field">
               {Object.entries(GENDER).map(([k, v]) => (
                 <option key={k} value={k}>{v}</option>
               ))}
@@ -358,7 +361,7 @@ export default function ProductForm({ product, brands }) {
       {/* ── الحفظ ── */}
       <div className="flex flex-wrap items-center gap-3">
         <button type="button" onClick={save} disabled={busy} className="btn-solid px-8">
-          {busy ? 'بيتسجّل…' : isNew ? 'أنشئ العطر' : 'اسجّل التعديلات'}
+          {busy ? 'جاري الحفظ…' : isNew ? 'إنشاء العطر' : 'حفظ التعديلات'}
         </button>
         <Link href="/admin/products" className="btn-ghost">رجوع</Link>
 

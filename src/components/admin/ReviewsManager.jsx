@@ -111,16 +111,41 @@ export default function ReviewsManager({ initialReviews = [] }) {
 
   // حفظ التعديلات في جدول الإعدادات
   const saveAll = async () => {
-    setBusy(true);
     setError('');
     setOk('');
+
+    for (let i = 0; i < reviews.length; i++) {
+      const r = reviews[i];
+      if (!r.customer_name?.trim()) {
+        return setError(`اسم العميل في الرأي رقم ${i + 1} مطلوب.`);
+      }
+      if (!r.perfume?.trim()) {
+        return setError(`اسم العطر في الرأي رقم ${i + 1} مطلوب.`);
+      }
+      const ratingNum = parseInt(r.rating, 10);
+      if (isNaN(ratingNum) || ratingNum < 1 || ratingNum > 5) {
+        return setError(`التقييم في الرأي رقم ${i + 1} يجب أن يكون بين ١ و ٥ نجوم.`);
+      }
+      if (!r.comment?.trim() && !r.image_url?.trim()) {
+        return setError(`يرجى كتابة نص التعليق أو رفع صورة اسكرين للرأي رقم ${i + 1}.`);
+      }
+    }
+
+    setBusy(true);
 
     try {
       const supabase = createClient();
       const { error: dbErr } = await supabase.from('settings').upsert(
         {
           key: 'customer_reviews',
-          value: reviews,
+          value: reviews.map((r) => ({
+            ...r,
+            customer_name: r.customer_name.trim(),
+            city: (r.city || '').trim(),
+            perfume: r.perfume.trim(),
+            comment: (r.comment || '').trim(),
+            rating: Math.min(5, Math.max(1, parseInt(r.rating, 10) || 5)),
+          })),
           label: 'آراء واسكرينات العملاء',
         },
         { onConflict: 'key' }

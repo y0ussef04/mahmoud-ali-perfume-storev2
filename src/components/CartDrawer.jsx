@@ -145,7 +145,7 @@ export default function CartDrawer({ freeShipThreshold = 1500 }) {
                     باقي <span className="text-[#1A1814] dark:text-white font-semibold num">{egp(remaining)}</span> للحصول على شحن مجاني
                   </p>
                 ) : (
-                  <p className="text-xs font-semibold text-[#2D6A4F]">الشحن مجاني على هذا الأوردر</p>
+                  <p className="text-xs font-semibold text-[#2D6A4F]">الشحن مجاني على هذا الطلب</p>
                 )}
                 <div className="mt-2 h-1.5 w-full bg-[#E8E6E1] dark:bg-[#2E2B22] rounded-full overflow-hidden">
                   <div

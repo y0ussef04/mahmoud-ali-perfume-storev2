@@ -15,11 +15,11 @@ import { normalizePhone } from '@/lib/validate';
 const TRACK = ['new', 'confirmed', 'packed', 'shipped', 'delivered'];
 
 const STEP_HINT = {
-  new: 'استلمنا الأوردر وبنراجعه',
-  confirmed: 'أكّدنا معاك وبنجهّزه',
-  packed: 'اتغلّف وجاهز للمندوب',
-  shipped: 'مع شركة الشحن في السكة',
-  delivered: 'وصلك — بالهنا والشفا',
+  new: 'تم استلام الطلب وجاري مراجعته',
+  confirmed: 'تم تأكيد الطلب وجاري تجهيزه',
+  packed: 'تم تغليف الشحنة وهي جاهزة للشحن',
+  shipped: 'الشحنة مع شركة الشحن في الطريق إليك',
+  delivered: 'تم تسليم الشحنة بنجاح',
 };
 
 export default function TrackOrder() {
@@ -47,12 +47,12 @@ export default function TrackOrder() {
       const data = await res.json();
 
       if (!res.ok || !data?.ok) {
-        setError(data?.error || 'مالقيناش الأوردر.');
+        setError(data?.error || 'لم نتمكن من العثور على الطلب. يرجى التأكد من البيانات.');
       } else {
         setOrder(data.order);
       }
     } catch {
-      setError('مشكلة في الاتصال. جرّب تاني.');
+      setError('حدث تعذر في الاتصال. يرجى المحاولة مرة أخرى.');
     } finally {
       setBusy(false);
     }
@@ -61,29 +61,31 @@ export default function TrackOrder() {
   return (
     <div className="mx-auto max-w-2xl">
       <header className="text-center">
-        <p className="text-xs2 tracking-wide3 text-brass">تتبع</p>
-        <h1 className="mt-3 font-display text-d4">فين أوردرك</h1>
+        <p className="text-xs2 tracking-wide3 text-brass">تتبع الشحنة</p>
+        <h1 className="mt-3 font-display text-d4">تتبع حالة الطلب</h1>
         <p className="mt-3 text-xs1 leading-relaxed text-ink-60">
-          اكتب رقم الأوردر ورقم الموبايل اللي طلبت بيه. مافيش تسجيل ولا باسورد.
+          أدخل رقم الطلب ورقم الهاتف المسجل لديك لمتابعة حالة شحنتك فوراً بدون الحاجة لتسجيل حساب.
         </p>
       </header>
 
       <form onSubmit={submit} className="surface mt-9 grid gap-5 p-6 sm:grid-cols-2 sm:p-8">
         <div>
-          <label htmlFor="t-order" className="label">رقم الأوردر</label>
+          <label htmlFor="t-order" className="label">رقم الطلب</label>
           <input
             id="t-order"
             value={orderNo}
             onChange={(e) => setOrderNo(e.target.value.toUpperCase())}
             dir="ltr"
             required
+            minLength={5}
+            pattern="[A-Za-z0-9-]+"
             className="field num text-start font-mark"
             placeholder="MA-260909-0001"
           />
         </div>
 
         <div>
-          <label htmlFor="t-phone" className="label">الموبايل</label>
+          <label htmlFor="t-phone" className="label">رقم الهاتف</label>
           <input
             id="t-phone"
             value={phone}
@@ -91,6 +93,8 @@ export default function TrackOrder() {
             dir="ltr"
             inputMode="numeric"
             required
+            pattern="^01[0125][0-9]{8}$"
+            maxLength={11}
             className="field text-start"
             placeholder="01xxxxxxxxx"
           />
@@ -98,7 +102,7 @@ export default function TrackOrder() {
 
         <div className="sm:col-span-2">
           <button type="submit" disabled={busy} className="btn-solid w-full py-3.5">
-            {busy ? 'بندوّر…' : 'اعرض الأوردر'}
+            {busy ? 'جاري البحث…' : 'عرض تفاصيل الطلب'}
           </button>
         </div>
 
@@ -132,7 +136,7 @@ function OrderView({ order }) {
             {order.order_no}
           </p>
           <p className="mt-1 text-xs2 text-ink-42">
-            اتسجّل {dateTimeAr(order.created_at)}
+            تم التنسيق في {dateTimeAr(order.created_at)}
           </p>
         </div>
 
@@ -158,8 +162,8 @@ function OrderView({ order }) {
           }`}
         >
           {cancelled
-            ? 'الأوردر ده اتلغى. لو ده مش صح كلّمنا على واتساب.'
-            : 'الأوردر ده مرتجع. لو عندك استفسار كلّمنا على واتساب.'}
+            ? 'هذا الطلب تم إلغاؤه. للتواصل أو الاستفسار يرجى التواصل معنا عبر واتساب.'
+            : 'هذا الطلب مرتجع. للتواصل أو الاستفسار يرجى التواصل معنا عبر واتساب.'}
         </p>
       ) : (
         <ol className="space-y-0">

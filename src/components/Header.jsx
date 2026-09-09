@@ -6,23 +6,60 @@ import Logo from '@/components/Logo';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useCart } from '@/lib/cart';
 
+import { egp } from '@/lib/money';
+import { settingNum } from '@/lib/totals';
+
 const NAV_LINKS = [
   { href: '/', label: 'الرئيسية' },
   { href: '/products', label: 'الكاتالوج' },
-  { href: '/track', label: 'تتبع الأوردر' },
+  { href: '/track', label: 'تتبع الطلب' },
 ];
 
-export default function Header({ announcement = '' }) {
+export default function Header({ settings, announcement = '', freeShipThreshold }) {
   const { count, setOpen } = useCart();
   const pathname = usePathname();
 
+  const threshold = freeShipThreshold ?? settingNum(settings?.free_ship_threshold, 1500);
+  const customText = announcement || settings?.announcement || '';
+  const shipText = threshold > 0 ? `🚚 شحن مجاني لجميع المحافظات للطلبات بقيمة ${egp(threshold)} فأكثر` : '🚚 شحن مجاني لكل المحافظات';
+
   return (
     <>
-      {announcement ? (
-        <div className="bg-[#1A1814] text-center text-xs py-2 px-4 text-[#C9A84C] font-semibold border-b border-[#2E2B22]">
-          <p className="max-w-6xl mx-auto">{announcement}</p>
+      {/* ══════════════ الشريط الإعلاني المتحرك (Dynamic Marquee Ticker) ══════════════ */}
+      <div className="bg-[#1A1814] text-xs py-2 text-[#C9A84C] font-semibold border-b border-[#2E2B22] overflow-hidden select-none">
+        <div className="animate-marquee gap-8 items-center whitespace-nowrap">
+          <span className="inline-flex items-center gap-6 px-4">
+            {customText ? (
+              <>
+                <span>✨ {customText}</span>
+                <span className="text-[#6B6760]">✦</span>
+              </>
+            ) : null}
+            <span>{shipText}</span>
+            <span className="text-[#6B6760]">✦</span>
+            <span>💵 خيارات دفع مرنة: عند الاستلام، الفيزا، المحافظ، وإنستاباي</span>
+            <span className="text-[#6B6760]">✦</span>
+            <span>📦 تغليف فاخر وضمان وصول آمن للشحنة</span>
+            <span className="text-[#6B6760]">✦</span>
+            <span>✨ عطور إماراتية وسعودية أصلية ١٠٠٪ في مصر</span>
+          </span>
+          <span className="inline-flex items-center gap-6 px-4" aria-hidden="true">
+            {customText ? (
+              <>
+                <span>✨ {customText}</span>
+                <span className="text-[#6B6760]">✦</span>
+              </>
+            ) : null}
+            <span>{shipText}</span>
+            <span className="text-[#6B6760]">✦</span>
+            <span>💵 خيارات دفع مرنة: عند الاستلام، الفيزا، المحافظ، وإنستاباي</span>
+            <span className="text-[#6B6760]">✦</span>
+            <span>📦 تغليف فاخر وضمان وصول آمن للشحنة</span>
+            <span className="text-[#6B6760]">✦</span>
+            <span>✨ عطور إماراتية وسعودية أصلية ١٠٠٪ في مصر</span>
+          </span>
         </div>
-      ) : null}
+      </div>
 
       <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#1C1A14]/90 backdrop-blur-md border-b border-[#E8E6E1] dark:border-[#2E2B22]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">

@@ -380,6 +380,10 @@ function Fields({ f, on, idp, lockCode = false }) {
           value={f.code}
           onChange={on('code')}
           readOnly={lockCode}
+          required
+          minLength={3}
+          maxLength={24}
+          pattern="[A-Z0-9-]+"
           dir="ltr"
           className="field text-start font-mark uppercase"
           placeholder="EID25"
@@ -391,7 +395,7 @@ function Fields({ f, on, idp, lockCode = false }) {
 
       <div>
         <label htmlFor={`${idp}-kind`} className="label">النوع</label>
-        <select id={`${idp}-kind`} value={f.kind} onChange={on('kind')} className="field">
+        <select id={`${idp}-kind`} value={f.kind} onChange={on('kind')} required className="field">
           {Object.entries(COUPON_KIND).map(([k, v]) => (
             <option key={k} value={k}>{v}</option>
           ))}
@@ -411,6 +415,10 @@ function Fields({ f, on, idp, lockCode = false }) {
           value={f.kind === 'free_ship' ? '' : f.value}
           onChange={on('value')}
           disabled={f.kind === 'free_ship'}
+          required={f.kind !== 'free_ship'}
+          min="0.1"
+          max={f.kind === 'percent' ? '90' : undefined}
+          step="any"
           inputMode="decimal"
           dir="ltr"
           className="field text-start"
@@ -426,6 +434,8 @@ function Fields({ f, on, idp, lockCode = false }) {
           id={`${idp}-min`}
           value={f.min_subtotal}
           onChange={on('min_subtotal')}
+          min="0"
+          step="any"
           inputMode="decimal"
           dir="ltr"
           className="field text-start"
@@ -441,6 +451,8 @@ function Fields({ f, on, idp, lockCode = false }) {
           id={`${idp}-max`}
           value={f.max_uses}
           onChange={on('max_uses')}
+          min="1"
+          step="1"
           inputMode="numeric"
           dir="ltr"
           className="field text-start"
