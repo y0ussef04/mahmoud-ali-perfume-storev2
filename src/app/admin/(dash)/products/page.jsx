@@ -45,28 +45,49 @@ function ProductsTableSkeleton() {
   );
 }
 
-async function ProductsTableData({ sp }) {
-  const { supabase } = await requireAdmin();
+import { unstable_cache } from 'next/cache';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
-  const search = safeSearch(sp?.q);
+const getAllAdminProducts = unstable_cache(
+  async () => {
+    const adminClient = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+    const { data, error } = await adminClient
+      .from('products')
+      .select(
+        `id, slug, name_ar, name_en, family, gender, is_active, is_featured, created_at,
+         brand:brands ( id, name_ar ),
+         variants ( id, label, price, stock, is_active )`
+      )
+      .order('created_at', { ascending: false });
+    return { data: data || [], error: error?.message || null };
+  },
+  ['admin-products-full'],
+  { revalidate: 60, tags: ['products'] }
+);
+
+async function ProductsTableData({ sp }) {
+  await requireAdmin();
+
+  const search = safeSearch(sp?.q).toLowerCase();
   const brandId = /^[0-9a-f-]{36}$/i.test(sp?.brand || '') ? sp.brand : '';
   const only = sp?.only === 'low' || sp?.only === 'off' ? sp.only : '';
 
-  let query = supabase
-    .from('products')
-    .select(
-      `id, slug, name_ar, name_en, family, gender, is_active, is_featured, created_at,
-       brand:brands ( id, name_ar ),
-       variants ( id, label, price, stock, is_active )`
-    )
-    .order('created_at', { ascending: false });
+  const { data: rows, error } = await getAllAdminProducts();
 
-  if (brandId) query = query.eq('brand_id', brandId);
-  if (search) query = query.or(`name_ar.ilike.%${search}%,name_en.ilike.%${search}%`);
+  let filteredRows = rows || [];
+  if (brandId) filteredRows = filteredRows.filter((p) => p.brand?.id === brandId);
+  if (search) {
+    filteredRows = filteredRows.filter(
+      (p) =>
+        (p.name_ar && p.name_ar.toLowerCase().includes(search)) ||
+        (p.name_en && p.name_en.toLowerCase().includes(search))
+    );
+  }
 
-  const { data: rows, error } = await query;
-
-  let products = (rows || []).map((p) => {
+  let products = filteredRows.map((p) => {
     const live = (p.variants || []).filter((v) => v.is_active);
     const prices = live.map((v) => Number(v.price)).filter((n) => n > 0);
     return {

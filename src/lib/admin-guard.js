@@ -15,6 +15,27 @@ import { createClient } from '@/lib/supabase/server';
  *
  * @returns {Promise<{supabase: any, user: any, admin: any}>}
  */
+import { unstable_cache } from 'next/cache';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+
+/** كاش فوري في الذاكرة لحسابات الأدمن لمدة 5 دقائق لتقليل وقت الاستعلام إلى 0ms */
+const getCachedAdmin = unstable_cache(
+  async (userId) => {
+    const adminClient = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+    const { data } = await adminClient
+      .from('admins')
+      .select('user_id, email, full_name')
+      .eq('user_id', userId)
+      .maybeSingle();
+    return data || null;
+  },
+  ['admin-auth-record'],
+  { revalidate: 300, tags: ['admins'] }
+);
+
 export const requireAdmin = cache(async function requireAdmin() {
   const supabase = await createClient();
 
@@ -38,11 +59,7 @@ export const requireAdmin = cache(async function requireAdmin() {
 
   if (!user) redirect('/admin/login');
 
-  const { data: admin } = await supabase
-    .from('admins')
-    .select('user_id, email, full_name')
-    .eq('user_id', user.id)
-    .maybeSingle();
+  const admin = await getCachedAdmin(user.id);
 
   if (!admin) redirect('/admin/login?denied=1');
 

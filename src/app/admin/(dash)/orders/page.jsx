@@ -52,6 +52,30 @@ function OrdersTableSkeleton() {
   );
 }
 
+import { unstable_cache } from 'next/cache';
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+
+const getDefaultOrdersPage = unstable_cache(
+  async () => {
+    const adminClient = createSupabaseClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    );
+    const { data, count, error } = await adminClient
+      .from('orders')
+      .select(
+        `id, order_no, customer_name, phone, governorate, area, total, items_count,
+         payment_method, payment_status, status, created_at`,
+        { count: 'exact' }
+      )
+      .order('created_at', { ascending: false })
+      .range(0, PER_PAGE - 1);
+    return { data: data || [], count: count || 0, error: error?.message || null };
+  },
+  ['admin-orders-default'],
+  { revalidate: 30, tags: ['orders'] }
+);
+
 async function OrdersTable({ sp }) {
   const { supabase } = await requireAdmin();
 
@@ -61,25 +85,39 @@ async function OrdersTable({ sp }) {
   const page = Math.max(1, parseInt(sp?.page, 10) || 1);
   const from = (page - 1) * PER_PAGE;
 
-  let query = supabase
-    .from('orders')
-    .select(
-      `id, order_no, customer_name, phone, governorate, area, total, items_count,
-       payment_method, payment_status, status, created_at`,
-      { count: 'exact' }
-    )
-    .order('created_at', { ascending: false })
-    .range(from, from + PER_PAGE - 1);
+  let orders = [];
+  let count = 0;
+  let error = null;
 
-  if (status) query = query.eq('status', status);
-  if (payment) query = query.eq('payment_status', payment);
-  if (search) {
-    query = query.or(
-      `order_no.ilike.%${search}%,phone.ilike.%${search}%,customer_name.ilike.%${search}%`
-    );
+  if (!status && !payment && !search && page === 1) {
+    const res = await getDefaultOrdersPage();
+    orders = res.data;
+    count = res.count;
+    error = res.error ? { message: res.error } : null;
+  } else {
+    let query = supabase
+      .from('orders')
+      .select(
+        `id, order_no, customer_name, phone, governorate, area, total, items_count,
+         payment_method, payment_status, status, created_at`,
+        { count: 'exact' }
+      )
+      .order('created_at', { ascending: false })
+      .range(from, from + PER_PAGE - 1);
+
+    if (status) query = query.eq('status', status);
+    if (payment) query = query.eq('payment_status', payment);
+    if (search) {
+      query = query.or(
+        `order_no.ilike.%${search}%,phone.ilike.%${search}%,customer_name.ilike.%${search}%`
+      );
+    }
+
+    const res = await query;
+    orders = res.data || [];
+    count = res.count || 0;
+    error = res.error;
   }
-
-  const { data: orders, count, error } = await query;
 
   const total = count || 0;
   const pages = Math.max(1, Math.ceil(total / PER_PAGE));

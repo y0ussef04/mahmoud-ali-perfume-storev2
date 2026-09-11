@@ -37,10 +37,38 @@ export async function proxy(request) {
     }
   );
 
-  // تحقق حقيقي من التوكن عبر getUser()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // فحص فوري وسريع للتوكن الموجود في الكوكيز محلياً (0.003ms) لتجنب اتصال شبكي مع كل نقرة
+  let user = null;
+  const authCookie = request.cookies.getAll().find((c) => c.name.includes('auth-token'));
+  if (authCookie) {
+    try {
+      let raw = authCookie.value;
+      if (raw.startsWith('base64-')) {
+        raw = Buffer.from(raw.slice(7), 'base64url').toString('utf8');
+      }
+      const session = JSON.parse(raw);
+      if (session?.access_token) {
+        const payload = JSON.parse(
+          Buffer.from(session.access_token.split('.')[1], 'base64url').toString('utf8')
+        );
+        // التوكن صالح لأكثر من دقيقة قادمة
+        if (payload?.exp && payload.exp > Math.floor(Date.now() / 1000) + 60) {
+          user = {
+            id: payload.sub,
+            email: payload.email || session.user?.email || '',
+          };
+        }
+      }
+    } catch {
+      // لو فيه خطأ في القراءة يظل user = null
+    }
+  }
+
+  // لو التوكن غير موجود أو شارف على الانتهاء، نجدده ونتحقق رسمياً من سيرفر التوثيق
+  if (!user) {
+    const { data } = await supabase.auth.getUser();
+    user = data?.user || null;
+  }
 
   const { pathname, search } = request.nextUrl;
   const isLogin = pathname === '/admin/login';

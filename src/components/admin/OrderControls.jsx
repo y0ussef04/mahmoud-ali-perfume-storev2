@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { ORDER_STATUS, PAYMENT_STATUS, STATUS_NEXT } from '@/lib/labels';
 import { egp } from '@/lib/money';
+import { invalidateCacheTag } from '@/lib/actions/revalidate';
 
 /** 01012345678 → 201012345678 عشان wa.me */
 function waNumber(phone) {
@@ -64,6 +65,7 @@ export default function OrderControls({ order }) {
           ? `الحالة بقت "${ORDER_STATUS[status]}" والمخزون رجع مكانه.`
           : `الحالة بقت "${ORDER_STATUS[status]}".`
       );
+      await invalidateCacheTag('orders');
       router.refresh();
     } catch (e) {
       setError(e.message || 'مانفعش يتغيّر.');
@@ -86,6 +88,7 @@ export default function OrderControls({ order }) {
       if (rpcError) throw new Error(rpcError.message);
 
       reset(`حالة الدفع بقت "${PAYMENT_STATUS[paymentStatus]}".`);
+      await invalidateCacheTag('orders');
       router.refresh();
     } catch (e) {
       setError(e.message || 'مانفعش يتغيّر.');
