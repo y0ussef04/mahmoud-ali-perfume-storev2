@@ -22,10 +22,12 @@ export default function AdminShell({ admin, pending = 0, children }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [navigatingTo, setNavigatingTo] = useState(null);
 
-  // اقفل القائمة مع كل تنقّل
+  // اقفل القائمة ومؤشر التحميل مع كل تنقّل
   useEffect(() => {
     setOpen(false);
+    setNavigatingTo(null);
   }, [pathname]);
 
   async function signOut() {
@@ -45,20 +47,32 @@ export default function AdminShell({ admin, pending = 0, children }) {
             ? pathname === '/admin'
             : pathname.startsWith(item.href);
 
+        const isPending = navigatingTo === item.href;
+
         return (
           <Link
             key={item.href}
             href={item.href}
+            prefetch={true}
+            onMouseEnter={() => router.prefetch(item.href)}
+            onClick={() => {
+              if (pathname !== item.href) setNavigatingTo(item.href);
+            }}
             aria-current={active ? 'page' : undefined}
             className={`flex items-center justify-between gap-2 border-s-2 px-4 py-3
                         transition-colors ${
                           active
                             ? 'border-brass bg-brass/12 text-brass-gilt'
                             : 'border-transparent text-frost/70 hover:bg-white/5 hover:text-frost'
-                        }`}
+                        } ${isPending ? 'opacity-75 bg-brass/10 border-s-brass animate-pulse' : ''}`}
           >
             <span>
-              <span className="block text-xs1">{item.label}</span>
+              <span className="block text-xs1 flex items-center gap-1.5">
+                {item.label}
+                {isPending ? (
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-brass animate-ping" />
+                ) : null}
+              </span>
               <span className="mt-0.5 block text-xs2 text-frost/35">{item.hint}</span>
             </span>
 
@@ -100,7 +114,16 @@ export default function AdminShell({ admin, pending = 0, children }) {
 
   return (
     // print:block — وقت الطباعة الشريط الجانبي يختفي فمانحتاجش الجريد
-    <div className="min-h-screen lg:grid lg:grid-cols-[16rem_1fr] print:block">
+    <div className="relative min-h-screen lg:grid lg:grid-cols-[16rem_1fr] print:block">
+      {/* ── مؤشر تنقّل فوري رفيع بأعلى الشاشة بلون البراند ── */}
+      {navigatingTo ? (
+        <div
+          role="progressbar"
+          aria-label="جاري التحميل"
+          className="fixed top-0 inset-x-0 h-[2px] bg-brass shadow-[0_0_8px_rgba(201,168,76,0.8)] z-50 animate-pulse pointer-events-none"
+        />
+      ) : null}
+
       {/* ── الشريط الجانبي: ثابت على الشاشات الكبيرة ── */}
       <aside className="no-print hidden bg-lacquer lg:flex lg:h-screen lg:flex-col lg:sticky lg:top-0">
         <div className="flex items-center gap-3 px-4 py-5">

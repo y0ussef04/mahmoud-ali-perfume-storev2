@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { requireAdmin } from '@/lib/admin-guard';
 import { BrandBars, MethodSplit, RevenueChart } from '@/components/admin/Charts';
 import { Broken, Empty, Kpi, PageHead, Panel, RangeTabs } from '@/components/admin/ui';
@@ -13,13 +14,57 @@ const ALLOWED_DAYS = [7, 30, 90];
 const LOW_STOCK_AT = 5;
 const STALE_AFTER = 60;
 
-export default async function DashboardPage({ searchParams }) {
+function DashboardSkeleton() {
+  return (
+    <div className="animate-pulse space-y-6">
+      {/* الـ 5 كروت KPI */}
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="surface p-5 space-y-3">
+            <div className="h-3 w-16 bg-hair/50 rounded" />
+            <div className="h-7 w-28 bg-hair/70 rounded" />
+            <div className="h-3 w-20 bg-hair/30 rounded" />
+          </div>
+        ))}
+      </div>
+
+      {/* الرسوم البيانية */}
+      <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
+        <div className="surface p-5 sm:p-6 space-y-4">
+          <div className="h-5 w-32 bg-hair/50 rounded" />
+          <div className="h-64 w-full bg-hair/20 rounded-lg border border-hair/30" />
+        </div>
+        <div className="surface p-5 sm:p-6 space-y-4">
+          <div className="h-5 w-24 bg-hair/50 rounded" />
+          <div className="h-64 w-full bg-hair/20 rounded-lg border border-hair/30" />
+        </div>
+      </div>
+
+      {/* الجداول السفلية */}
+      <div className="grid gap-4 xl:grid-cols-2">
+        <div className="surface p-5 sm:p-6 space-y-4">
+          <div className="h-5 w-36 bg-hair/50 rounded" />
+          <div className="space-y-2 pt-2">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-10 w-full bg-hair/20 rounded border border-hair/30" />
+            ))}
+          </div>
+        </div>
+        <div className="surface p-5 sm:p-6 space-y-4">
+          <div className="h-5 w-36 bg-hair/50 rounded" />
+          <div className="space-y-2 pt-2">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="h-10 w-full bg-hair/20 rounded border border-hair/30" />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+async function DashboardData({ days }) {
   const { supabase } = await requireAdmin();
-
-  const sp = await searchParams;
-  const asked = parseInt(sp?.d, 10);
-  const days = ALLOWED_DAYS.includes(asked) ? asked : 30;
-
   const since = new Date(Date.now() - days * 86_400_000).toISOString();
 
   const [kpisRes, seriesRes, topRes, brandsRes, lowRes, staleRes, geoRes, ...methodRes] =
@@ -61,10 +106,6 @@ export default async function DashboardPage({ searchParams }) {
 
   return (
     <>
-      <PageHead title="نظرة عامة" hint={`آخر ${days} يوم · محدَّث الآن`}>
-        <RangeTabs days={days} base="/admin" />
-      </PageHead>
-
       {/* ── محتاج انتباه ── */}
       {(k.new_orders > 0 || k.pending_review > 0) ? (
         <div className="mb-7 flex flex-wrap items-center gap-3 border border-brass bg-brass/8 px-4 py-3.5">
@@ -128,14 +169,22 @@ export default async function DashboardPage({ searchParams }) {
 
           <p className="mt-5 border-t border-hair-soft pt-4 text-xs2 leading-relaxed text-ink-42">
             لو نسبة الدفع عند الاستلام عالية جداً، ده بيزوّد خطر الإلغاء ورسوم
-            الشحن المرتجع. جدول المحافظات تحت بيوريك المشكلة بتتركز فين.
+            التحصيل.
           </p>
         </Panel>
       </div>
 
-      {/* ── العطور والبراندات ── */}
+      {/* ── الأكثر مبيعاً + البراندات ── */}
       <div className="mt-6 grid gap-4 xl:grid-cols-2">
-        <Panel title="أكتر العطور مبيعاً" hint="بالقطع المبيعة">
+        <Panel
+          title="أكتر عطور مبيعة"
+          hint={`آخر ${days} يوم · الترتيب حسب الإيراد`}
+          action={
+            <Link href="/admin/products" className="btn-quiet">
+              كل العطور
+            </Link>
+          }
+        >
           {topRes.error ? (
             <Broken>{topRes.error.message}</Broken>
           ) : (topRes.data || []).length === 0 ? (
@@ -151,15 +200,20 @@ export default async function DashboardPage({ searchParams }) {
                   </tr>
                 </thead>
                 <tbody>
-                  {topRes.data.map((r, i) => (
-                    <tr key={`${r.product_id || 'x'}-${i}`}>
+                  {(topRes.data || []).map((r) => (
+                    <tr key={r.product_id}>
                       <td>
-                        <span className="block">{r.product_name}</span>
+                        <Link
+                          href={`/admin/products/${r.product_id}`}
+                          className="text-oud underline decoration-brass underline-offset-4"
+                        >
+                          {r.product_name}
+                        </Link>
                         <span className="block text-xs2 text-ink-42">
                           {r.brand_name || '—'}
                         </span>
                       </td>
-                      <td className="num text-end">{num(r.units)}</td>
+                      <td className="num text-end">{num(r.units_sold)}</td>
                       <td className="num text-end">{egp(r.revenue)}</td>
                     </tr>
                   ))}
@@ -169,7 +223,10 @@ export default async function DashboardPage({ searchParams }) {
           )}
         </Panel>
 
-        <Panel title="أداء البراندات" hint="بالإيراد">
+        <Panel
+          title="أداء البراندات"
+          hint={`مقارنة إيراد كل براند في آخر ${days} يوم`}
+        >
           {brandsRes.error ? (
             <Broken>{brandsRes.error.message}</Broken>
           ) : (
@@ -178,27 +235,27 @@ export default async function DashboardPage({ searchParams }) {
         </Panel>
       </div>
 
-      {/* ── المخزون ── */}
+      {/* ── المخزون: ناقص + راكد ── */}
       <div className="mt-6 grid gap-4 xl:grid-cols-2">
         <Panel
-          title="المخزون على وشك يخلص"
-          hint={`الأحجام اللي فيها ${LOW_STOCK_AT} قطع أو أقل`}
+          title="تنبيهات المخزون"
+          hint={`عطور خلصت أو فاضل منها ${LOW_STOCK_AT} قطع أو أقل`}
           action={
-            <Link href="/admin/products" className="btn-quiet">
-              إدارة المخزون
+            <Link href="/admin/products?only=low" className="btn-quiet">
+              كل النواقص
             </Link>
           }
         >
           {lowRes.error ? (
             <Broken>{lowRes.error.message}</Broken>
           ) : low.length === 0 ? (
-            <Empty>كل الأحجام فيها مخزون مريح.</Empty>
+            <Empty>المخزون مظبوط — مافيش نواقص حرجة.</Empty>
           ) : (
             <>
               {outOfStock.length > 0 ? (
-                <p className="mb-3 border border-garnet bg-garnet/8 px-3 py-2 text-xs2 text-garnet">
-                  <span className="num">{num(outOfStock.length)}</span> حجم خلص
-                  خلاص ومش قابل للبيع.
+                <p className="mb-3 border border-garnet bg-garnet/8 px-3.5 py-2 text-xs2 text-garnet">
+                  فيه <span className="num font-bold">{num(outOfStock.length)}</span> أحجام
+                  خلصت تماماً ولازم تتجدد.
                 </p>
               ) : null}
 
@@ -208,44 +265,49 @@ export default async function DashboardPage({ searchParams }) {
                     <tr>
                       <th>العطر</th>
                       <th>الحجم</th>
-                      <th className="text-end">الباقي</th>
+                      <th className="text-end">المتبقي</th>
+                      <th className="text-end">السعر</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {low.slice(0, 12).map((r) => (
+                    {low.slice(0, 10).map((r) => (
                       <tr key={r.variant_id}>
                         <td>
-                          <span className="block">{r.product_name}</span>
+                          <Link
+                            href={`/admin/products/${r.product_id}`}
+                            className="text-oud underline decoration-brass underline-offset-4"
+                          >
+                            {r.product_name}
+                          </Link>
                           <span className="block text-xs2 text-ink-42">
                             {r.brand_name || '—'}
                           </span>
                         </td>
-                        <td>{r.label}</td>
-                        <td
-                          className={`num text-end ${
-                            r.stock === 0 ? 'text-garnet' : 'text-brass'
-                          }`}
-                        >
-                          {r.stock === 0 ? 'خلص' : num(r.stock)}
+                        <td>{r.variant_label}</td>
+                        <td className="num text-end">
+                          <span
+                            className={
+                              r.stock === 0
+                                ? 'text-garnet font-bold'
+                                : 'text-brass font-bold'
+                            }
+                          >
+                            {num(r.stock)}
+                          </span>
                         </td>
+                        <td className="num text-end">{egp(r.price)}</td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
-
-              {low.length > 12 ? (
-                <p className="num mt-3 text-xs2 text-ink-42">
-                  و{num(low.length - 12)} حجم كمان.
-                </p>
-              ) : null}
             </>
           )}
         </Panel>
 
         <Panel
-          title="فلوس واقفة"
-          hint={`عطور عندها مخزون ومحصلش عليها بيع من أكتر من ${STALE_AFTER} يوم`}
+          title="عطور راكدة"
+          hint={`مفيهاش مبيعات بقالها أكتر من ${STALE_AFTER} يوم مع وجود مخزون`}
         >
           {staleRes.error ? (
             <Broken>{staleRes.error.message}</Broken>
@@ -345,6 +407,26 @@ export default async function DashboardPage({ searchParams }) {
           </>
         )}
       </Panel>
+    </>
+  );
+}
+
+export default async function DashboardPage({ searchParams }) {
+  const sp = await searchParams;
+  const asked = parseInt(sp?.d, 10);
+  const days = ALLOWED_DAYS.includes(asked) ? asked : 30;
+
+  return (
+    <>
+      {/* ── رأس الصفحة وتبويبات المدة (تظهر فوراً بدون أي تأخير) ── */}
+      <PageHead title="نظرة عامة" hint={`آخر ${days} يوم · محدَّث الآن`}>
+        <RangeTabs days={days} base="/admin" />
+      </PageHead>
+
+      {/* ── المحتوى المتدفق مع هيكل تحميل فوري ── */}
+      <Suspense key={days} fallback={<DashboardSkeleton />}>
+        <DashboardData days={days} />
+      </Suspense>
     </>
   );
 }

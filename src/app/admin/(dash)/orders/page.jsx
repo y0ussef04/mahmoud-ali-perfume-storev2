@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { requireAdmin } from '@/lib/admin-guard';
 import { Empty, PageHead, Panel } from '@/components/admin/ui';
 import { dateTimeAr, egp, num } from '@/lib/money';
@@ -18,10 +19,6 @@ const PER_PAGE = 25;
 const STATUSES = ['new', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled', 'returned'];
 const PAY_STATUSES = ['unpaid', 'pending_review', 'paid', 'refunded'];
 
-/**
- * البحث بيتحوّل لتعبير PostgREST، والفاصلة والأقواس ليها معنى هناك.
- * فبنشيل أي حرف مش حرف ولا رقم ولا مسافة ولا شرطة.
- */
 function safeSearch(v) {
   return String(v || '')
     .trim()
@@ -29,9 +26,34 @@ function safeSearch(v) {
     .slice(0, 40);
 }
 
-export default async function OrdersPage({ searchParams }) {
+function OrdersTableSkeleton() {
+  return (
+    <Panel>
+      <div className="overflow-x-auto animate-pulse">
+        <div className="h-10 w-full bg-hair/40 rounded-lg mb-3" />
+        <div className="space-y-3 py-2">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="h-12 w-full bg-hair/20 rounded-lg border border-hair/30 flex items-center justify-between px-4"
+            >
+              <div className="h-4 w-28 bg-hair/40 rounded" />
+              <div className="h-4 w-32 bg-hair/30 rounded" />
+              <div className="h-4 w-20 bg-hair/30 rounded" />
+              <div className="h-4 w-16 bg-hair/40 rounded" />
+              <div className="h-5 w-20 bg-hair/40 rounded-full" />
+              <div className="h-5 w-20 bg-hair/40 rounded-full" />
+              <div className="h-4 w-24 bg-hair/30 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+async function OrdersTable({ sp }) {
   const { supabase } = await requireAdmin();
-  const sp = await searchParams;
 
   const status = STATUSES.includes(sp?.status) ? sp.status : '';
   const payment = PAY_STATUSES.includes(sp?.payment) ? sp.payment : '';
@@ -72,7 +94,125 @@ export default async function OrdersPage({ searchParams }) {
     return `/admin/orders${s ? `?${s}` : ''}`;
   };
 
-  // التصدير بياخد نفس الفلتر — اللي شايفه هو اللي بينزل
+  return (
+    <Panel>
+      {error ? (
+        <p className="border border-garnet bg-garnet/8 px-4 py-3 text-xs1 text-garnet">
+          {error.message}
+        </p>
+      ) : (orders || []).length === 0 ? (
+        <Empty>
+          {status || payment || search
+            ? 'مافيش أوردر مطابق للفلتر.'
+            : 'أول أوردر لسه مجاش. لما يجي هيظهر هنا فوراً.'}
+        </Empty>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>الأوردر</th>
+                <th>العميل</th>
+                <th>المحافظة</th>
+                <th className="text-end">الإجمالي</th>
+                <th>الدفع</th>
+                <th>الحالة</th>
+                <th className="text-end">التاريخ</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orders.map((o) => (
+                <tr key={o.id}>
+                  <td>
+                    <Link
+                      href={`/admin/orders/${o.id}`}
+                      className="num font-mark text-brass underline underline-offset-4"
+                      dir="ltr"
+                    >
+                      {o.order_no}
+                    </Link>
+                    <span className="num mt-0.5 block text-xs2 text-ink-42">
+                      {num(o.items_count)} قطعة
+                    </span>
+                  </td>
+
+                  <td>
+                    <span className="block">{o.customer_name}</span>
+                    <span className="num block text-xs2 text-ink-42" dir="ltr">
+                      {o.phone}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span className="block">{o.governorate}</span>
+                    <span className="block text-xs2 text-ink-42">{o.area}</span>
+                  </td>
+
+                  <td className="num text-end">{egp(o.total)}</td>
+
+                  <td>
+                    <span className="block text-xs2">
+                      {PAYMENT_METHOD_SHORT[o.payment_method] || o.payment_method}
+                    </span>
+                    <span
+                      className={`chip mt-1 ${PAYMENT_STATUS_STYLE[o.payment_status] || ''}`}
+                    >
+                      {PAYMENT_STATUS[o.payment_status]}
+                    </span>
+                  </td>
+
+                  <td>
+                    <span className={`chip ${STATUS_STYLE[o.status] || ''}`}>
+                      {ORDER_STATUS[o.status]}
+                    </span>
+                  </td>
+
+                  <td className="num text-end text-xs2 text-ink-60">
+                    {dateTimeAr(o.created_at)}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {/* ── الصفحات ── */}
+      {pages > 1 ? (
+        <div className="mt-5 flex items-center justify-between border-t border-hair-soft pt-4">
+          {page > 1 ? (
+            <Link href={href({ page: page - 1 })} className="btn-ghost">
+              الأحدث
+            </Link>
+          ) : (
+            <span />
+          )}
+
+          <span className="num text-xs2 text-ink-60">
+            صفحة {num(page)} من {num(pages)}
+          </span>
+
+          {page < pages ? (
+            <Link href={href({ page: page + 1 })} className="btn-ghost">
+              الأقدم
+            </Link>
+          ) : (
+            <span />
+          )}
+        </div>
+      ) : null}
+    </Panel>
+  );
+}
+
+export default async function OrdersPage({ searchParams }) {
+  const sp = await searchParams;
+
+  const status = STATUSES.includes(sp?.status) ? sp.status : '';
+  const payment = PAY_STATUSES.includes(sp?.payment) ? sp.payment : '';
+  const search = safeSearch(sp?.q);
+  const kept = { status, payment, q: search };
+
   const exportHref = (() => {
     const p = new URLSearchParams();
     for (const [k, v] of Object.entries(kept)) if (v) p.set(k, String(v));
@@ -84,20 +224,15 @@ export default async function OrdersPage({ searchParams }) {
     <>
       <PageHead
         title="الأوردرات"
-        hint={
-          total > 0
-            ? `${num(total)} أوردر${status || payment || search ? ' بالفلتر الحالي' : ''}`
-            : 'مافيش أوردرات لسه'
-        }
+        hint="متابعة وتأكيد طلبات المتجر مع تحديث فوري للحالة"
       >
         <a href={exportHref} className="btn-ghost">
           نزّل Excel
         </a>
       </PageHead>
 
-      {/* ── الفلاتر ── */}
+      {/* ── الفلاتر الفورية (تظهر فوراً بدون أي انتظار) ── */}
       <Panel className="mb-5">
-        {/* GET form — بتشتغل من غير جافاسكريبت خالص */}
         <form method="get" action="/admin/orders" className="flex flex-wrap items-end gap-3">
           <div className="min-w-[13rem] flex-1">
             <label htmlFor="o-q" className="label">بحث</label>
@@ -166,114 +301,10 @@ export default async function OrdersPage({ searchParams }) {
         </div>
       </Panel>
 
-      {/* ── الجدول ── */}
-      <Panel>
-        {error ? (
-          <p className="border border-garnet bg-garnet/8 px-4 py-3 text-xs1 text-garnet">
-            {error.message}
-          </p>
-        ) : (orders || []).length === 0 ? (
-          <Empty>
-            {status || payment || search
-              ? 'مافيش أوردر مطابق للفلتر.'
-              : 'أول أوردر لسه مجاش. لما يجي هيظهر هنا فوراً.'}
-          </Empty>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th>الأوردر</th>
-                  <th>العميل</th>
-                  <th>المحافظة</th>
-                  <th className="text-end">الإجمالي</th>
-                  <th>الدفع</th>
-                  <th>الحالة</th>
-                  <th className="text-end">التاريخ</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.map((o) => (
-                  <tr key={o.id}>
-                    <td>
-                      <Link
-                        href={`/admin/orders/${o.id}`}
-                        className="num font-mark text-brass underline underline-offset-4"
-                        dir="ltr"
-                      >
-                        {o.order_no}
-                      </Link>
-                      <span className="num mt-0.5 block text-xs2 text-ink-42">
-                        {num(o.items_count)} قطعة
-                      </span>
-                    </td>
-
-                    <td>
-                      <span className="block">{o.customer_name}</span>
-                      <span className="num block text-xs2 text-ink-42" dir="ltr">
-                        {o.phone}
-                      </span>
-                    </td>
-
-                    <td>
-                      <span className="block">{o.governorate}</span>
-                      <span className="block text-xs2 text-ink-42">{o.area}</span>
-                    </td>
-
-                    <td className="num text-end">{egp(o.total)}</td>
-
-                    <td>
-                      <span className="block text-xs2">
-                        {PAYMENT_METHOD_SHORT[o.payment_method] || o.payment_method}
-                      </span>
-                      <span
-                        className={`chip mt-1 ${PAYMENT_STATUS_STYLE[o.payment_status] || ''}`}
-                      >
-                        {PAYMENT_STATUS[o.payment_status]}
-                      </span>
-                    </td>
-
-                    <td>
-                      <span className={`chip ${STATUS_STYLE[o.status] || ''}`}>
-                        {ORDER_STATUS[o.status]}
-                      </span>
-                    </td>
-
-                    <td className="num text-end text-xs2 text-ink-60">
-                      {dateTimeAr(o.created_at)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* ── الصفحات ── */}
-        {pages > 1 ? (
-          <div className="mt-5 flex items-center justify-between border-t border-hair-soft pt-4">
-            {page > 1 ? (
-              <Link href={href({ page: page - 1 })} className="btn-ghost">
-                الأحدث
-              </Link>
-            ) : (
-              <span />
-            )}
-
-            <span className="num text-xs2 text-ink-60">
-              صفحة {num(page)} من {num(pages)}
-            </span>
-
-            {page < pages ? (
-              <Link href={href({ page: page + 1 })} className="btn-ghost">
-                الأقدم
-              </Link>
-            ) : (
-              <span />
-            )}
-          </div>
-        ) : null}
-      </Panel>
+      {/* ── جدول الأوردرات المتدفق مع هيكل تحميل فوري ── */}
+      <Suspense key={JSON.stringify(sp)} fallback={<OrdersTableSkeleton />}>
+        <OrdersTable sp={sp} />
+      </Suspense>
     </>
   );
 }

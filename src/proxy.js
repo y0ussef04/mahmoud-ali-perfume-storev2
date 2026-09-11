@@ -63,6 +63,17 @@ export async function proxy(request) {
     return NextResponse.redirect(url);
   }
 
+  if (user) {
+    const requestHeaders = new Headers(request.headers);
+    requestHeaders.set('x-user-id', user.id);
+    requestHeaders.set('x-user-email', user.email || '');
+    return NextResponse.next({
+      request: {
+        headers: requestHeaders,
+      },
+    });
+  }
+
   return response;
 }
 

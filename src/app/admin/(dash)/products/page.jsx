@@ -1,8 +1,10 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { requireAdmin } from '@/lib/admin-guard';
 import { Empty, PageHead, Panel } from '@/components/admin/ui';
 import { egp, num } from '@/lib/money';
 import { FAMILY, GENDER } from '@/lib/labels';
+import { getBrands } from '@/lib/queries';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,9 +19,34 @@ function safeSearch(v) {
     .slice(0, 40);
 }
 
-export default async function AdminProductsPage({ searchParams }) {
+function ProductsTableSkeleton() {
+  return (
+    <Panel>
+      <div className="overflow-x-auto animate-pulse">
+        <div className="h-10 w-full bg-hair/40 rounded-lg mb-3" />
+        <div className="space-y-3 py-2">
+          {[...Array(6)].map((_, i) => (
+            <div
+              key={i}
+              className="h-12 w-full bg-hair/20 rounded-lg border border-hair/30 flex items-center justify-between px-4"
+            >
+              <div className="h-4 w-32 bg-hair/40 rounded" />
+              <div className="h-4 w-20 bg-hair/30 rounded" />
+              <div className="h-4 w-12 bg-hair/30 rounded" />
+              <div className="h-4 w-20 bg-hair/40 rounded" />
+              <div className="h-4 w-16 bg-hair/40 rounded" />
+              <div className="h-5 w-16 bg-hair/30 rounded-full" />
+              <div className="h-4 w-24 bg-hair/30 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </Panel>
+  );
+}
+
+async function ProductsTableData({ sp }) {
   const { supabase } = await requireAdmin();
-  const sp = await searchParams;
 
   const search = safeSearch(sp?.q);
   const brandId = /^[0-9a-f-]{36}$/i.test(sp?.brand || '') ? sp.brand : '';
@@ -37,10 +64,7 @@ export default async function AdminProductsPage({ searchParams }) {
   if (brandId) query = query.eq('brand_id', brandId);
   if (search) query = query.or(`name_ar.ilike.%${search}%,name_en.ilike.%${search}%`);
 
-  const [{ data: rows, error }, { data: brands }] = await Promise.all([
-    query,
-    supabase.from('brands').select('id, name_ar').order('sort'),
-  ]);
+  const { data: rows, error } = await query;
 
   let products = (rows || []).map((p) => {
     const live = (p.variants || []).filter((v) => v.is_active);
@@ -59,16 +83,129 @@ export default async function AdminProductsPage({ searchParams }) {
   if (only === 'off') products = products.filter((p) => p.offCount > 0);
 
   return (
+    <Panel>
+      {error ? (
+        <p className="border border-garnet bg-garnet/8 px-4 py-3 text-xs1 text-garnet">
+          {error.message}
+        </p>
+      ) : products.length === 0 ? (
+        <Empty>
+          {search || brandId || only
+            ? 'مافيش عطر مطابق.'
+            : 'مافيش عطور لسه. ابدأ بـ "أضف عطر".'}
+        </Empty>
+      ) : (
+        <div className="overflow-x-auto">
+          <table className="tbl">
+            <thead>
+              <tr>
+                <th>العطر</th>
+                <th>العائلة</th>
+                <th className="text-end">الأحجام</th>
+                <th className="text-end">أرخص سعر</th>
+                <th className="text-end">المخزون</th>
+                <th>الحالة</th>
+                <th />
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((p) => (
+                <tr key={p.id}>
+                  <td>
+                    <Link
+                      href={`/admin/products/${p.id}`}
+                      className="text-brass underline underline-offset-4"
+                    >
+                      {p.name_ar}
+                    </Link>
+                    <span className="block text-xs2 text-ink-42">
+                      {p.brand?.name_ar || '—'}
+                      {p.gender ? ` · ${GENDER[p.gender]}` : ''}
+                    </span>
+                  </td>
+
+                  <td className="text-xs2">{FAMILY[p.family] || p.family}</td>
+
+                  <td className="num text-end">{num(p.variantCount)}</td>
+
+                  <td className="num text-end">
+                    {p.minPrice > 0 ? egp(p.minPrice) : '—'}
+                  </td>
+
+                  <td className="num text-end">
+                    <span
+                      className={
+                        p.totalStock === 0
+                          ? 'text-garnet'
+                          : p.lowCount > 0
+                            ? 'text-brass'
+                            : 'text-oud'
+                      }
+                    >
+                      {num(p.totalStock)}
+                    </span>
+                    {p.offCount > 0 ? (
+                      <span className="num mt-0.5 block text-xs2 text-garnet">
+                        {num(p.offCount)} حجم خلص
+                      </span>
+                    ) : p.lowCount > 0 ? (
+                      <span className="num mt-0.5 block text-xs2 text-brass">
+                        {num(p.lowCount)} حجم قرّب يخلص
+                      </span>
+                    ) : null}
+                  </td>
+
+                  <td>
+                    <span className="chip" data-on={p.is_active ? '1' : '0'}>
+                      {p.is_active ? 'معروض' : 'مخفي'}
+                    </span>
+                    {p.is_featured ? (
+                      <span className="chip mt-1 block w-fit">مميّز</span>
+                    ) : null}
+                  </td>
+
+                  <td className="text-end">
+                    <Link
+                      href={`/products/${p.slug}`}
+                      target="_blank"
+                      className="btn-quiet"
+                      prefetch={false}
+                    >
+                      شوفه في المتجر
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </Panel>
+  );
+}
+
+export default async function AdminProductsPage({ searchParams }) {
+  const sp = await searchParams;
+
+  const search = safeSearch(sp?.q);
+  const brandId = /^[0-9a-f-]{36}$/i.test(sp?.brand || '') ? sp.brand : '';
+  const only = sp?.only === 'low' || sp?.only === 'off' ? sp.only : '';
+
+  // البراندات مجلوبة من الكاش الفوري
+  const brands = await getBrands();
+
+  return (
     <>
       <PageHead
         title="العطور والمخزون"
-        hint={`${num(products.length)} عطر · كل حجم له سعره ومخزونه`}
+        hint="الأسعار والكميات وحالات العرض في المتجر"
       >
         <Link href="/admin/products/new" className="btn-solid">
           أضف عطر
         </Link>
       </PageHead>
 
+      {/* ── الفلاتر الفورية (تظهر فوراً بدون أي انتظار) ── */}
       <Panel className="mb-5">
         <form method="get" action="/admin/products" className="flex flex-wrap items-end gap-3">
           <div className="min-w-[13rem] flex-1">
@@ -103,104 +240,10 @@ export default async function AdminProductsPage({ searchParams }) {
         </form>
       </Panel>
 
-      <Panel>
-        {error ? (
-          <p className="border border-garnet bg-garnet/8 px-4 py-3 text-xs1 text-garnet">
-            {error.message}
-          </p>
-        ) : products.length === 0 ? (
-          <Empty>
-            {search || brandId || only
-              ? 'مافيش عطر مطابق.'
-              : 'مافيش عطور لسه. ابدأ بـ "أضف عطر".'}
-          </Empty>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="tbl">
-              <thead>
-                <tr>
-                  <th>العطر</th>
-                  <th>العائلة</th>
-                  <th className="text-end">الأحجام</th>
-                  <th className="text-end">أرخص سعر</th>
-                  <th className="text-end">المخزون</th>
-                  <th>الحالة</th>
-                  <th />
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((p) => (
-                  <tr key={p.id}>
-                    <td>
-                      <Link
-                        href={`/admin/products/${p.id}`}
-                        className="text-brass underline underline-offset-4"
-                      >
-                        {p.name_ar}
-                      </Link>
-                      <span className="block text-xs2 text-ink-42">
-                        {p.brand?.name_ar || '—'}
-                        {p.gender ? ` · ${GENDER[p.gender]}` : ''}
-                      </span>
-                    </td>
-
-                    <td className="text-xs2">{FAMILY[p.family] || p.family}</td>
-
-                    <td className="num text-end">{num(p.variantCount)}</td>
-
-                    <td className="num text-end">
-                      {p.minPrice > 0 ? egp(p.minPrice) : '—'}
-                    </td>
-
-                    <td className="num text-end">
-                      <span
-                        className={
-                          p.totalStock === 0
-                            ? 'text-garnet'
-                            : p.lowCount > 0
-                              ? 'text-brass'
-                              : 'text-oud'
-                        }
-                      >
-                        {num(p.totalStock)}
-                      </span>
-                      {p.offCount > 0 ? (
-                        <span className="num mt-0.5 block text-xs2 text-garnet">
-                          {num(p.offCount)} حجم خلص
-                        </span>
-                      ) : p.lowCount > 0 ? (
-                        <span className="num mt-0.5 block text-xs2 text-brass">
-                          {num(p.lowCount)} حجم قرّب يخلص
-                        </span>
-                      ) : null}
-                    </td>
-
-                    <td>
-                      <span className="chip" data-on={p.is_active ? '1' : '0'}>
-                        {p.is_active ? 'معروض' : 'مخفي'}
-                      </span>
-                      {p.is_featured ? (
-                        <span className="chip mt-1 block w-fit">مميّز</span>
-                      ) : null}
-                    </td>
-
-                    <td className="text-end">
-                      <Link
-                        href={`/products/${p.slug}`}
-                        target="_blank"
-                        className="btn-quiet"
-                        prefetch={false}
-                      >
-                        شوفه في المتجر
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </Panel>
+      {/* ── جدول العطور المتدفق مع هيكل تحميل فوري ── */}
+      <Suspense key={JSON.stringify(sp)} fallback={<ProductsTableSkeleton />}>
+        <ProductsTableData sp={sp} />
+      </Suspense>
     </>
   );
 }
