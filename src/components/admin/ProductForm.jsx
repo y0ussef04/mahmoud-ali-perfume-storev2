@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { invalidateCacheTag } from '@/lib/actions/revalidate';
 import { FAMILY, FAMILY_ORDER, GENDER, SCALE_5 } from '@/lib/labels';
 import { checkImageFile, slugify, toPositiveInt, toPositiveNumber } from '@/lib/validate';
 import { egp } from '@/lib/money';
@@ -106,6 +107,7 @@ export default function ProductForm({ product, brands }) {
           .single();
 
         if (dbError) throw dbError;
+        await invalidateCacheTag('products');
         router.replace(`/admin/products/${data.id}`);
         router.refresh();
         return;
@@ -118,6 +120,7 @@ export default function ProductForm({ product, brands }) {
 
       if (dbError) throw dbError;
 
+      await invalidateCacheTag('products');
       setOk('اتسجّل. المتجر بيحدّث نفسه في حدود دقيقة.');
       router.refresh();
     } catch (e) {
@@ -449,6 +452,7 @@ function VariantEditor({ productId, initial }) {
 
       setRows((rs) => [...rs, data]);
       setDraft({ ...blank, sort: rows.length + 1 });
+      await invalidateCacheTag('products');
       setOk('الحجم اتضاف.');
       router.refresh();
     } catch (e) {
@@ -489,6 +493,7 @@ function VariantEditor({ productId, initial }) {
       if (dbError) throw dbError;
 
       setRows((rs) => rs.map((r) => (r.id === row.id ? { ...r, _dirty: false } : r)));
+      await invalidateCacheTag('products');
       setOk('اتسجّل.');
       router.refresh();
     } catch (e) {
@@ -506,6 +511,7 @@ function VariantEditor({ productId, initial }) {
       const { error: dbError } = await supabase.from('variants').delete().eq('id', row.id);
       if (dbError) throw dbError;
       setRows((rs) => rs.filter((r) => r.id !== row.id));
+      await invalidateCacheTag('products');
       router.refresh();
     } catch (e) {
       setError(
@@ -790,6 +796,7 @@ function ImageEditor({ productId, initial }) {
         setImages((xs) => [...xs, row]);
       }
 
+      await invalidateCacheTag('products');
       router.refresh();
     } catch (err) {
       setError(err?.message || 'الرفع مانفعش.');
@@ -815,6 +822,7 @@ function ImageEditor({ productId, initial }) {
       if (path) await supabase.storage.from('products').remove([path]);
 
       setImages((xs) => xs.filter((x) => x.id !== img.id));
+      await invalidateCacheTag('products');
       router.refresh();
     } catch (err) {
       setError(err?.message || 'الحذف مانفعش.');
@@ -857,6 +865,7 @@ function ImageEditor({ productId, initial }) {
           supabase.from('product_images').update({ sort: idx }).eq('id', x.id)
         )
       );
+      await invalidateCacheTag('products');
       router.refresh();
     } catch (err) {
       setError(err?.message || 'الترتيب مانفعش.');
@@ -982,6 +991,7 @@ function DangerZone({ product }) {
         .eq('id', product.id);
       if (dbError) throw dbError;
 
+      await invalidateCacheTag('products');
       router.replace('/admin/products');
       router.refresh();
     } catch (e) {

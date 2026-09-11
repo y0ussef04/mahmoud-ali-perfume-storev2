@@ -1,3 +1,5 @@
+import { cache } from 'react';
+import { unstable_cache } from 'next/cache';
 import { createPublicClient } from '@/lib/supabase/public';
 
 // كل الاستعلامات هنا قراية عامّة للكاتالوج — من غير كوكيز عشان صفحات
@@ -47,22 +49,26 @@ export function shapeProduct(p) {
   };
 }
 
-/** كل العطور المفعّلة — للكاتالوج */
-export async function getProducts() {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from('products')
-    .select(PRODUCT_SELECT)
-    .eq('is_active', true)
-    .order('is_featured', { ascending: false })
-    .order('created_at', { ascending: true });
+/** كل العطور المفعّلة — كاش فوري للكاتالوج والصفحة الرئيسية */
+export const getProducts = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from('products')
+      .select(PRODUCT_SELECT)
+      .eq('is_active', true)
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: true });
 
-  if (error) throw new Error(`تحميل العطور فشل: ${error.message}`);
-  return (data || []).map(shapeProduct);
-}
+    if (error) throw new Error(`تحميل العطور فشل: ${error.message}`);
+    return (data || []).map(shapeProduct);
+  },
+  ['products-list'],
+  { revalidate: 60, tags: ['products'] }
+);
 
-/** عطر واحد بالـ slug — بيرجع null لو مش موجود */
-export async function getProduct(slug) {
+/** عطر واحد بالـ slug — مغلّف بـ React cache لمنع تكرار الاستعلام بين generateMetadata و ProductPage */
+export const getProduct = cache(async (slug) => {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from('products')
@@ -73,7 +79,31 @@ export async function getProduct(slug) {
 
   if (error) throw new Error(`تحميل العطر فشل: ${error.message}`);
   return data ? shapeProduct(data) : null;
-}
+});
+
+/** قائمة الـ slugs فقط — خفيفة جداً لتوليد generateStaticParams في أجزاء من الثانية دون جلب الصور والأحجام */
+export const getProductSlugs = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from('products')
+      .select('slug')
+      .eq('is_active', true);
+
+    if (error) return [];
+    return data || [];
+  },
+  ['product-slugs'],
+  { revalidate: 300, tags: ['products'] }
+);
+
+/** الأعمدة المخصصة للعطور المشابهة — كروت فقط بدون نوتات أو وصف لتقليل نقل البيانات */
+const RELATED_SELECT = `
+  id, slug, name_ar, name_en,
+  brand:brands ( name_ar ),
+  variants ( id, label, price, compare_price, stock, sort, is_active ),
+  images:product_images ( url, alt, sort )
+`;
 
 /** عطور شبيهة — نفس العائلة، وبعدين نفس الماركة */
 export async function getRelated(product, limit = 4) {
@@ -87,7 +117,7 @@ export async function getRelated(product, limit = 4) {
 
   const { data, error } = await supabase
     .from('products')
-    .select(PRODUCT_SELECT)
+    .select(RELATED_SELECT)
     .eq('is_active', true)
     .neq('id', product.id)
     .or(ors.join(','))
@@ -97,49 +127,62 @@ export async function getRelated(product, limit = 4) {
   return (data || []).map(shapeProduct);
 }
 
-export async function getBrands() {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from('brands')
-    .select('id, slug, name_ar, name_en, country, about')
-    .eq('is_active', true)
-    .order('sort', { ascending: true });
+export const getBrands = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from('brands')
+      .select('id, slug, name_ar, name_en, country, about')
+      .eq('is_active', true)
+      .order('sort', { ascending: true });
 
-  if (error) throw new Error(`تحميل الماركات فشل: ${error.message}`);
-  return data || [];
-}
+    if (error) throw new Error(`تحميل الماركات فشل: ${error.message}`);
+    return data || [];
+  },
+  ['brands-list'],
+  { revalidate: 300, tags: ['brands'] }
+);
 
-export async function getShippingRates() {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase
-    .from('shipping_rates')
-    .select('governorate, fee, days_min, days_max')
-    .eq('is_active', true)
-    .order('fee', { ascending: true })
-    .order('governorate', { ascending: true });
+export const getShippingRates = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase
+      .from('shipping_rates')
+      .select('governorate, fee, days_min, days_max')
+      .eq('is_active', true)
+      .order('fee', { ascending: true })
+      .order('governorate', { ascending: true });
 
-  if (error) throw new Error(`تحميل مصاريف الشحن فشل: ${error.message}`);
-  return data || [];
-}
+    if (error) throw new Error(`تحميل مصاريف الشحن فشل: ${error.message}`);
+    return data || [];
+  },
+  ['shipping-rates'],
+  { revalidate: 3600, tags: ['shipping'] }
+);
 
 /** الإعدادات كـ كائن جاهز: { free_ship_threshold: 1500, wa_number: '201...' } */
-export async function getSettings() {
-  const supabase = createPublicClient();
-  const { data, error } = await supabase.from('settings').select('key, value');
+export const getSettings = unstable_cache(
+  async () => {
+    const supabase = createPublicClient();
+    const { data, error } = await supabase.from('settings').select('key, value');
 
-  if (error) throw new Error(`تحميل الإعدادات فشل: ${error.message}`);
+    if (error) throw new Error(`تحميل الإعدادات فشل: ${error.message}`);
 
-  const out = {};
-  for (const row of data || []) out[row.key] = row.value;
+    const out = {};
+    for (const row of data || []) out[row.key] = row.value;
 
-  // قيم افتراضية لو الصف ناقص — الموقع مايقعش أبداً بسبب إعداد ناقص
-  return {
-    store_name: "Mahmoud-Ali's store",
-    free_ship_threshold: 1500,
-    cod_fee: 15,
-    wallet_number: '01000000000',
-    wa_number: '201000000000',
-    announcement: '',
-    ...out,
-  };
-}
+    // قيم افتراضية لو الصف ناقص — الموقع مايقعش أبداً بسبب إعداد ناقص
+    return {
+      store_name: "Mahmoud-Ali's store",
+      free_ship_threshold: 1500,
+      cod_fee: 15,
+      wallet_number: '01000000000',
+      wa_number: '201000000000',
+      announcement: '',
+      ...out,
+    };
+  },
+  ['store-settings'],
+  { revalidate: 60, tags: ['settings'] }
+);
+

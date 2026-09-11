@@ -10,7 +10,6 @@
 
 import { useMemo, useState } from 'react';
 import ProductCard from '@/components/ProductCard';
-import { SpineKey } from '@/components/Spine';
 import { egp, num } from '@/lib/money';
 import { COUNTRY, FAMILY, GENDER } from '@/lib/labels';
 
@@ -213,8 +212,6 @@ export default function Catalog({ products, brands, initialFamily = '' }) {
         </div>
       </div>
 
-      <SpineKey />
-
       {/* ─── شبكة الكروت (2 للموبايل / 3 للتابلت / 4 للكمبيوتر) ─── */}
       {shown.length === 0 ? (
         <div className="bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl p-12 text-center space-y-3">
@@ -231,7 +228,7 @@ export default function Catalog({ products, brands, initialFamily = '' }) {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {shown.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

@@ -1,5 +1,7 @@
 import Link from 'next/link';
 import { Mark } from '@/components/Logo';
+import { egp } from '@/lib/money';
+import { settingNum } from '@/lib/totals';
 
 const DEV_PHONE = '01027780575';
 const DEV_TEL = '+201027780575';
@@ -8,6 +10,7 @@ export default function Footer({ settings }) {
   const wa = settings?.wa_number || '';
   const storeName = settings?.store_name || "محمود علي للعطور";
   const year = new Date().getFullYear();
+  const threshold = settingNum(settings?.free_ship_threshold, 1500);
 
   const waUrl = wa
     ? `https://wa.me/${wa.replace(/\D/g, '')}?text=${encodeURIComponent('السلام عليكم، محتاج استفسار عن العطور المتاحة')}`
@@ -69,8 +72,8 @@ export default function Footer({ settings }) {
             <h4 className="text-sm font-semibold text-[#C9A84C] tracking-wide">الخدمات والضمانات</h4>
             <ul className="space-y-2.5 text-xs sm:text-sm text-[#A09C94]">
               <li>عطور مستوردة وأصلية ١٠٠٪</li>
-              <li>شحن مجاني للطلبات فوق ١,٥٠٠ ج.م</li>
-              <li>الدفع كاش عند الاستلام أو بالفيزا</li>
+              <li>شحن مجاني للطلبات بقيمة {egp(threshold)} وأكثر</li>
+              <li>الدفع عند الاستلام نقداً أو إلكترونياً</li>
               <li>تغليف فاخر وآمن للشحنات</li>
             </ul>
           </div>

@@ -76,6 +76,7 @@ export default function Header({ settings, announcement = '', freeShipThreshold 
                 <Link
                   key={n.href}
                   href={n.href}
+                  prefetch={true}
                   aria-current={active ? 'page' : undefined}
                   className={`text-sm font-semibold transition-colors duration-150 relative py-1 ${
                     active

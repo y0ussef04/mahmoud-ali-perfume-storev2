@@ -11,8 +11,8 @@ function arError(msg = '') {
   const m = msg.toLowerCase();
   if (m.includes('invalid login credentials')) return 'الإيميل أو الباسورد غلط.';
   if (m.includes('email not confirmed')) return 'الإيميل لسه مش مؤكَّد. افتح رسالة التأكيد.';
-  if (m.includes('too many requests') || m.includes('rate limit'))
-    return 'محاولات كتير. استنى شوية وجرّب تاني.';
+  if (m.includes('too many requests') || m.includes('rate limit') || m.includes('security purposes') || m.includes('60 seconds'))
+    return 'لدواعي الأمان، يمكنك طلب رابط الاستعادة مرة واحدة كل 60 ثانية. يُرجى الانتظار دقيقة ثم المحاولة مجدداً.';
   if (m.includes('failed to fetch') || m.includes('network'))
     return 'مافيش اتصال بالسيرفر. اتأكّد من الإنترنت.';
   return msg || 'مانفعش الدخول. جرّب تاني.';
@@ -64,18 +64,55 @@ export default function AdminLogin() {
     router.refresh();
   }
 
+  const [forgotMode, setForgotMode] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetBusy, setResetBusy] = useState(false);
+  const [resetError, setResetError] = useState('');
+  const [resetSuccess, setResetSuccess] = useState('');
+
+  async function handleForgot(e) {
+    e.preventDefault();
+    setResetError('');
+    setResetSuccess('');
+
+    if (!resetEmail.trim()) {
+      return setResetError('يرجى كتابة البريد الإلكتروني.');
+    }
+
+    setResetBusy(true);
+    try {
+      const supabase = createClient();
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      const { error: resetErr } = await supabase.auth.resetPasswordForEmail(resetEmail.trim(), {
+        redirectTo: `${origin}/admin/reset-password`,
+      });
+
+      if (resetErr) {
+        setResetError(arError(resetErr.message));
+      } else {
+        setResetSuccess('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك. يرجى فحص صندوق الوارد.');
+      }
+    } catch (err) {
+      setResetError(err?.message || 'تعذر إرسال رسالة الاستعادة.');
+    } finally {
+      setResetBusy(false);
+    }
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-lacquer px-5 py-16">
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center text-center">
           <Mark size={64} />
-          <h1 className="mt-6 font-display text-d3 text-frost">لوحة التحكم</h1>
+          <h1 className="mt-6 font-display text-d3 text-frost">
+            {forgotMode ? 'استعادة كلمة المرور' : 'لوحة التحكم'}
+          </h1>
           <p className="mt-2 text-xs2 tracking-wide2 text-brass">
             Mahmoud-Ali&apos;s store
           </p>
         </div>
 
-        {denied ? (
+        {denied && !forgotMode ? (
           <div className="mt-8 border border-garnet bg-garnet/12 px-4 py-3.5">
             <p className="text-xs1 leading-relaxed text-frost">
               الحساب ده مسجّل دخول بس مش من الأدمن. لو ده حسابك الصح، لازم يتضاف
@@ -91,79 +128,162 @@ export default function AdminLogin() {
           </div>
         ) : null}
 
-        <form onSubmit={submit} className="mt-8 space-y-5">
-          <div>
-            <label
-              htmlFor="a-email"
-              className="mb-1.5 block text-xs2 tracking-wide2 text-brass"
-            >
-              البريد الإلكتروني
-            </label>
-            <input
-              id="a-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="username"
-              dir="ltr"
-              className="w-full border border-brass/40 bg-espresso/60 px-3.5 py-3 text-start
-                         text-xs1 text-frost placeholder:text-frost/30
-                         focus:border-brass focus:outline-none rounded-lg"
-              placeholder="admin@example.com"
-            />
-          </div>
+        {forgotMode ? (
+          <form onSubmit={handleForgot} className="mt-8 space-y-5">
+            <p className="text-xs2 leading-relaxed text-frost/70">
+              أدخل البريد الإلكتروني المسجّل لحساب المدير، وسنرسل لك رابطاً آمناً لإعادة تعيين كلمة المرور فوراً.
+            </p>
 
-          <div>
-            <label
-              htmlFor="a-pass"
-              className="mb-1.5 block text-xs2 tracking-wide2 text-brass"
-            >
-              كلمة المرور
-            </label>
-            <div className="relative">
+            <div>
+              <label
+                htmlFor="r-email"
+                className="mb-1.5 block text-xs2 tracking-wide2 text-brass"
+              >
+                البريد الإلكتروني
+              </label>
               <input
-                id="a-pass"
-                type={show ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                id="r-email"
+                type="email"
+                value={resetEmail}
+                onChange={(e) => setResetEmail(e.target.value)}
                 required
-                autoComplete="current-password"
                 dir="ltr"
-                className="w-full border border-brass/40 bg-espresso/60 px-3.5 py-3 pe-16
-                           text-start text-xs1 text-frost placeholder:text-frost/30
-                           focus:border-brass focus:outline-none rounded-lg"
-                placeholder="••••••••"
+                className="w-full border border-brass/40 bg-espresso/60 px-3.5 py-3 text-start
+                           text-xs1 text-frost placeholder:text-frost/30
+                           focus:border-brass focus:outline-none rounded-lg font-mono"
+                placeholder="admin@example.com"
               />
+            </div>
+
+            {resetError ? (
+              <p
+                role="alert"
+                className="border border-garnet bg-garnet/12 px-3.5 py-2.5 text-xs2 text-frost rounded-lg"
+              >
+                {resetError}
+              </p>
+            ) : null}
+
+            {resetSuccess ? (
+              <p
+                role="alert"
+                className="border border-sage bg-sage/12 px-3.5 py-2.5 text-xs2 text-sage rounded-lg leading-relaxed"
+              >
+                {resetSuccess}
+              </p>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={resetBusy}
+              className="w-full bg-brass px-4 py-3.5 text-xs1 tracking-wide2 text-lacquer font-bold rounded-lg
+                         transition-colors hover:bg-brass-gilt disabled:opacity-50 min-h-[44px]"
+            >
+              {resetBusy ? 'جاري الإرسال…' : 'إرسال رابط الاستعادة'}
+            </button>
+
+            <div className="text-center pt-2">
               <button
                 type="button"
-                onClick={() => setShow((v) => !v)}
-                className="absolute inset-y-0 end-0 px-3 text-xs2 text-brass
-                           hover:text-brass-gilt"
+                onClick={() => {
+                  setForgotMode(false);
+                  setResetError('');
+                  setResetSuccess('');
+                }}
+                className="text-xs2 text-brass hover:text-brass-gilt underline"
               >
-                {show ? 'إخفاء' : 'إظهار'}
+                العودة لتسجيل الدخول
               </button>
             </div>
-          </div>
+          </form>
+        ) : (
+          <form onSubmit={submit} className="mt-8 space-y-5">
+            <div>
+              <label
+                htmlFor="a-email"
+                className="mb-1.5 block text-xs2 tracking-wide2 text-brass"
+              >
+                البريد الإلكتروني
+              </label>
+              <input
+                id="a-email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="username"
+                dir="ltr"
+                className="w-full border border-brass/40 bg-espresso/60 px-3.5 py-3 text-start
+                           text-xs1 text-frost placeholder:text-frost/30
+                           focus:border-brass focus:outline-none rounded-lg"
+                placeholder="admin@example.com"
+              />
+            </div>
 
-          {error ? (
-            <p
-              role="alert"
-              className="border border-garnet bg-garnet/12 px-3.5 py-2.5 text-xs2 text-frost rounded-lg"
+            <div>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label
+                  htmlFor="a-pass"
+                  className="block text-xs2 tracking-wide2 text-brass"
+                >
+                  كلمة المرور
+                </label>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setForgotMode(true);
+                    setResetEmail(email);
+                    setError('');
+                  }}
+                  className="text-[11px] text-brass/80 hover:text-brass-gilt underline"
+                >
+                  نسيت كلمة المرور؟
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  id="a-pass"
+                  type={show ? 'text' : 'password'}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  dir="ltr"
+                  className="w-full border border-brass/40 bg-espresso/60 px-3.5 py-3 pe-16
+                             text-start text-xs1 text-frost placeholder:text-frost/30
+                             focus:border-brass focus:outline-none rounded-lg"
+                  placeholder="••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShow((v) => !v)}
+                  className="absolute inset-y-0 end-0 px-3 text-xs2 text-brass
+                             hover:text-brass-gilt"
+                >
+                  {show ? 'إخفاء' : 'إظهار'}
+                </button>
+              </div>
+            </div>
+
+            {error ? (
+              <p
+                role="alert"
+                className="border border-garnet bg-garnet/12 px-3.5 py-2.5 text-xs2 text-frost rounded-lg"
+              >
+                {error}
+              </p>
+            ) : null}
+
+            <button
+              type="submit"
+              disabled={busy}
+              className="w-full bg-brass px-4 py-3.5 text-xs1 tracking-wide2 text-lacquer font-bold rounded-lg
+                         transition-colors hover:bg-brass-gilt disabled:opacity-50 min-h-[44px]"
             >
-              {error}
-            </p>
-          ) : null}
-
-          <button
-            type="submit"
-            disabled={busy}
-            className="w-full bg-brass px-4 py-3.5 text-xs1 tracking-wide2 text-lacquer font-bold rounded-lg
-                       transition-colors hover:bg-brass-gilt disabled:opacity-50 min-h-[44px]"
-          >
-            {busy ? 'جاري التحقق…' : 'تسجيل الدخول'}
-          </button>
-        </form>
+              {busy ? 'جاري التحقق…' : 'تسجيل الدخول'}
+            </button>
+          </form>
+        )}
 
         <p className="mt-8 text-center text-xs2 leading-relaxed text-frost/40">
           هذه الصفحة مخصصة لإدارة المتجر فقط.{' '}

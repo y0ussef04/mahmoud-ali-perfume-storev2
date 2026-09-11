@@ -113,7 +113,7 @@ export default function MobileQuickBar({ waNumber = '201000000000' }) {
           }
 
           return (
-            <Link key={t.id} href={t.href} className={className}>
+            <Link key={t.id} href={t.href} prefetch={true} className={className}>
               {content}
             </Link>
           );

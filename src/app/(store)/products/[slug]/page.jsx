@@ -13,7 +13,7 @@ import Gallery from '@/components/Gallery';
 import ProductCard from '@/components/ProductCard';
 import { ScentNotesBar, NoteLadder, Strength } from '@/components/Spine';
 import OlfactoryPyramid from '@/components/OlfactoryPyramid';
-import { getProduct, getProducts, getRelated, getSettings } from '@/lib/queries';
+import { getProduct, getProductSlugs, getRelated, getSettings } from '@/lib/queries';
 import { egp } from '@/lib/money';
 import { settingNum } from '@/lib/totals';
 import { COUNTRY, FAMILY, GENDER } from '@/lib/labels';
@@ -22,8 +22,8 @@ export const revalidate = 60;
 
 export async function generateStaticParams() {
   try {
-    const products = await getProducts();
-    return products.map((p) => ({ slug: p.slug }));
+    const slugs = await getProductSlugs();
+    return slugs.map((p) => ({ slug: p.slug }));
   } catch {
     return [];
   }
@@ -158,7 +158,7 @@ export default async function ProductPage({ params }) {
                 <svg className="w-4 h-4 text-[#2D6A4F] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
                 </svg>
-                <span>دفع عند الاستلام أو الفيزا والمحافظ الإلكترونية والتحويل.</span>
+                <span>الدفع عند الاستلام نقداً، أو إلكترونياً بالبطاقات والمحافظ وإنستاباي.</span>
               </li>
             </ul>
           </div>
@@ -169,7 +169,7 @@ export default async function ProductPage({ params }) {
       {related.length ? (
         <section className="pt-12 border-t border-[#E8E6E1] dark:border-[#2E2B22] space-y-6">
           <h2 className="text-xl sm:text-2xl font-semibold text-[#1A1814] dark:text-white">عطور مشابهة قد تعجبك</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {related.map((r) => (
               <ProductCard key={r.id} product={r} />
             ))}

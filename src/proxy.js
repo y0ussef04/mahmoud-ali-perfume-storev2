@@ -3,19 +3,17 @@ import { createServerClient } from '@supabase/ssr';
 
 /**
  * ══════════════════════════════════════════════════════════
- *  حماية /admin + تحديث جلسة Supabase
+ *  حماية /admin + تحديث جلسة Supabase (Next.js 16 Proxy)
  * ══════════════════════════════════════════════════════════
  *
- * الميدل‌وير بيعمل حاجتين:
- *   ① بيحدّث توكن الجلسة (refresh) عشان ماتفصلش وسط الشغل
- *   ② بيمنع أي حد مش مسجّل دخول من يشوف /admin
+ * البروكسي ينفذ طبقة حماية الراحة وإدارة الكوكيز قبل وصول الطلب:
+ *   ① تحديث توكن الجلسة (refresh) حتى لا تنتهي الجلسة أثناء العمل
+ *   ② منع غير المسجلين من دخول صفحات الإدارة وتحويلهم لصفحة الدخول
+ *   ③ السماح بصفحات الدخول واستعادة كلمة المرور (/admin/login, /admin/reset-password)
  *
- * ⚠️ مهم تفهم إن ده طبقة راحة مش طبقة أمان.
- * الأمان الحقيقي في RLS جوه الداتابيز + دالة is_admin().
- * حتى لو حد لفّ حول الميدل‌وير، مش هيقدر يقرا ولا يكتب حرف.
- * التحقق إن اليوزر ده أدمن فعلاً بيحصل في layout الداشبورد.
+ * ⚠️ الأمان الحقيقي محمي في السيرفر عبر requireAdmin() وقواعد RLS في Supabase.
  */
-export async function middleware(request) {
+export async function proxy(request) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -39,22 +37,25 @@ export async function middleware(request) {
     }
   );
 
-  // لازم getUser() مش getSession() — ده اللي بيتحقق من التوكن فعلاً
+  // تحقق حقيقي من التوكن عبر getUser()
   const {
     data: { user },
   } = await supabase.auth.getUser();
 
   const { pathname, search } = request.nextUrl;
   const isLogin = pathname === '/admin/login';
+  const isResetPassword = pathname === '/admin/reset-password';
+  const isAuthRoute = isLogin || isResetPassword;
 
-  if (!user && !isLogin) {
+  // غير مسجّل دخول ويحاول دخول صفحات الإدارة المحمية → تحويل لصفحة الدخول
+  if (!user && !isAuthRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/admin/login';
     url.search = `?next=${encodeURIComponent(pathname + search)}`;
     return NextResponse.redirect(url);
   }
 
-  // مسجّل دخول وبيفتح صفحة الدخول → وديه للداشبورد
+  // مسجّل دخول وبالفعل في صفحة تسجيل الدخول → تحويل للداشبورد
   if (user && isLogin) {
     const url = request.nextUrl.clone();
     url.pathname = '/admin';

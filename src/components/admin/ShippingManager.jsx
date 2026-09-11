@@ -3,6 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+import { invalidateCacheTag } from '@/lib/actions/revalidate';
 import { egp, num } from '@/lib/money';
 import { toPositiveInt, toPositiveNumber } from '@/lib/validate';
 
@@ -108,7 +109,8 @@ function SettingsPanel({ initial }) {
         .upsert(rows, { onConflict: 'key' });
       if (dbError) throw dbError;
 
-      setOk('اتسجّل. المتجر بيحدّث نفسه في حدود دقيقة.');
+      await invalidateCacheTag('settings');
+      setOk('اتسجّلت الإعدادات وتحدث المتجر فوراً.');
       router.refresh();
     } catch (e) {
       setError(e?.message || 'مانفعش يتسجّل.');
@@ -215,7 +217,8 @@ function RatesPanel({ initial }) {
       }
 
       setRows((rs) => rs.map((r) => ({ ...r, _dirty: false })));
-      setOk(`اتسجّلت ${num(dirty.length)} محافظة.`);
+      await invalidateCacheTag('shipping');
+      setOk(`اتسجّلت ${num(dirty.length)} محافظة وتحدث المتجر فوراً.`);
       router.refresh();
     } catch (e) {
       setError(e?.message || 'مانفعش يتسجّل.');

@@ -17,11 +17,10 @@ export default async function ProductsPage({ searchParams }) {
   return (
     <div className="mx-auto max-w-wrap px-4 py-12">
       <header className="max-w-2xl">
-        <p className="text-xs2 tracking-wide3 text-brass">الكاتالوج</p>
-        <h1 className="mt-2 text-d4">كل العطور بأسعارها</h1>
-        <p className="mt-4 text-ink-60">
-          كل حجم مكتوب سعره جنبه، والمتاح والخلصان واضح. مش محتاج تسأل عن سعر في
-          رسالة وتستنى رد.
+        <p className="text-xs2 tracking-wide3 text-brass">الكتالوج</p>
+        <h1 className="mt-2 text-d4">مجموعة العطور الفاخرة</h1>
+        <p className="mt-3 text-ink-60 leading-relaxed text-sm">
+          تشكيلة العطور الخليجية الأصلية معروضة بتفاصيلها وأسعارها وأحجامها المباشرة لضمان تجربة تسوق واضحة وموثوقة.
         </p>
       </header>
 

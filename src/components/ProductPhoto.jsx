@@ -3,10 +3,10 @@ import Image from 'next/image';
 export default function ProductPhoto({
   product: p,
   priority = false,
-  sizes = '(min-width: 1024px) 18rem, (min-width: 640px) 30vw, 45vw',
+  sizes = '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw',
   className = '',
 }) {
-  const box = `relative aspect-[3/4] w-full rounded-xl overflow-hidden bg-[#FAFAF8] dark:bg-[#1C1A14] ${className}`;
+  const box = `relative aspect-[3/4] max-h-[380px] sm:max-h-none w-full rounded-xl overflow-hidden bg-[#FAFAF8] dark:bg-[#1C1A14] ${className}`;
 
   if (p?.cover) {
     return (

@@ -94,16 +94,16 @@ export default function Checkout({ rates, settings }) {
         setCoupon({ ...data, at: subtotal });
         setCouponMsg(
           data.free_ship
-            ? 'تمام — الشحن بقى مجاني.'
-            : `تمام — اتخصم ${egp(data.discount)}.`
+            ? 'تم تطبيق الشحن المجاني بنجاح.'
+            : `تم تطبيق الخصم بقيمة ${egp(data.discount)}.`
         );
       } else {
         setCoupon(null);
-        setCouponMsg(data?.error || 'الكود مش صالح.');
+        setCouponMsg(data?.error || 'رمز الكوبون غير صالح أو منتهي الصلاحية.');
       }
     } catch {
       setCoupon(null);
-      setCouponMsg('مشكلة في الاتصال. جرّب تاني.');
+      setCouponMsg('تعذر التحقق من الكوبون حالياً. يرجى المحاولة لاحقاً.');
     } finally {
       setCouponBusy(false);
     }
@@ -138,18 +138,17 @@ export default function Checkout({ rates, settings }) {
           setCoupon({ ...data, at: subtotal });
           setCouponMsg(
             data.free_ship
-              ? 'تمام — الشحن بقى مجاني.'
-              : `تمام — اتخصم ${egp(data.discount)}.`
+              ? 'تم تطبيق الشحن المجاني بنجاح.'
+              : `تم تطبيق الخصم بقيمة ${egp(data.discount)}.`
           );
         } else {
           setCoupon(null);
-          setCouponMsg(data?.error || 'الكود مابقاش صالح بعد ما العربة اتغيّرت.');
+          setCouponMsg(data?.error || 'لم يعد رمز الكوبون صالحاً بعد تعديل محتويات السلة.');
         }
       } catch {
         if (!alive) return;
-        // الشبكة وقعت — نشيل الخصم بدل ما نعرض رقم مش مضمون
         setCoupon(null);
-        setCouponMsg('مقدرناش نتأكد من الكود بعد تعديل العربة. ضيفه تاني.');
+        setCouponMsg('تعذر إعادة التحقق من الكوبون بعد تعديل السلة. يرجى إدخاله مجدداً.');
       } finally {
         if (alive) setCouponBusy(false);
       }
@@ -257,7 +256,7 @@ export default function Checkout({ rates, settings }) {
 
       const data = await res.json();
       if (!res.ok || !data?.ok) {
-        throw new Error(data?.error || 'الأوردر مانفعش يتسجّل.');
+        throw new Error(data?.error || 'تعذر تسجيل الطلب، يرجى المحاولة مرة أخرى.');
       }
 
       // صورة للعرض قبل ما نفرّغ العربة
@@ -275,7 +274,7 @@ export default function Checkout({ rates, settings }) {
       clear();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (e) {
-      setFatal(e.message || 'حصلت مشكلة. جرّب تاني.');
+      setFatal(e.message || 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
     } finally {
       setBusy(false);
     }
@@ -297,12 +296,12 @@ export default function Checkout({ rates, settings }) {
   if (items.length === 0) {
     return (
       <div className="surface mx-auto max-w-lg px-6 py-16 text-center">
-        <h1 className="font-display text-d3">العربة فاضية</h1>
+        <h1 className="font-display text-d3">سلة التسوق فارغة</h1>
         <p className="mt-3 text-xs1 text-ink-60">
-          ضيف عطر من الكاتالوج الأول.
+          لم تقم بإضافة أي عطور إلى السلة بعد.
         </p>
         <Link href="/products" className="btn-solid mt-6">
-          كل العطور
+          استكشف العطور
         </Link>
       </div>
     );
@@ -871,7 +870,7 @@ function Done({ done, form, settings, rate }) {
     .join('\n');
 
   const msg = [
-    `أوردر رقم ${done.order_no}`,
+    `طلب رقم ${done.order_no} — محمود علي للعطور`,
     '',
     lines,
     '',

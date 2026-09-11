@@ -1,9 +1,8 @@
 /*
  * DESIGN DECISIONS:
- * Layout: Card redesigned with 3/4 aspect image, upfront variant pricing, scent notes bar, and touch-optimized action button.
- * Mobile: 2-column grid ready with 44px min-h touch target on buttons.
- * Removed: Emoji icons, heavy shadows, decorative card backgrounds.
- * RTL notes: All spacing uses start/end logical properties, price formatted as "X ج.م".
+ * Layout: Refined luxury perfume card focusing on bottle image, brand, title, clear price/discount, and 1-click add-to-cart.
+ * Mobile: Optimized 2-column mobile scanability, equal heights, 44px min-h touch target.
+ * Details: Scent notes & exhaustive pyramids kept for the Product Details Page.
  */
 
 'use client';
@@ -11,10 +10,8 @@
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 import ProductPhoto from '@/components/ProductPhoto';
-import { ScentNotesBar } from '@/components/Spine';
 import { useCart } from '@/lib/cart';
 import { egp } from '@/lib/money';
-import { COUNTRY, FAMILY, GENDER } from '@/lib/labels';
 
 export default function ProductCard({ product: p }) {
   const { add } = useCart();
@@ -27,7 +24,7 @@ export default function ProductCard({ product: p }) {
     if (e) e.preventDefault();
     if (!v || v.stock <= 0) return;
 
-    // Step 1: Loading state (150ms simulated response)
+    // Step 1: Loading state
     setAddingState({ id: v.id, state: 'loading' });
 
     setTimeout(() => {
@@ -55,7 +52,7 @@ export default function ProductCard({ product: p }) {
     }, 150);
   };
 
-  // الخصم للأحجام
+  // أقصى نسبة خصم للأحجام
   const discountPct = p.variants?.reduce((max, v) => {
     if (v.compare_price && Number(v.compare_price) > Number(v.price)) {
       const pct = Math.round((1 - Number(v.price) / Number(v.compare_price)) * 100);
@@ -67,80 +64,75 @@ export default function ProductCard({ product: p }) {
   const allOut = p.variants?.length > 0 && p.variants.every((v) => v.stock <= 0);
 
   return (
-    <article className="card group bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-md hover:border-[#D4CFC8] transition-all duration-150">
+    <article className="card group bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl p-3 sm:p-4 flex flex-col justify-between hover:shadow-md hover:border-[#C9A84C]/50 transition-all duration-200">
       <div>
-        {/* الصورة مع الشارات */}
-        <Link href={`/products/${p.slug}`} className="block relative mb-3">
+        {/* الصورة مع شارات الحالة */}
+        <Link href={`/products/${p.slug}`} className="block relative mb-3 rounded-lg overflow-hidden bg-[#FAFAF8] dark:bg-[#151410]">
           <ProductPhoto product={p} />
           
-          <div className="absolute top-2.5 inset-x-2.5 flex items-center justify-between gap-1 pointer-events-none">
-            {p.brand?.name_ar ? (
-              <span className="bg-amber-50 text-amber-800 text-xs font-semibold rounded-full px-2.5 py-0.5 border border-amber-200/60 shadow-xs">
-                {p.brand.name_ar}
-              </span>
-            ) : <span />}
-
+          {/* شارات الخصم ونفاد المخزون */}
+          <div className="absolute top-2 end-2 flex items-center gap-1 pointer-events-none">
             {allOut ? (
-              <span className="bg-red-50 text-red-700 text-xs font-semibold rounded-full px-2.5 py-0.5 shadow-xs">
+              <span className="bg-neutral-900/80 text-white text-[11px] font-semibold rounded-md px-2 py-0.5 backdrop-blur-xs">
                 نفد المخزون
               </span>
             ) : discountPct > 0 ? (
-              <span className="bg-red-50 text-red-700 text-xs font-semibold rounded-full px-2.5 py-0.5 num shadow-xs">
+              <span className="bg-red-600 text-white text-[11px] font-bold rounded-md px-2 py-0.5 num shadow-xs">
                 خصم {discountPct}%
               </span>
             ) : null}
           </div>
         </Link>
 
-        {/* معلومات العطر */}
+        {/* الماركة واسم العطر بتسلسل راقي */}
         <div className="space-y-1">
-          <div className="flex items-center gap-1.5 text-xs text-[#6B6760] dark:text-[#A09C94]">
-            <span>{COUNTRY[p.brand?.country] || 'خليجي'}</span>
-            <span>·</span>
-            <span>{[p.kind || FAMILY[p.family], GENDER[p.gender]].filter(Boolean).join(' · ')}</span>
-          </div>
+          {p.brand?.name_ar ? (
+            <p className="text-[11px] font-semibold text-[#C9A84C] tracking-wide truncate">
+              {p.brand.name_ar}
+            </p>
+          ) : null}
 
           <h3 className="text-sm sm:text-base font-semibold text-[#1A1814] dark:text-white line-clamp-1 group-hover:text-[#C9A84C] transition-colors duration-150">
             <Link href={`/products/${p.slug}`}>{p.name_ar}</Link>
           </h3>
 
           {p.name_en ? (
-            <p className="text-xs text-[#6B6760] dark:text-[#A09C94] line-clamp-1">{p.name_en}</p>
+            <p className="text-[11px] text-[#8C877D] dark:text-[#A09C94] line-clamp-1">
+              {p.name_en}
+            </p>
           ) : null}
-        </div>
-
-        {/* الشريط اللوني للنوتات */}
-        <div className="mt-3">
-          <ScentNotesBar product={p} />
         </div>
       </div>
 
-      {/* السعر والشراء */}
-      <div className="mt-4 pt-3 border-t border-[#E8E6E1] dark:border-[#2E2B22] space-y-3">
+      {/* السعر والشراء بتصميم نظيف وسريع */}
+      <div className="mt-3.5 pt-3 border-t border-[#E8E6E1] dark:border-[#2E2B22] space-y-2.5">
         {selectedVariant ? (
-          <div className="flex items-baseline justify-between gap-2 flex-wrap">
-            <span className="text-xs font-semibold text-[#6B6760] dark:text-[#A09C94]">
-              {selectedVariant.label}
-            </span>
-            <div className="flex items-baseline gap-2 flex-wrap">
-              <span className="text-sm sm:text-base font-semibold text-[#1A1814] dark:text-white num">
+          <div className="flex items-baseline justify-between gap-1.5 flex-wrap">
+            <div className="flex items-baseline gap-1.5 flex-wrap">
+              <span className="text-sm sm:text-base font-bold text-[#1A1814] dark:text-white num">
                 {egp(selectedVariant.price)}
               </span>
               {selectedVariant.compare_price && Number(selectedVariant.compare_price) > Number(selectedVariant.price) ? (
-                <span className="text-xs text-[#6B6760] line-through num">
+                <span className="text-xs text-[#A09C94] line-through num">
                   {egp(selectedVariant.compare_price)}
                 </span>
               ) : null}
             </div>
+
+            {selectedVariant.label ? (
+              <span className="text-[11px] font-medium text-[#6B6760] dark:text-[#A09C94] bg-[#FAFAF8] dark:bg-[#25221B] px-1.5 py-0.5 rounded border border-[#E8E6E1]/80 dark:border-[#2E2B22]">
+                {selectedVariant.label}
+              </span>
+            ) : null}
           </div>
         ) : null}
 
-        {/* زر إضافة الحجم المتاح */}
+        {/* زر الإجراء السريع */}
         {allOut ? (
           <button
             type="button"
             disabled
-            className="w-full bg-[#E8E6E1] dark:bg-[#2E2B22] text-[#6B6760] text-sm font-semibold py-2.5 rounded-lg min-h-[44px] cursor-not-allowed"
+            className="w-full bg-[#E8E6E1] dark:bg-[#2E2B22] text-[#8C877D] text-xs sm:text-sm font-semibold py-2.5 rounded-lg min-h-[44px] cursor-not-allowed"
           >
             غير متاح حالياً
           </button>
@@ -149,7 +141,7 @@ export default function ProductCard({ product: p }) {
             type="button"
             onClick={(e) => handleAdd(selectedVariant, e)}
             disabled={addingState?.id === selectedVariant?.id}
-            className="w-full bg-[#1A1814] hover:bg-[#2D2921] text-white text-sm font-semibold py-2.5 rounded-lg transition-all duration-150 active:scale-[0.97] min-h-[44px] flex items-center justify-center gap-2"
+            className="w-full bg-[#1A1814] hover:bg-[#2D2921] dark:bg-[#25221B] dark:hover:bg-[#332F26] text-white text-xs sm:text-sm font-semibold py-2.5 rounded-lg transition-all duration-150 active:scale-[0.97] min-h-[44px] flex items-center justify-center gap-2"
           >
             {addingState?.id === selectedVariant?.id ? (
               addingState.state === 'loading' ? (
@@ -161,11 +153,11 @@ export default function ProductCard({ product: p }) {
                   <span>جاري الإضافة...</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1.5 text-white font-semibold animate-bounce">
-                  <svg className="w-4 h-4 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <span className="inline-flex items-center gap-1.5 text-[#C9A84C] font-semibold">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
                   </svg>
-                  <span>أضيف!</span>
+                  <span>تمت الإضافة</span>
                 </span>
               )
             ) : (
@@ -177,3 +169,4 @@ export default function ProductCard({ product: p }) {
     </article>
   );
 }
+

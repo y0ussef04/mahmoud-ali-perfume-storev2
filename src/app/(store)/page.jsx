@@ -19,44 +19,43 @@ export default async function HomePage() {
 
   const threshold = settingNum(settings.free_ship_threshold, 1500);
 
-  const waNumber = (settings.wa_number || '201000000000').replace(/\D/g, '');
-  const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent('السلام عليكم، يرجى التكرم بإفادتي حول العطور المتاحة')}`;
-
   const groupedRates = {
     'القاهرة والجيزة والقليوبية': rates.filter((r) => ['القاهرة', 'الجيزة', 'القليوبية'].includes(r.governorate)),
     'محافظات الدلتا والقناة': rates.filter((r) => ['الإسكندرية', 'الشرقية', 'الدقهلية', 'البحيرة', 'الغربية', 'المنوفية', 'دمياط', 'كفر الشيخ', 'الإسماعيلية', 'السويس', 'بورسعيد'].includes(r.governorate)),
-    'الصعيد والمحافظات النائية': rates.filter((r) => !['القاهرة', 'الجيزة', 'القليوبية', 'الإسكندرية', 'الشرقية', 'الدقهلية', 'البحيرة', 'الغربية', 'المنوفية', 'دمياط', 'كفر الشيخ', 'الإسماعيلية', 'السويس', 'بورسعيد'].includes(r.governorate)),
+    'الصعيد والمحافظات الإقليمية': rates.filter((r) => !['القاهرة', 'الجيزة', 'القليوبية', 'الإسكندرية', 'الشرقية', 'الدقهلية', 'البحيرة', 'الغربية', 'المنوفية', 'دمياط', 'كفر الشيخ', 'الإسماعيلية', 'السويس', 'بورسعيد'].includes(r.governorate)),
   };
 
   return (
-    <div className="space-y-12 sm:space-y-16 lg:space-y-20 pb-20 md:pb-8">
-      {/* ══════════════ 1. الهيرو (Hero Section) ══════════════ */}
-      <section className="bg-white dark:bg-[#1C1A14] border-b border-[#E8E6E1] dark:border-[#2E2B22] py-14 sm:py-20 lg:py-24">
+    <div className="space-y-12 sm:space-y-16 lg:space-y-20 pb-16 md:pb-8">
+      {/* ══════════════ 1. الهيرو الفاخر (Premium Hero Section) ══════════════ */}
+      <section className="bg-white dark:bg-[#1C1A14] border-b border-[#E8E6E1] dark:border-[#2E2B22] py-16 sm:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-          <span className="text-xs font-semibold text-[#C9A84C] tracking-widest uppercase block">
-            فخامة العطور الخليجية
-          </span>
+          <div className="inline-flex items-center gap-2 bg-[#C9A84C]/10 border border-[#C9A84C]/25 px-3.5 py-1 rounded-full text-xs font-semibold text-[#C9A84C]">
+            <span>✦ عطور خليجية فاخرة وأصلية ١٠٠٪</span>
+          </div>
 
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-semibold text-[#1A1814] dark:text-white leading-tight tracking-tight">
             محمود علي للعطور
           </h1>
 
-          <p className="text-base sm:text-lg text-[#6B6760] dark:text-[#A09C94] leading-relaxed max-w-2xl mx-auto">
-            تشكيلة استثنائية من دور العطور الإماراتية والسعودية الأصلية، معروضة بتفاصيلها وأسعارها الشفافة لتمنحك تجربة اقتناء فاخرة وموثوقة.
+          <p className="text-sm sm:text-base lg:text-lg text-[#6B6760] dark:text-[#A09C94] leading-relaxed max-w-2xl mx-auto">
+            روائع العطور الإماراتية والسعودية المختارة بعناية، معروضة بتفاصيلها وأسعارها الشفافة لتمنحك تجربة اقتناء راقية وموثوقة.
           </p>
 
-          <div className="flex flex-wrap items-center justify-center gap-3 pt-4">
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
             <Link
               href="/products"
-              className="bg-[#C9A84C] hover:bg-[#8B6914] text-white rounded-lg px-8 py-3.5 font-semibold text-sm transition-colors duration-150 active:scale-[0.97] min-h-[44px] flex items-center justify-center shadow-sm"
+              prefetch={true}
+              className="bg-[#1A1814] hover:bg-[#2D2921] dark:bg-[#C9A84C] dark:hover:bg-[#8B6914] text-white rounded-lg px-8 py-3.5 font-semibold text-sm transition-all duration-150 active:scale-[0.97] min-h-[44px] flex items-center justify-center shadow-sm"
             >
               استكشف المجموعة
             </Link>
             <Link
               href="/products?family=set"
-              className="border border-[#E8E6E1] dark:border-[#2E2B22] text-[#1A1814] dark:text-white hover:bg-[#FAFAF8] dark:hover:bg-[#111009] rounded-lg px-8 py-3.5 font-semibold text-sm transition-colors duration-150 min-h-[44px] flex items-center justify-center"
+              prefetch={true}
+              className="border border-[#E8E6E1] dark:border-[#2E2B22] text-[#1A1814] dark:text-white hover:bg-[#FAFAF8] dark:hover:bg-[#25221B] rounded-lg px-8 py-3.5 font-semibold text-sm transition-all duration-150 min-h-[44px] flex items-center justify-center"
             >
-              طقم العينات — {egp(290)}
+              طقم عينات النخبة — {egp(290)}
             </Link>
           </div>
         </div>
@@ -75,6 +74,7 @@ export default async function HomePage() {
           </div>
           <Link
             href="/products"
+            prefetch={true}
             className="text-xs sm:text-sm font-semibold text-[#C9A84C] hover:underline transition-colors flex items-center gap-1"
           >
             <span>عرض الكل</span>
@@ -82,7 +82,7 @@ export default async function HomePage() {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           {list.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
@@ -156,7 +156,7 @@ export default async function HomePage() {
             </span>
             <h3 className="text-2xl sm:text-3xl font-semibold">طقم عينات عطور النخبة</h3>
             <p className="text-xs sm:text-sm text-[#A09C94] max-w-xl leading-relaxed">
-              مجموعة عينات متناغمة تتيح لك اختيار التوليفة العطرية الأنسب لذوقك الخاص بكل ثقة.
+              مجموعة عينات متناغمة تتيح لك اختيار التوليفة العطرية الأنسب لذوقك الخاص بكل ثقة قبل شراء الحجم الكامل.
             </p>
           </div>
           <div className="shrink-0 text-center md:text-end">
@@ -170,68 +170,100 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ══════════════ 6. تفاصيل الشحن والدفع (Concise Accordion) ══════════════ */}
+      {/* ══════════════ 6. تفاصيل الشحن والتوصيل (Progressive Disclosure) ══════════════ */}
       <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="space-y-1">
           <h2 className="text-xl sm:text-2xl font-semibold text-[#1A1814] dark:text-white">
-            تفاصيل الشحن والتوصيل
+            الشحن والتوصيل
           </h2>
           <p className="text-xs sm:text-sm text-[#6B6760] dark:text-[#A09C94]">
-            تكاليف الشحن وتوقيتات التوصيل لكل محافظة.
+            توصيل سريع وآمن لجميع المحافظات مع خيارات دفع متعددة.
           </p>
         </div>
 
-        <div className="bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl p-5 sm:p-6 space-y-4">
+        <div className="bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-2xl p-5 sm:p-7 space-y-6">
+          {/* إشعار الشحن المجاني الأنيق */}
           {threshold > 0 ? (
-            <div className="flex items-center gap-3 p-3.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/40 text-xs sm:text-sm text-[#2D6A4F] font-semibold">
+            <div className="flex items-center gap-3 p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-900/40 text-xs sm:text-sm text-[#2D6A4F] dark:text-emerald-300 font-medium">
               <svg className="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
               <span>
-                شحن مجاني بالكامل لكل طلب بقيمة <span className="num font-bold">{egp(threshold)}</span> أو أكثر.
+                شحن مجاني بالكامل لكل طلب بقيمة <span className="num font-bold">{egp(threshold)}</span> أو أكثر إلى أي مكان في مصر.
               </span>
             </div>
           ) : null}
 
-          {/* قائمة الشحن المنظمة */}
-          <div className="space-y-3 pt-2">
-            {Object.entries(groupedRates).map(([groupName, groupItems]) => (
-              <details key={groupName} className="group border border-[#E8E6E1] dark:border-[#2E2B22] rounded-lg">
-                <summary className="cursor-pointer px-4 py-3 text-xs sm:text-sm font-semibold text-[#1A1814] dark:text-white flex justify-between items-center select-none">
-                  <span>{groupName}</span>
-                  <svg className="w-4 h-4 transition-transform duration-150 group-open:rotate-180 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <div className="px-4 pb-3 pt-1 border-t border-[#E8E6E1] dark:border-[#2E2B22] space-y-2">
-                  {groupItems.map((r) => (
-                    <div key={r.governorate} className="flex justify-between items-center text-xs py-1.5 border-b border-[#E8E6E1]/50 dark:border-[#2E2B22]/50 last:border-0">
-                      <span className="font-semibold text-[#1A1814] dark:text-white">{r.governorate}</span>
-                      <div className="flex items-center gap-4 text-[#6B6760]">
-                        <span className="num font-semibold text-[#1A1814] dark:text-white">{egp(r.fee)}</span>
-                        <span className="num">{r.days_min}–{r.days_max} أيام عمل</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </details>
-            ))}
+          {/* ملخص المواعيد والمناطق الثلاث */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs sm:text-sm">
+            <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#151410] border border-[#E8E6E1]/70 dark:border-[#2E2B22] space-y-1">
+              <div className="font-semibold text-[#1A1814] dark:text-white flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#C9A84C]" />
+                <span>القاهرة والجيزة والقليوبية</span>
+              </div>
+              <p className="text-[#6B6760] dark:text-[#A09C94] text-xs leading-relaxed">
+                توصيل خلال ٢٤ إلى ٤٨ ساعة عمل.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#151410] border border-[#E8E6E1]/70 dark:border-[#2E2B22] space-y-1">
+              <div className="font-semibold text-[#1A1814] dark:text-white flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#C9A84C]" />
+                <span>محافظات الدلتا والقناة والإسكندرية</span>
+              </div>
+              <p className="text-[#6B6760] dark:text-[#A09C94] text-xs leading-relaxed">
+                توصيل خلال ٢ إلى ٣ أيام عمل.
+              </p>
+            </div>
+
+            <div className="p-4 rounded-xl bg-[#FAFAF8] dark:bg-[#151410] border border-[#E8E6E1]/70 dark:border-[#2E2B22] space-y-1">
+              <div className="font-semibold text-[#1A1814] dark:text-white flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#C9A84C]" />
+                <span>الصعيد والمحافظات الإقليمية</span>
+              </div>
+              <p className="text-[#6B6760] dark:text-[#A09C94] text-xs leading-relaxed">
+                توصيل خلال ٣ إلى ٥ أيام عمل.
+              </p>
+            </div>
           </div>
+
+          {/* Progressive Disclosure: جدول تفاصيل المحافظات عند الحاجة */}
+          <details className="group border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl overflow-hidden transition-all duration-200">
+            <summary className="cursor-pointer px-4 sm:px-5 py-3.5 bg-[#FAFAF8] dark:bg-[#151410] hover:bg-[#F3F1ED] dark:hover:bg-[#201D17] text-xs sm:text-sm font-semibold text-[#1A1814] dark:text-white flex justify-between items-center select-none transition-colors">
+              <span className="flex items-center gap-2">
+                <svg className="w-4 h-4 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                </svg>
+                <span>عرض جدول أسعار ومواعيد التوصيل لجميع المحافظات (٢٧ محافظة)</span>
+              </span>
+              <svg className="w-4 h-4 transition-transform duration-200 group-open:rotate-180 text-[#C9A84C]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+              </svg>
+            </summary>
+
+            <div className="p-4 sm:p-5 border-t border-[#E8E6E1] dark:border-[#2E2B22] space-y-4 bg-white dark:bg-[#1C1A14]">
+              {Object.entries(groupedRates).map(([groupName, groupItems]) => (
+                <div key={groupName} className="space-y-2">
+                  <h4 className="text-xs font-semibold text-[#C9A84C]">{groupName}</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                    {groupItems.map((r) => (
+                      <div key={r.governorate} className="flex justify-between items-center text-xs p-2 rounded-lg bg-[#FAFAF8] dark:bg-[#151410] border border-[#E8E6E1]/50 dark:border-[#2E2B22]/50">
+                        <span className="font-semibold text-[#1A1814] dark:text-white">{r.governorate}</span>
+                        <div className="flex items-center gap-2.5 text-[#6B6760] dark:text-[#A09C94]">
+                          <span className="num font-semibold text-[#1A1814] dark:text-white">{egp(r.fee)}</span>
+                          <span>·</span>
+                          <span className="num">{r.days_min}–{r.days_max} أيام</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </details>
         </div>
       </section>
-
-      {/* ══════════════ WhatsApp FAB (Mobile Only) ══════════════ */}
-      <a
-        href={waUrl}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="تواصل عبر واتساب"
-        className="md:hidden fixed bottom-20 end-4 z-40 w-13 h-13 min-w-[52px] min-h-[52px] rounded-full bg-[#25D366] hover:bg-[#1EA855] text-white shadow-lg shadow-green-900/20 flex items-center justify-center transition-transform active:scale-95"
-      >
-        <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-          <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338-11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-1.146 4.185 4.189-1.098z" />
-        </svg>
-      </a>
     </div>
   );
 }
+

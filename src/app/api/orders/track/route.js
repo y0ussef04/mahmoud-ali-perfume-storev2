@@ -15,7 +15,7 @@ export async function POST(req) {
   const gate = rateLimit(`track:${clientIp(req)}`, 15, 60_000);
   if (!gate.ok) {
     return NextResponse.json(
-      { ok: false, error: `محاولات كتير. استنى ${gate.retryAfter} ثانية.` },
+      { ok: false, error: `تجاوزت عدد المحاولات المسموح بها. يرجى الانتظار ${gate.retryAfter} ثانية.` },
       { status: 429 }
     );
   }
@@ -32,12 +32,12 @@ export async function POST(req) {
 
   if (!/^MA-\d{6}-\d{4}$/.test(orderNo)) {
     return NextResponse.json(
-      { ok: false, error: 'رقم الأوردر شكله كده: MA-260909-0001' },
+      { ok: false, error: 'يرجى إدخال رقم الطلب بالصيغة الصحيحة، مثال: MA-260909-0001' },
       { status: 400 }
     );
   }
   if (!/^01[0125][0-9]{8}$/.test(phone)) {
-    return NextResponse.json({ ok: false, error: 'رقم الموبايل مش صحيح.' }, { status: 400 });
+    return NextResponse.json({ ok: false, error: 'رقم الهاتف غير صحيح. يرجى إدخال ١١ رقماً تبدأ بـ 01.' }, { status: 400 });
   }
 
   try {
@@ -58,9 +58,9 @@ export async function POST(req) {
     if (error) throw error;
 
     if (!data) {
-      // نفس الرسالة للحالتين — مانساعدش حد يخمّن أرقام أوردرات
+      // نفس الرسالة للحالتين — لحماية الخصوصية
       return NextResponse.json(
-        { ok: false, error: 'مالقيناش أوردر بالرقمين دول. اتأكّد منهم.' },
+        { ok: false, error: 'لم يتم العثور على طلب مطابق للبيانات المدخلة. يرجى التحقق من الرقمين.' },
         { status: 404 }
       );
     }
@@ -68,7 +68,7 @@ export async function POST(req) {
     return NextResponse.json({ ok: true, order: data });
   } catch (e) {
     return NextResponse.json(
-      { ok: false, error: e?.message || 'مشكلة في السيرفر.' },
+      { ok: false, error: 'تعذر معالجة الطلب حالياً. يرجى المحاولة لاحقاً.' },
       { status: 500 }
     );
   }

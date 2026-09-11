@@ -14,6 +14,7 @@ const NAV = [
   { href: '/admin/reviews', label: 'آراء العملاء', hint: 'اسكرينات الشات والتقييمات' },
   { href: '/admin/coupons', label: 'أكواد الخصم', hint: 'العروض' },
   { href: '/admin/shipping', label: 'الشحن', hint: 'أسعار المحافظات' },
+  { href: '/admin/admins', label: 'مديرو المتجر', hint: 'الحسابات وكلمات المرور' },
 ];
 
 export default function AdminShell({ admin, pending = 0, children }) {
