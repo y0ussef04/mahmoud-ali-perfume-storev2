@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { requireAdmin } from '@/lib/admin-guard';
+import { requirePermission } from '@/lib/admin-guard';
 import { Empty, PageHead, Panel } from '@/components/admin/ui';
 import { dateTimeAr, egp, num } from '@/lib/money';
 import {
@@ -15,16 +15,12 @@ export const dynamic = 'force-dynamic';
 
 export const metadata = { title: 'الأوردرات' };
 
+import { safePostgrestSearch, safeSearch } from '@/lib/validate';
+import OrdersFilter from '@/components/admin/OrdersFilter';
+
 const PER_PAGE = 25;
 const STATUSES = ['new', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled', 'returned'];
 const PAY_STATUSES = ['unpaid', 'pending_review', 'paid', 'refunded'];
-
-function safeSearch(v) {
-  return String(v || '')
-    .trim()
-    .replace(/[^\p{L}\p{N}\s-]/gu, '')
-    .slice(0, 40);
-}
 
 function OrdersTableSkeleton() {
   return (
@@ -77,11 +73,11 @@ const getDefaultOrdersPage = unstable_cache(
 );
 
 async function OrdersTable({ sp }) {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requirePermission('orders.view');
 
   const status = STATUSES.includes(sp?.status) ? sp.status : '';
   const payment = PAY_STATUSES.includes(sp?.payment) ? sp.payment : '';
-  const search = safeSearch(sp?.q);
+  const search = safePostgrestSearch(sp?.q);
   const page = Math.max(1, parseInt(sp?.page, 10) || 1);
   const from = (page - 1) * PER_PAGE;
 
@@ -269,75 +265,12 @@ export default async function OrdersPage({ searchParams }) {
         </a>
       </PageHead>
 
-      {/* ── الفلاتر الفورية (تظهر فوراً بدون أي انتظار) ── */}
-      <Panel className="mb-5">
-        <form method="get" action="/admin/orders" className="flex flex-wrap items-end gap-3">
-          <div className="min-w-[13rem] flex-1">
-            <label htmlFor="o-q" className="label">بحث</label>
-            <input
-              id="o-q"
-              name="q"
-              defaultValue={search}
-              className="field"
-              placeholder="رقم الأوردر أو الموبايل أو الاسم"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="o-status" className="label">الحالة</label>
-            <select id="o-status" name="status" defaultValue={status} className="field">
-              <option value="">كل الحالات</option>
-              {STATUSES.map((s) => (
-                <option key={s} value={s}>{ORDER_STATUS[s]}</option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label htmlFor="o-payment" className="label">الدفع</label>
-            <select id="o-payment" name="payment" defaultValue={payment} className="field">
-              <option value="">كل حالات الدفع</option>
-              {PAY_STATUSES.map((s) => (
-                <option key={s} value={s}>{PAYMENT_STATUS[s]}</option>
-              ))}
-            </select>
-          </div>
-
-          <button type="submit" className="btn-solid">فلتر</button>
-
-          {status || payment || search ? (
-            <Link href="/admin/orders" className="btn-quiet">صفّر</Link>
-          ) : null}
-        </form>
-
-        {/* اختصارات سريعة */}
-        <div className="mt-4 flex flex-wrap gap-2 border-t border-hair-soft pt-4">
-          <Link href="/admin/orders" className="chip" data-on={!status && !payment ? '1' : '0'}>
-            الكل
-          </Link>
-          <Link
-            href="/admin/orders?status=new"
-            className="chip"
-            data-on={status === 'new' ? '1' : '0'}
-          >
-            جديد
-          </Link>
-          <Link
-            href="/admin/orders?payment=pending_review"
-            className="chip"
-            data-on={payment === 'pending_review' ? '1' : '0'}
-          >
-            تحويل مستنّي مراجعة
-          </Link>
-          <Link
-            href="/admin/orders?status=shipped"
-            className="chip"
-            data-on={status === 'shipped' ? '1' : '0'}
-          >
-            في الشحن
-          </Link>
-        </div>
-      </Panel>
+      {/* ── الفلاتر الفورية وسلسة التنقل بدون إعادة تحميل الصفحة ── */}
+      <OrdersFilter
+        currentStatus={status}
+        currentPayment={payment}
+        currentSearch={search}
+      />
 
       {/* ── جدول الأوردرات المتدفق مع هيكل تحميل فوري ── */}
       <Suspense key={JSON.stringify(sp)} fallback={<OrdersTableSkeleton />}>

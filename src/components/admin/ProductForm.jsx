@@ -5,8 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { invalidateCacheTag } from '@/lib/actions/revalidate';
+import {
+  checkImageFile,
+  slugify,
+  toPositiveInt,
+  toPositiveNumber,
+  validateVariantData,
+} from '@/lib/validate';
 import { FAMILY, FAMILY_ORDER, GENDER, SCALE_5 } from '@/lib/labels';
-import { checkImageFile, slugify, toPositiveInt, toPositiveNumber } from '@/lib/validate';
 import { egp } from '@/lib/money';
 
 /* "مسك، عنبر" → ['مسك','عنبر'] — الفاصلة العربية والإنجليزية الاتنين */
@@ -424,9 +430,13 @@ function VariantEditor({ productId, initial }) {
   async function addRow() {
     setError('');
     setOk('');
-    if (!draft.label.trim()) return setError('اكتب اسم الحجم — زي "100 مل".');
-    // toPositiveNumber بترجع 0 للنص الفاضي، فبنطلب سعر أكبر من صفر بصراحة
-    if (toPositiveNumber(draft.price) <= 0) return setError('السعر مطلوب ولازم يكون أكبر من صفر.');
+
+    let validData;
+    try {
+      validData = validateVariantData(draft);
+    } catch (valErr) {
+      return setError(valErr.message);
+    }
 
     setBusy('add');
     try {
@@ -435,15 +445,14 @@ function VariantEditor({ productId, initial }) {
         .from('variants')
         .insert({
           product_id: productId,
-          label: draft.label.trim(),
-          ml: draft.ml === '' ? null : toPositiveNumber(draft.ml),
-          price: toPositiveNumber(draft.price),
-          compare_price:
-            draft.compare_price === '' ? null : toPositiveNumber(draft.compare_price),
-          stock: toPositiveInt(draft.stock),
-          sku: draft.sku.trim() || null,
+          label: validData.label,
+          ml: validData.ml,
+          price: validData.price,
+          compare_price: validData.compare_price,
+          stock: validData.stock,
+          sku: validData.sku,
           sort: rows.length,
-          is_active: draft.is_active,
+          is_active: validData.is_active,
         })
         .select('*')
         .single();
@@ -452,9 +461,8 @@ function VariantEditor({ productId, initial }) {
 
       setRows((rs) => [...rs, data]);
       setDraft({ ...blank, sort: rows.length + 1 });
-      await invalidateCacheTag('products');
+      invalidateCacheTag('products').catch(() => {});
       setOk('الحجم اتضاف.');
-      router.refresh();
     } catch (e) {
       setError(
         /duplicate/i.test(e?.message || '') ? 'الـ SKU ده مستخدم قبل كده.' : e?.message
@@ -467,9 +475,13 @@ function VariantEditor({ productId, initial }) {
   async function saveRow(row) {
     setError('');
     setOk('');
-    if (!String(row.label || '').trim()) return setError('اسم الحجم مايصحّ يبقى فاضي.');
-    if (toPositiveNumber(row.price) <= 0)
-      return setError('السعر لازم يكون أكبر من صفر — لو عايز تخفيه شيل علامة "معروض".');
+
+    let validData;
+    try {
+      validData = validateVariantData(row);
+    } catch (valErr) {
+      return setError(valErr.message);
+    }
 
     setBusy(row.id);
     try {
@@ -477,25 +489,21 @@ function VariantEditor({ productId, initial }) {
       const { error: dbError } = await supabase
         .from('variants')
         .update({
-          label: String(row.label || '').trim(),
-          ml: row.ml === '' || row.ml == null ? null : toPositiveNumber(row.ml),
-          price: toPositiveNumber(row.price),
-          compare_price:
-            row.compare_price === '' || row.compare_price == null
-              ? null
-              : toPositiveNumber(row.compare_price),
-          stock: toPositiveInt(row.stock),
-          sku: String(row.sku || '').trim() || null,
-          is_active: !!row.is_active,
+          label: validData.label,
+          ml: validData.ml,
+          price: validData.price,
+          compare_price: validData.compare_price,
+          stock: validData.stock,
+          sku: validData.sku,
+          is_active: validData.is_active,
         })
         .eq('id', row.id);
 
       if (dbError) throw dbError;
 
-      setRows((rs) => rs.map((r) => (r.id === row.id ? { ...r, _dirty: false } : r)));
-      await invalidateCacheTag('products');
+      setRows((rs) => rs.map((r) => (r.id === row.id ? { ...r, ...validData, _dirty: false } : r)));
+      invalidateCacheTag('products').catch(() => {});
       setOk('اتسجّل.');
-      router.refresh();
     } catch (e) {
       setError(e?.message || 'مانفعش يتسجّل.');
     } finally {
@@ -511,8 +519,7 @@ function VariantEditor({ productId, initial }) {
       const { error: dbError } = await supabase.from('variants').delete().eq('id', row.id);
       if (dbError) throw dbError;
       setRows((rs) => rs.filter((r) => r.id !== row.id));
-      await invalidateCacheTag('products');
-      router.refresh();
+      invalidateCacheTag('products').catch(() => {});
     } catch (e) {
       setError(
         /foreign key|violates/i.test(e?.message || '')
@@ -796,8 +803,7 @@ function ImageEditor({ productId, initial }) {
         setImages((xs) => [...xs, row]);
       }
 
-      await invalidateCacheTag('products');
-      router.refresh();
+      invalidateCacheTag('products').catch(() => {});
     } catch (err) {
       setError(err?.message || 'الرفع مانفعش.');
     } finally {
@@ -822,8 +828,7 @@ function ImageEditor({ productId, initial }) {
       if (path) await supabase.storage.from('products').remove([path]);
 
       setImages((xs) => xs.filter((x) => x.id !== img.id));
-      await invalidateCacheTag('products');
-      router.refresh();
+      invalidateCacheTag('products').catch(() => {});
     } catch (err) {
       setError(err?.message || 'الحذف مانفعش.');
     } finally {
@@ -865,8 +870,7 @@ function ImageEditor({ productId, initial }) {
           supabase.from('product_images').update({ sort: idx }).eq('id', x.id)
         )
       );
-      await invalidateCacheTag('products');
-      router.refresh();
+      invalidateCacheTag('products').catch(() => {});
     } catch (err) {
       setError(err?.message || 'الترتيب مانفعش.');
     } finally {

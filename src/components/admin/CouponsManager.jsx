@@ -5,7 +5,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { COUPON_KIND } from '@/lib/labels';
 import { dateAr, egp, num } from '@/lib/money';
-import { toPositiveInt, toPositiveNumber } from '@/lib/validate';
+import { toPositiveInt, toPositiveNumber, validateCouponData } from '@/lib/validate';
 
 /* الكود لاتيني/أرقام/شرطة بس وبالكابيتال — كده مافيش لبس بين أشكال متشابهة */
 const cleanCode = (v) =>
@@ -68,29 +68,17 @@ export default function CouponsManager({ initial }) {
 
   /** بيحوّل الفورم لسطر جاهز للداتابيز، وبيرجع نص خطأ لو فيه غلط */
   function shape(f) {
-    const code = cleanCode(f.code);
-    if (code.length < 3) return 'الكود قصير — ٣ حروف على الأقل بالإنجليزي أو أرقام.';
-
-    const value = toPositiveNumber(f.value);
-    if (f.kind === 'percent' && (value <= 0 || value > 90))
-      return 'النسبة لازم تكون بين ١ و ٩٠٪.';
-    if (f.kind === 'fixed' && value <= 0) return 'المبلغ لازم يكون أكبر من صفر.';
-
-    const starts = fromDateInput(f.starts_at, false);
-    const ends = fromDateInput(f.ends_at, true);
-    if (starts && ends && new Date(ends) <= new Date(starts))
-      return 'تاريخ النهاية لازم يكون بعد البداية.';
-
-    return {
-      code,
-      kind: f.kind,
-      value: f.kind === 'free_ship' ? 0 : value,
-      min_subtotal: toPositiveNumber(f.min_subtotal),
-      max_uses: String(f.max_uses ?? '').trim() === '' ? null : toPositiveInt(f.max_uses),
-      starts_at: starts,
-      ends_at: ends,
-      is_active: !!f.is_active,
-    };
+    try {
+      const starts = fromDateInput(f.starts_at, false);
+      const ends = fromDateInput(f.ends_at, true);
+      return validateCouponData({
+        ...f,
+        starts_at: starts,
+        ends_at: ends,
+      });
+    } catch (err) {
+      return err.message;
+    }
   }
 
   async function create() {

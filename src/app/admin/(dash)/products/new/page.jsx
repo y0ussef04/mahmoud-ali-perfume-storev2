@@ -2,18 +2,15 @@ import { requireAdmin } from '@/lib/admin-guard';
 import ProductForm from '@/components/admin/ProductForm';
 import { PageHead } from '@/components/admin/ui';
 
+import { getBrands } from '@/lib/queries';
+
 export const dynamic = 'force-dynamic';
 
 export const metadata = { title: 'عطر جديد' };
 
 export default async function NewProductPage() {
-  const { supabase } = await requireAdmin();
-
-  const { data: brands } = await supabase
-    .from('brands')
-    .select('id, name_ar, country')
-    .eq('is_active', true)
-    .order('sort');
+  await requireAdmin();
+  const brands = await getBrands();
 
   return (
     <>

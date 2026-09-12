@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
+import { checkImageFile } from '@/lib/validate';
 
 const DEFAULT_REVIEWS = [
   {
@@ -84,20 +85,27 @@ export default function ReviewsManager({ initialReviews = [] }) {
   const handleFileUpload = async (id, file) => {
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      setError('يرجى اختيار صورة صحيحة (PNG, JPG, WebP).');
+    const fileErr = checkImageFile(file);
+    if (fileErr) {
+      setError(fileErr);
       return;
     }
+
+    const rawExt = (file.name.split('.').pop() || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+    const ALLOWED_EXTS = ['jpg', 'jpeg', 'png', 'webp', 'avif'];
+    const ext = ALLOWED_EXTS.includes(rawExt) ? rawExt : 'jpg';
 
     setUploadingId(id);
     setError('');
 
     try {
       const supabase = createClient();
-      const ext = file.name.split('.').pop() || 'jpg';
-      const path = `reviews/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const path = `reviews/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.${ext}`;
 
-      const { error: upErr } = await supabase.storage.from('products').upload(path, file);
+      const { error: upErr } = await supabase.storage.from('products').upload(path, file, {
+        contentType: file.type,
+        upsert: false,
+      });
       if (upErr) throw upErr;
 
       const { data: pub } = supabase.storage.from('products').getPublicUrl(path);

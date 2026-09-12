@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
-import { requireAdmin } from '@/lib/admin-guard';
+import { requirePermission } from '@/lib/admin-guard';
 import { BrandBars, MethodSplit, RevenueChart } from '@/components/admin/Charts';
 import { Broken, Empty, Kpi, PageHead, Panel, RangeTabs } from '@/components/admin/ui';
 import { dateAr, delta, egp, num } from '@/lib/money';
@@ -64,7 +64,7 @@ function DashboardSkeleton() {
 }
 
 async function DashboardData({ days }) {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requirePermission('dashboard.view');
   const since = new Date(Date.now() - days * 86_400_000).toISOString();
 
   const [kpisRes, seriesRes, topRes, brandsRes, lowRes, staleRes, geoRes, ...methodRes] =

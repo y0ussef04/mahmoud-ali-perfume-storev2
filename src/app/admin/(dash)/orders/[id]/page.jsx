@@ -17,18 +17,26 @@ export const dynamic = 'force-dynamic';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+
 export async function generateMetadata({ params }) {
   const { id } = await params;
   return { title: UUID.test(id) ? 'أوردر' : 'غير موجود' };
 }
 
 export default async function OrderPage({ params }) {
-  const { supabase } = await requireAdmin();
+  await requireAdmin();
   const { id } = await params;
 
   if (!UUID.test(id)) notFound();
 
-  const { data: order } = await supabase
+  const adminClient = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY,
+    { auth: { persistSession: false, autoRefreshToken: false } }
+  );
+
+  const { data: order } = await adminClient
     .from('orders')
     .select('*, order_items ( * )')
     .eq('id', id)
@@ -39,7 +47,7 @@ export default async function OrderPage({ params }) {
   // الإيصال في باكِت خاص — بنعمل رابط مؤقّت بيقفل بعد ١٠ دقايق
   let receiptLink = null;
   if (order.receipt_url) {
-    const { data: signed } = await supabase.storage
+    const { data: signed } = await adminClient.storage
       .from('receipts')
       .createSignedUrl(order.receipt_url, 600);
     receiptLink = signed?.signedUrl || null;

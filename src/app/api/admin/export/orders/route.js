@@ -33,13 +33,7 @@ const collectable = (o) =>
     ? Number(o.total) || 0
     : 0;
 
-/** نفس منظّف البحث اللي في صفحة الأوردرات — الفاصلة ليها معنى في PostgREST */
-function safeSearch(v) {
-  return String(v || '')
-    .trim()
-    .replace(/[^\p{L}\p{N}\s-]/gu, '')
-    .slice(0, 40);
-}
+import { safePostgrestSearch } from '@/lib/validate';
 
 /** وقت القاهرة بصيغة YYYY-MM-DD HH:mm — بتترتب صح في Excel كنص */
 function stamp(iso) {
@@ -93,7 +87,7 @@ export async function GET(request) {
   const sp = request.nextUrl.searchParams;
   const status = STATUSES.includes(sp.get('status')) ? sp.get('status') : '';
   const payment = PAY_STATUSES.includes(sp.get('payment')) ? sp.get('payment') : '';
-  const search = safeSearch(sp.get('q'));
+  const search = safePostgrestSearch(sp.get('q'));
 
   let query = supabase
     .from('orders')

@@ -147,5 +147,8 @@ export async function POST(req) {
 }
 
 function trim(v, max) {
-  return String(v ?? '').trim().slice(0, max);
+  return String(v ?? '')
+    .replace(/[\0\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
+    .trim()
+    .slice(0, max);
 }

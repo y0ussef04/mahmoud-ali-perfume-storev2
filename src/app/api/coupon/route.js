@@ -22,15 +22,16 @@ export async function POST(req) {
     return NextResponse.json({ ok: false, error: 'طلب غير صالح.' }, { status: 400 });
   }
 
-  const code = String(body?.code || '').trim();
+  const rawCode = String(body?.code || '').trim();
+  const code = rawCode.toUpperCase().replace(/[^A-Z0-9_-]/g, '').slice(0, 30);
   const subtotal = Number(body?.subtotal);
 
-  if (!code) {
-    return NextResponse.json({ ok: false, error: 'اكتب الكود.' }, { status: 400 });
+  if (!rawCode || code.length < 2) {
+    return NextResponse.json({ ok: false, error: 'يرجى إدخال رمز كوبون صالح.' }, { status: 400 });
   }
-  if (!Number.isFinite(subtotal) || subtotal <= 0) {
+  if (!Number.isFinite(subtotal) || subtotal <= 0 || subtotal > 1_000_000) {
     return NextResponse.json(
-      { ok: false, error: 'العربة فاضية.' },
+      { ok: false, error: 'قيمة السلة غير صالحة.' },
       { status: 400 }
     );
   }

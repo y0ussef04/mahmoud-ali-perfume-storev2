@@ -20,46 +20,67 @@ export default function Header({ settings, announcement = '', freeShipThreshold 
   const pathname = usePathname();
 
   const threshold = freeShipThreshold ?? settingNum(settings?.free_ship_threshold, 1500);
-  const customText = announcement || settings?.announcement || '';
   const shipText = threshold > 0 ? `🚚 شحن مجاني لجميع المحافظات للطلبات بقيمة ${egp(threshold)} فأكثر` : '🚚 شحن مجاني لكل المحافظات';
+
+  // تحكّم كامل في الشريط الإعلاني من لوحة الإدارة
+  const isEnabled =
+    settings?.announcement_enabled !== false &&
+    settings?.announcement_enabled !== 'false' &&
+    settings?.announcement_enabled !== 'off' &&
+    settings?.announcement_enabled !== 0;
+
+  const customText = (announcement || settings?.announcement || '').trim();
+  const mode = settings?.announcement_mode || (customText ? 'custom_and_features' : 'features_only');
+
+  // إخفاء الشريط تماماً لو كان معطلاً أو لو كان وضع النص المخصص فقط والنص فارغ
+  const shouldRenderBar = isEnabled && (mode !== 'custom_only' || customText);
+
+  let phrases = [];
+  if (mode === 'custom_only') {
+    phrases = [customText];
+  } else if (mode === 'features_only') {
+    phrases = [
+      shipText,
+      '💵 خيارات دفع مرنة: عند الاستلام، الفيزا، المحافظ، وإنستاباي',
+      '📦 تغليف فاخر وضمان وصول آمن للشحنة',
+      '✨ عطور إماراتية وسعودية أصلية ١٠٠٪ في مصر',
+    ];
+  } else {
+    // custom_and_features
+    phrases = [
+      customText ? `✨ ${customText}` : null,
+      shipText,
+      '💵 خيارات دفع مرنة: عند الاستلام، الفيزا، المحافظ، وإنستاباي',
+      '📦 تغليف فاخر وضمان وصول آمن للشحنة',
+      '✨ عطور إماراتية وسعودية أصلية ١٠٠٪ في مصر',
+    ].filter(Boolean);
+  }
 
   return (
     <>
       {/* ══════════════ الشريط الإعلاني المتحرك (Dynamic Marquee Ticker) ══════════════ */}
-      <div className="bg-[#1A1814] text-xs py-2 text-[#C9A84C] font-semibold border-b border-[#2E2B22] overflow-hidden select-none">
-        <div className="animate-marquee gap-8 items-center whitespace-nowrap">
-          <span className="inline-flex items-center gap-6 px-4">
-            {customText ? (
-              <>
-                <span>✨ {customText}</span>
-                <span className="text-[#6B6760]">✦</span>
-              </>
-            ) : null}
-            <span>{shipText}</span>
-            <span className="text-[#6B6760]">✦</span>
-            <span>💵 خيارات دفع مرنة: عند الاستلام، الفيزا، المحافظ، وإنستاباي</span>
-            <span className="text-[#6B6760]">✦</span>
-            <span>📦 تغليف فاخر وضمان وصول آمن للشحنة</span>
-            <span className="text-[#6B6760]">✦</span>
-            <span>✨ عطور إماراتية وسعودية أصلية ١٠٠٪ في مصر</span>
-          </span>
-          <span className="inline-flex items-center gap-6 px-4" aria-hidden="true">
-            {customText ? (
-              <>
-                <span>✨ {customText}</span>
-                <span className="text-[#6B6760]">✦</span>
-              </>
-            ) : null}
-            <span>{shipText}</span>
-            <span className="text-[#6B6760]">✦</span>
-            <span>💵 خيارات دفع مرنة: عند الاستلام، الفيزا، المحافظ، وإنستاباي</span>
-            <span className="text-[#6B6760]">✦</span>
-            <span>📦 تغليف فاخر وضمان وصول آمن للشحنة</span>
-            <span className="text-[#6B6760]">✦</span>
-            <span>✨ عطور إماراتية وسعودية أصلية ١٠٠٪ في مصر</span>
-          </span>
+      {shouldRenderBar ? (
+        <div className="bg-[#1A1814] text-xs py-2 text-[#C9A84C] font-semibold border-b border-[#2E2B22] overflow-hidden select-none">
+          <div className="animate-marquee gap-8 items-center whitespace-nowrap">
+            <span className="inline-flex items-center gap-6 px-4">
+              {phrases.map((phrase, idx) => (
+                <span key={idx} className="inline-flex items-center gap-6">
+                  <span>{phrase}</span>
+                  <span className="text-[#6B6760]">✦</span>
+                </span>
+              ))}
+            </span>
+            <span className="inline-flex items-center gap-6 px-4" aria-hidden="true">
+              {phrases.map((phrase, idx) => (
+                <span key={`dup-${idx}`} className="inline-flex items-center gap-6">
+                  <span>{phrase}</span>
+                  <span className="text-[#6B6760]">✦</span>
+                </span>
+              ))}
+            </span>
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#1C1A14]/90 backdrop-blur-md border-b border-[#E8E6E1] dark:border-[#2E2B22]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">

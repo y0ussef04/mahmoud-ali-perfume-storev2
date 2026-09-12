@@ -104,3 +104,155 @@ export function toPositiveInt(v, fallback = 0) {
   const n = parseInt(String(v ?? '').replace(/,/g, ''), 10);
   return Number.isFinite(n) && n >= 0 ? n : fallback;
 }
+
+// ══════════════════════════════════════════════════════════
+//  دوال التحقق الصارم وحماية الاستعلامات (Guardrail Validators)
+// ══════════════════════════════════════════════════════════
+
+/**
+ * تنقية استعلامات البحث الموجهة إلى PostgREST ومصفوفات .or(...)
+ * تدعم وتحافظ على اللغة العربية بالكامل، الحروف اللاتينية، الأرقام، المسافات،
+ * وعلامات الترقيم الطبيعية في أسماء العطور مثل & و - و /
+ * وتمنع تماماً محارف كسر بناء جمل PostgREST مثل الفواصل والأقواس وعلامات التنصيص والنسبة المئوية.
+ */
+export function safePostgrestSearch(v, maxLen = 60) {
+  if (!v) return '';
+  return String(v)
+    .replace(/[\0\x00-\x1F\x7F]/g, '') // إزالة محارف التحكم الخفية والـ Null Bytes
+    .replace(/[,()"'\\;%`]/g, ' ')      // استبدال محارف كسر الجمل بمسافة
+    .replace(/\s+/g, ' ')               // توحيد المسافات المتعددة
+    .trim()
+    .slice(0, maxLen);
+}
+
+export const safeSearch = safePostgrestSearch;
+
+/**
+ * فحص صارم للأرقام الموجبة (يرفض القيم السالبة والـ NaN والـ Infinity بدلاً من تحويلها صامتاً).
+ */
+export function parseStrictPositiveNumber(v, fieldName = 'الحقل', { allowZero = true, max = 1000000 } = {}) {
+  if (v === '' || v === null || v === undefined) return null;
+  const raw = String(v).replace(/,/g, '').trim();
+  const n = Number(raw);
+  if (!Number.isFinite(n) || isNaN(n)) {
+    throw new Error(`${fieldName} يجب أن يكون رقماً صالحاً.`);
+  }
+  if (allowZero ? n < 0 : n <= 0) {
+    throw new Error(`${fieldName} يجب أن يكون رقماً ${allowZero ? 'أكبر من أو يساوي الصفر' : 'أكبر من الصفر'}.`);
+  }
+  if (n > max) {
+    throw new Error(`${fieldName} تجاوز الحد الأقصى المسموح به (${max}).`);
+  }
+  return n;
+}
+
+/**
+ * فحص صارم للأعداد الصحيحة (يرفض الكسور والقيم السالبة).
+ */
+export function parseStrictPositiveInt(v, fieldName = 'الحقل', { allowZero = true, max = 1000000 } = {}) {
+  if (v === '' || v === null || v === undefined) return null;
+  const raw = String(v).replace(/,/g, '').trim();
+  if (!/^-?\d+$/.test(raw)) {
+    throw new Error(`${fieldName} يجب أن يكون عدداً صحيحاً بدون كسور.`);
+  }
+  const n = parseInt(raw, 10);
+  if (!Number.isFinite(n) || isNaN(n)) {
+    throw new Error(`${fieldName} يجب أن يكون عدداً صحيحاً صالحاً.`);
+  }
+  if (allowZero ? n < 0 : n <= 0) {
+    throw new Error(`${fieldName} يجب أن يكون ${allowZero ? 'صفراً أو عدداً موجباً' : 'عدداً موجباً أكبر من الصفر'}.`);
+  }
+  if (n > max) {
+    throw new Error(`${fieldName} تجاوز الحد الأقصى المسموح به (${max}).`);
+  }
+  return n;
+}
+
+/**
+ * فحص بيانات المتغيرات والأحجام (Variant) مع رفض الأخطاء صراحة.
+ */
+export function validateVariantData(draft) {
+  const label = String(draft?.label || '').trim();
+  if (!label) throw new Error('اسم الحجم مطلوب — مثال: "100 مل".');
+  if (label.length > 80) throw new Error('اسم الحجم طويل جداً (الحد الأقصى 80 حرفاً).');
+
+  const price = parseStrictPositiveNumber(draft?.price, 'سعر البيع', { allowZero: false });
+  if (price == null) throw new Error('سعر البيع مطلوب ولا يمكن تركه فارغاً.');
+
+  const comparePrice = parseStrictPositiveNumber(draft?.compare_price, 'السعر قبل الخصم', { allowZero: false });
+  if (comparePrice != null && comparePrice <= price) {
+    throw new Error('السعر قبل الخصم يجب أن يكون أعلى من سعر البيع الفعلي.');
+  }
+
+  const stock = parseStrictPositiveInt(draft?.stock ?? 0, 'المخزون', { allowZero: true });
+  if (stock == null) throw new Error('كمية المخزون مطلوبة.');
+
+  const ml = parseStrictPositiveNumber(draft?.ml, 'الحجم بالملي', { allowZero: false, max: 5000 });
+
+  return {
+    label,
+    price,
+    compare_price: comparePrice,
+    stock,
+    ml,
+    sku: draft?.sku ? String(draft.sku).trim().slice(0, 60) : null,
+    is_active: draft?.is_active !== false,
+  };
+}
+
+/**
+ * فحص بيانات الكوبونات.
+ */
+export function validateCouponData(f) {
+  const code = String(f?.code || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9_-]/g, '');
+
+  if (code.length < 3) throw new Error('رمز الكوبون قصير — ٣ أحرف أو أرقام على الأقل.');
+  if (code.length > 30) throw new Error('رمز الكوبون لا يمكن أن يتجاوز 30 حرفاً.');
+
+  const kind = f?.kind;
+  if (!['percent', 'fixed', 'free_ship'].includes(kind)) {
+    throw new Error('نوع الكوبون غير صالح.');
+  }
+
+  let value = 0;
+  if (kind === 'percent') {
+    value = parseStrictPositiveNumber(f?.value, 'نسبة الخصم', { allowZero: false, max: 90 });
+    if (value <= 0 || value > 90) throw new Error('نسبة الخصم يجب أن تكون بين 1 و 90٪.');
+  } else if (kind === 'fixed') {
+    value = parseStrictPositiveNumber(f?.value, 'قيمة الخصم', { allowZero: false });
+    if (value <= 0) throw new Error('قيمة الخصم يجب أن تكون أكبر من الصفر.');
+  }
+
+  const minSubtotal = parseStrictPositiveNumber(f?.min_subtotal || 0, 'الحد الأدنى للطلب', { allowZero: true }) || 0;
+  const maxUses = parseStrictPositiveInt(f?.max_uses, 'أقصى عدد استخدامات', { allowZero: false });
+
+  let startsAt = null;
+  let endsAt = null;
+  if (f?.starts_at) {
+    const s = new Date(f.starts_at);
+    if (isNaN(s.getTime())) throw new Error('تاريخ بداية الكوبون غير صالح.');
+    startsAt = s.toISOString();
+  }
+  if (f?.ends_at) {
+    const e = new Date(f.ends_at);
+    if (isNaN(e.getTime())) throw new Error('تاريخ نهاية الكوبون غير صالح.');
+    endsAt = e.toISOString();
+  }
+  if (startsAt && endsAt && new Date(endsAt) <= new Date(startsAt)) {
+    throw new Error('تاريخ نهاية الكوبون يجب أن يكون بعد تاريخ البداية.');
+  }
+
+  return {
+    code,
+    kind,
+    value,
+    min_subtotal: minSubtotal,
+    max_uses: maxUses,
+    starts_at: startsAt,
+    ends_at: endsAt,
+    is_active: f?.is_active !== false,
+  };
+}

@@ -8,13 +8,13 @@ import { Mark } from '@/components/Logo';
 import ThemeToggle from '@/components/ThemeToggle';
 
 const NAV = [
-  { href: '/admin', label: 'نظرة عامة', hint: 'الأرقام والرسوم' },
-  { href: '/admin/orders', label: 'الأوردرات', hint: 'المتابعة والتأكيد' },
-  { href: '/admin/products', label: 'العطور والمخزون', hint: 'الأسعار والكميات' },
-  { href: '/admin/reviews', label: 'آراء العملاء', hint: 'اسكرينات الشات والتقييمات' },
-  { href: '/admin/coupons', label: 'أكواد الخصم', hint: 'العروض' },
-  { href: '/admin/shipping', label: 'الشحن', hint: 'أسعار المحافظات' },
-  { href: '/admin/admins', label: 'مديرو المتجر', hint: 'الحسابات وكلمات المرور' },
+  { href: '/admin', label: 'نظرة عامة', hint: 'الأرقام والرسوم', perm: 'dashboard.view' },
+  { href: '/admin/orders', label: 'الأوردرات', hint: 'المتابعة والتأكيد', perm: 'orders.view' },
+  { href: '/admin/products', label: 'العطور والمخزون', hint: 'الأسعار والكميات', perm: 'products.view' },
+  { href: '/admin/reviews', label: 'آراء العملاء', hint: 'اسكرينات الشات والتقييمات', perm: 'products.view' },
+  { href: '/admin/coupons', label: 'أكواد الخصم', hint: 'العروض', perm: 'coupons.view' },
+  { href: '/admin/shipping', label: 'الشحن والإعدادات', hint: 'أسعار الشحن والشريط المتحرك', perm: 'shipping.view' },
+  { href: '/admin/admins', label: 'مديرو المتجر', hint: 'الحسابات والصلاحيات', perm: 'admins.view' },
 ];
 
 export default function AdminShell({ admin, pending = 0, children }) {
@@ -23,6 +23,15 @@ export default function AdminShell({ admin, pending = 0, children }) {
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [navigatingTo, setNavigatingTo] = useState(null);
+
+  const isManager = admin?.role === 'manager';
+
+  // تصفية القائمة بحسب الصلاحيات
+  const visibleNav = NAV.filter((item) => {
+    if (isManager) return true;
+    if (!item.perm) return true;
+    return Array.isArray(admin?.permissions) && admin.permissions.includes(item.perm);
+  });
 
   // اقفل القائمة ومؤشر التحميل مع كل تنقّل
   useEffect(() => {
@@ -40,8 +49,7 @@ export default function AdminShell({ admin, pending = 0, children }) {
 
   const nav = (
     <nav className="space-y-1">
-      {NAV.map((item) => {
-        // /admin نفسه لازم يكون مطابق تام، والباقي بالبادئة
+      {visibleNav.map((item) => {
         const active =
           item.href === '/admin'
             ? pathname === '/admin'
@@ -88,11 +96,25 @@ export default function AdminShell({ admin, pending = 0, children }) {
   );
 
   const foot = (
-    <div className="border-t border-brass/20 px-4 py-4">
-      <p className="truncate text-xs2 text-frost/50" dir="ltr">
-        {admin?.full_name || admin?.email}
+    <div className="border-t border-brass/20 px-4 py-4 space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <span className="font-semibold text-xs1 text-frost truncate">
+          {admin?.full_name || (isManager ? 'المدير العام' : 'مشرف')}
+        </span>
+        <span
+          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${
+            isManager
+              ? 'bg-brass/20 text-brass-light border border-brass/40'
+              : 'bg-white/10 text-frost/80 border border-white/20'
+          }`}
+        >
+          {isManager ? 'مدير عام' : 'مشرف'}
+        </span>
+      </div>
+      <p className="truncate text-xs2 text-frost/50 font-mono" dir="ltr">
+        {admin?.email}
       </p>
-      <div className="mt-3 flex items-center gap-3">
+      <div className="pt-2 flex items-center gap-3">
         <button
           type="button"
           onClick={signOut}
@@ -113,9 +135,7 @@ export default function AdminShell({ admin, pending = 0, children }) {
   );
 
   return (
-    // print:block — وقت الطباعة الشريط الجانبي يختفي فمانحتاجش الجريد
     <div className="relative min-h-screen lg:grid lg:grid-cols-[16rem_1fr] print:block">
-      {/* ── مؤشر تنقّل فوري رفيع بأعلى الشاشة بلون البراند ── */}
       {navigatingTo ? (
         <div
           role="progressbar"
@@ -124,7 +144,6 @@ export default function AdminShell({ admin, pending = 0, children }) {
         />
       ) : null}
 
-      {/* ── الشريط الجانبي: ثابت على الشاشات الكبيرة ── */}
       <aside className="no-print hidden bg-lacquer lg:flex lg:h-screen lg:flex-col lg:sticky lg:top-0">
         <div className="flex items-center gap-3 px-4 py-5">
           <Mark size={36} />
@@ -143,7 +162,6 @@ export default function AdminShell({ admin, pending = 0, children }) {
         {foot}
       </aside>
 
-      {/* ── شريط علوي على الموبايل ── */}
       <div className="no-print lg:hidden">
         <div className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-lacquer px-4 py-3">
           <span className="flex items-center gap-2.5">
@@ -176,7 +194,6 @@ export default function AdminShell({ admin, pending = 0, children }) {
         ) : null}
       </div>
 
-      {/* ── المحتوى ── */}
       <main className="min-w-0 px-4 py-6 sm:px-7 sm:py-9 print:p-0">{children}</main>
     </div>
   );

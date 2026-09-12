@@ -179,6 +179,8 @@ export const getSettings = unstable_cache(
       wallet_number: '01000000000',
       wa_number: '201000000000',
       announcement: '',
+      announcement_enabled: true,
+      announcement_mode: 'custom_and_features',
       ...out,
     };
   },

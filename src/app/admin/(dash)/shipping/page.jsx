@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { requireAdmin } from '@/lib/admin-guard';
+import { requirePermission } from '@/lib/admin-guard';
 import ShippingManager from '@/components/admin/ShippingManager';
 import { PageHead } from '@/components/admin/ui';
 
@@ -31,7 +31,7 @@ function ShippingSkeleton() {
 }
 
 async function ShippingData() {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requirePermission('shipping.view');
 
   const [{ data: rates, error }, { data: rows }] = await Promise.all([
     supabase.from('shipping_rates').select('*').order('fee').order('governorate'),
@@ -56,7 +56,7 @@ export default function ShippingPage() {
     <>
       <PageHead
         title="الشحن والإعدادات"
-        hint="أسعار المحافظات ورسم التحصيل وأرقام التحويل"
+        hint="أسعار المحافظات، الشريط الإعلاني المتحرك، وأرقام التحويل"
       />
 
       <Suspense fallback={<ShippingSkeleton />}>

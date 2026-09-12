@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
-import { requireAdmin } from '@/lib/admin-guard';
-import { listAdmins } from '@/lib/actions/admin-accounts';
+import { requirePermission, hasPermission } from '@/lib/admin-guard';
+import { listAdmins, listAuditLogs } from '@/lib/actions/admin-accounts';
 import { PageHead } from '@/components/admin/ui';
 import AdminAccountsManager from '@/components/admin/AdminAccountsManager';
 
@@ -25,14 +25,25 @@ function AdminsSkeleton() {
 }
 
 async function AdminsData() {
-  const { user } = await requireAdmin();
-  const res = await listAdmins();
-  const admins = res.ok ? res.admins : [];
+  const { admin, user } = await requirePermission('admins.view');
+
+  const [resAdmins, resLogs] = await Promise.all([
+    listAdmins(),
+    admin.role === 'manager' || hasPermission(admin, 'audit_logs.view')
+      ? listAuditLogs({ page: 1, limit: 15 })
+      : Promise.resolve({ ok: true, logs: [], count: 0 }),
+  ]);
+
+  const admins = resAdmins.ok ? resAdmins.admins : [];
+  const logs = resLogs.ok ? resLogs.logs : [];
 
   return (
     <AdminAccountsManager
       initialAdmins={admins}
+      initialLogs={logs}
+      currentAdmin={admin}
       currentUserId={user.id}
+      isManager={admin.role === 'manager'}
     />
   );
 }
@@ -42,7 +53,7 @@ export default function AdminsPage() {
     <>
       <PageHead
         title="حسابات مديري المتجر"
-        hint="إدارة المديرين، الصلاحيات، وتحديث كلمات المرور"
+        hint="الرتب، الصلاحيات الدقيقة، سجل العمليات الحساسة، وتأمين الحسابات"
       />
 
       <Suspense fallback={<AdminsSkeleton />}>

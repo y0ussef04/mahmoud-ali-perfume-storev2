@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { requireAdmin } from '@/lib/admin-guard';
+import { requirePermission } from '@/lib/admin-guard';
 import ReviewsManager from '@/components/admin/ReviewsManager';
 import { PageHead } from '@/components/admin/ui';
 
@@ -23,7 +23,7 @@ function ReviewsSkeleton() {
 }
 
 async function ReviewsData() {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requirePermission('products.view');
 
   const { data } = await supabase
     .from('settings')

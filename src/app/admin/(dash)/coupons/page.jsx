@@ -1,5 +1,5 @@
 import { Suspense } from 'react';
-import { requireAdmin } from '@/lib/admin-guard';
+import { requirePermission } from '@/lib/admin-guard';
 import CouponsManager from '@/components/admin/CouponsManager';
 import { PageHead } from '@/components/admin/ui';
 
@@ -24,7 +24,7 @@ function CouponsSkeleton() {
 }
 
 async function CouponsData() {
-  const { supabase } = await requireAdmin();
+  const { supabase } = await requirePermission('coupons.view');
 
   const { data: coupons, error } = await supabase
     .from('coupons')
