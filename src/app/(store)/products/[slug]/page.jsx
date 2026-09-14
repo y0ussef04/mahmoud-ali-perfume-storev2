@@ -165,7 +165,7 @@ export default async function ProductPage({ params }) {
       {related.length ? (
         <AnimateIn direction="up" className="pt-12 border-t border-[#E8E6E1] dark:border-[#2E2B22] space-y-6">
           <h2 className="text-xl sm:text-2xl font-semibold text-[#1A1814] dark:text-white">عطور مشابهة قد تعجبك</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-md md:max-w-none mx-auto">
             {related.map((r) => (
               <ProductCard key={r.id} product={r} />
             ))}

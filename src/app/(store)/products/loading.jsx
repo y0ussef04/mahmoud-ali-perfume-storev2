@@ -28,7 +28,7 @@ export default function ProductsLoading() {
       </div>
 
       {/* شبكة الكروت التمهيدية (1 بالموبايل، 2 بالتابلت، 4 بالكمبيوتر) */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-md md:max-w-none mx-auto">
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <div
             key={i}

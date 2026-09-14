@@ -19,7 +19,7 @@ export default function Gallery({ product: p }) {
 
   return (
     <div>
-      <div className="relative aspect-square w-full overflow-hidden bg-glass">
+      <div className="relative aspect-square w-full rounded-2xl overflow-hidden bg-[#FAF9F5] dark:bg-[#151410] border border-[#E8E6E1] dark:border-[#2E2B22] p-4 flex items-center justify-center">
         <Image
           key={current.url}
           src={current.url}
@@ -27,11 +27,11 @@ export default function Gallery({ product: p }) {
           fill
           sizes="(min-width: 1024px) 28rem, 92vw"
           priority
-          className="animate-bloom object-cover"
+          className="animate-bloom object-contain p-3"
         />
       </div>
 
-      <ul className="mt-2 flex gap-2 overflow-x-auto pb-1">
+      <ul className="mt-3 flex gap-2.5 overflow-x-auto pb-1">
         {imgs.map((img, idx) => {
           const on = idx === i;
           return (
@@ -40,8 +40,8 @@ export default function Gallery({ product: p }) {
                 type="button"
                 onClick={() => setI(idx)}
                 aria-pressed={on}
-                className={`relative block h-16 w-16 overflow-hidden border transition-colors ${
-                  on ? 'border-brass' : 'border-hair-soft hover:border-hair'
+                className={`relative block h-16 w-16 rounded-xl overflow-hidden border bg-[#FAF9F5] dark:bg-[#151410] transition-all p-1 ${
+                  on ? 'border-[#C9A84C] ring-2 ring-[#C9A84C]/30' : 'border-[#E8E6E1] dark:border-[#2E2B22] opacity-70 hover:opacity-100'
                 }`}
               >
                 <Image
@@ -49,7 +49,7 @@ export default function Gallery({ product: p }) {
                   alt=""
                   fill
                   sizes="64px"
-                  className="object-cover"
+                  className="object-contain p-1"
                 />
                 <span className="sr-only">صورة {idx + 1}</span>
               </button>

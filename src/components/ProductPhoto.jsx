@@ -3,10 +3,10 @@ import Image from 'next/image';
 export default function ProductPhoto({
   product: p,
   priority = false,
-  sizes = '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw',
+  sizes = '(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw',
   className = '',
 }) {
-  const box = `relative aspect-[3/4] max-h-[380px] sm:max-h-none w-full rounded-xl overflow-hidden bg-[#FAFAF8] dark:bg-[#1C1A14] ${className}`;
+  const box = `relative aspect-square md:aspect-[3/4] max-h-[340px] md:max-h-none w-full rounded-xl overflow-hidden bg-[#FAF9F5] dark:bg-[#151410] flex items-center justify-center p-3 border border-[#E8E6E1]/50 dark:border-[#2E2B22]/50 ${className}`;
 
   if (p?.cover) {
     return (
@@ -17,7 +17,7 @@ export default function ProductPhoto({
           fill
           sizes={sizes}
           priority={priority}
-          className="object-cover object-center group-hover:scale-[1.03] transition-transform duration-300"
+          className="object-contain p-2 group-hover:scale-[1.04] transition-transform duration-300"
         />
       </div>
     );

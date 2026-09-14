@@ -65,10 +65,10 @@ export default function ProductCard({ product: p }) {
   const allOut = p.variants?.length > 0 && p.variants.every((v) => v.stock <= 0);
 
   return (
-    <article className="card group bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl p-3 sm:p-4 flex flex-col justify-between hover:shadow-md hover:border-[#C9A84C]/50 transition-all duration-200">
+    <article className="card group bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-2xl p-4 sm:p-5 flex flex-col justify-between hover:shadow-md hover:border-[#C9A84C]/50 transition-all duration-200">
       <div>
         {/* الصورة مع شارات الحالة */}
-        <Link href={`/products/${p.slug}`} className="block relative mb-3 rounded-lg overflow-hidden bg-[#FAFAF8] dark:bg-[#151410]">
+        <Link href={`/products/${p.slug}`} className="block relative mb-3.5 rounded-xl overflow-hidden bg-[#FAF9F5] dark:bg-[#151410]">
           <ProductPhoto product={p} />
           
           {/* شارات الخصم ونفاد المخزون */}

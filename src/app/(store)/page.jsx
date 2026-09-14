@@ -70,39 +70,39 @@ export default async function HomePage() {
       {/* ══════════════ 2. شريط الأصالة والضمان (Luxury Trust Bar) ══════════════ */}
       <section className="relative z-10 border-b border-[#E8E6E1] dark:border-[#2E2B22] bg-white/70 dark:bg-[#12110C]/80 backdrop-blur-md py-6">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 max-w-sm sm:max-w-none mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 md:gap-4 max-w-md md:max-w-none mx-auto">
             <AnimateIn direction="up" delay={0.1} className="w-full">
-              <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 hover:shadow-md transition-all duration-300">
+              <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 hover:shadow-md transition-all duration-300">
                 <span className="w-10 h-10 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/25 flex items-center justify-center text-[#C9A84C] shrink-0">
                   <ShieldCheck strokeWidth={1.75} className="w-5 h-5" />
                 </span>
                 <div className="text-right">
-                  <p className="text-xs sm:text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">أصالة مضمونة ١٠٠٪</p>
-                  <p className="text-[11px] text-[#8C887B] dark:text-[#A09C94] mt-0.5">عطور أصلية ومفحوصة بالكامل</p>
+                  <p className="text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">أصالة مضمونة ١٠٠٪</p>
+                  <p className="text-xs text-[#8C887B] dark:text-[#A09C94] mt-0.5">عطور أصلية ومفحوصة بالكامل</p>
                 </div>
               </div>
             </AnimateIn>
 
             <AnimateIn direction="up" delay={0.2} className="w-full">
-              <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 hover:shadow-md transition-all duration-300">
+              <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 hover:shadow-md transition-all duration-300">
                 <span className="w-10 h-10 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/25 flex items-center justify-center text-[#C9A84C] shrink-0">
                   <Truck strokeWidth={1.75} className="w-5 h-5" />
                 </span>
                 <div className="text-right">
-                  <p className="text-xs sm:text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">شحن سريع لجميع المحافظات</p>
-                  <p className="text-[11px] text-[#8C887B] dark:text-[#A09C94] mt-0.5">توصيل آمن حتى باب بيتك</p>
+                  <p className="text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">شحن سريع لجميع المحافظات</p>
+                  <p className="text-xs text-[#8C887B] dark:text-[#A09C94] mt-0.5">توصيل آمن حتى باب بيتك</p>
                 </div>
               </div>
             </AnimateIn>
 
             <AnimateIn direction="up" delay={0.3} className="w-full">
-              <div className="flex items-center gap-3.5 p-3.5 rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 hover:shadow-md transition-all duration-300">
+              <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 hover:shadow-md transition-all duration-300">
                 <span className="w-10 h-10 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/25 flex items-center justify-center text-[#C9A84C] shrink-0">
                   <Banknote strokeWidth={1.75} className="w-5 h-5" />
                 </span>
                 <div className="text-right">
-                  <p className="text-xs sm:text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">الدفع عند الاستلام</p>
-                  <p className="text-[11px] text-[#8C887B] dark:text-[#A09C94] mt-0.5">عاين طلبك وادفع بكل راحة</p>
+                  <p className="text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">الدفع عند الاستلام</p>
+                  <p className="text-xs text-[#8C887B] dark:text-[#A09C94] mt-0.5">عاين طلبك وادفع بكل راحة</p>
                 </div>
               </div>
             </AnimateIn>
@@ -132,7 +132,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-md md:max-w-none mx-auto">
             {list.map((p, idx) => (
               <AnimateIn key={p.id} direction="up" delay={idx * 0.1}>
                 <ProductCard product={p} />
