@@ -102,7 +102,7 @@ export default function Footer({ settings }) {
       </div>
 
       {/* Bottom Copyright Bar */}
-      <div className="border-t border-[#2E2B22] bg-[#111009]">
+      <div className="border-t border-[#2E2B22] bg-[#111009] pb-24 md:pb-0">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-[#A09C94]">
           <p>© {year} {storeName}. جميع الحقوق محفوظة.</p>
           <p className="flex items-center gap-1.5">

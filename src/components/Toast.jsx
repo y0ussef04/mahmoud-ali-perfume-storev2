@@ -9,7 +9,7 @@ export default function Toast() {
     <div
       aria-live="polite"
       aria-atomic="true"
-      className="pointer-events-none fixed bottom-6 z-[60] flex justify-center px-4"
+      className="pointer-events-none fixed bottom-20 md:bottom-6 z-[60] flex justify-center px-4"
       style={{ insetInlineStart: 0, insetInlineEnd: 0 }}
     >
       {toast ? (
