@@ -155,9 +155,31 @@ export function CheckoutStepper({ currentStep = 2 }) {
 }
 ```
 
+## 4. Fixed Admin Sidebar & Layout (القائمة الجانبية الثابتة للأدمن)
+
+A permanently fixed sidebar that never disappears on scroll, with independently scrollable nav items:
+
+```jsx
+export function AdminLayoutShell({ children, nav, foot }) {
+  return (
+    <div className="relative min-h-screen bg-[#FBFBF9] dark:bg-[#12110F] text-[#1A1814] dark:text-[#F5F2EB]">
+      {/* Sidebar: Fixed permanently to the right in RTL */}
+      <aside className="no-print hidden bg-[#1A1814] border-l border-[#2A2720] lg:flex lg:flex-col lg:fixed lg:top-0 lg:right-0 lg:bottom-0 lg:w-[17rem] lg:h-screen lg:z-40 shadow-xl">
+        <div className="p-5 border-b border-[#2A2720] shrink-0">Logo & Title</div>
+        <div className="flex-1 overflow-y-auto py-2">{nav}</div>
+        <div className="shrink-0">{foot}</div>
+      </aside>
+
+      {/* Main Content: Offset by 17rem from right in RTL */}
+      <main className="min-w-0 px-4 py-8 lg:mr-[17rem]">{children}</main>
+    </div>
+  );
+}
+```
+
 ---
 
-## 4. Framed Glass Admin Data Table
+## 5. Framed Glass Admin Data Table
 
 Responsive, clean padding, scrollable, with cohesive status badges and action menus:
 
