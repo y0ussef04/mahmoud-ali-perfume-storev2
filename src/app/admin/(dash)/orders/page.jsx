@@ -10,6 +10,8 @@ import {
   PAYMENT_STATUS_STYLE,
   STATUS_STYLE,
 } from '@/lib/labels';
+import AnimateIn from '@/components/AnimateIn';
+import { FileSpreadsheet, ChevronRight, ChevronLeft } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -141,67 +143,67 @@ async function OrdersTable({ sp }) {
             : 'أول أوردر لسه مجاش. لما يجي هيظهر هنا فوراً.'}
         </Empty>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
           <table className="tbl">
             <thead>
               <tr>
-                <th>الأوردر</th>
+                <th className="w-28 text-start">الأوردر</th>
                 <th>العميل</th>
-                <th>المحافظة</th>
-                <th className="text-end">الإجمالي</th>
-                <th>الدفع</th>
-                <th>الحالة</th>
-                <th className="text-end">التاريخ</th>
+                <th className="w-32 text-start">المحافظة</th>
+                <th className="w-28 text-end">الإجمالي</th>
+                <th className="w-32 text-center">الدفع</th>
+                <th className="w-28 text-center">الحالة</th>
+                <th className="w-36 text-end">التاريخ</th>
               </tr>
             </thead>
             <tbody>
               {orders.map((o) => (
                 <tr key={o.id}>
-                  <td>
+                  <td className="w-28">
                     <Link
                       href={`/admin/orders/${o.id}`}
-                      className="num font-mark text-brass underline underline-offset-4"
+                      className="num font-mark font-bold text-[#C9A84C] hover:underline"
                       dir="ltr"
                     >
                       {o.order_no}
                     </Link>
-                    <span className="num mt-0.5 block text-xs2 text-ink-42">
+                    <span className="num mt-0.5 block text-[11px] text-[#736B5E] dark:text-[#A8A296]">
                       {num(o.items_count)} قطعة
                     </span>
                   </td>
 
                   <td>
-                    <span className="block">{o.customer_name}</span>
-                    <span className="num block text-xs2 text-ink-42" dir="ltr">
+                    <span className="block font-medium">{o.customer_name}</span>
+                    <span className="num block text-[11px] text-[#736B5E] dark:text-[#A8A296]" dir="ltr">
                       {o.phone}
                     </span>
                   </td>
 
-                  <td>
-                    <span className="block">{o.governorate}</span>
-                    <span className="block text-xs2 text-ink-42">{o.area}</span>
+                  <td className="w-32">
+                    <span className="block font-medium">{o.governorate}</span>
+                    <span className="block text-[11px] text-[#736B5E] dark:text-[#A8A296]">{o.area}</span>
                   </td>
 
-                  <td className="num text-end">{egp(o.total)}</td>
+                  <td className="num w-28 text-end font-semibold text-[#C9A84C]">{egp(o.total)}</td>
 
-                  <td>
-                    <span className="block text-xs2">
+                  <td className="w-32 text-center">
+                    <span className="block text-xs font-medium">
                       {PAYMENT_METHOD_SHORT[o.payment_method] || o.payment_method}
                     </span>
                     <span
-                      className={`chip mt-1 ${PAYMENT_STATUS_STYLE[o.payment_status] || ''}`}
+                      className={`chip mt-1 text-[11px] px-2 py-0.5 rounded-full inline-flex ${PAYMENT_STATUS_STYLE[o.payment_status] || ''}`}
                     >
                       {PAYMENT_STATUS[o.payment_status]}
                     </span>
                   </td>
 
-                  <td>
-                    <span className={`chip ${STATUS_STYLE[o.status] || ''}`}>
+                  <td className="w-28 text-center">
+                    <span className={`chip text-[11px] px-2 py-0.5 rounded-full inline-flex ${STATUS_STYLE[o.status] || ''}`}>
                       {ORDER_STATUS[o.status]}
                     </span>
                   </td>
 
-                  <td className="num text-end text-xs2 text-ink-60">
+                  <td className="num w-36 text-end text-xs text-[#736B5E] dark:text-[#A8A296]">
                     {dateTimeAr(o.created_at)}
                   </td>
                 </tr>
@@ -213,22 +215,30 @@ async function OrdersTable({ sp }) {
 
       {/* ── الصفحات ── */}
       {pages > 1 ? (
-        <div className="mt-5 flex items-center justify-between border-t border-hair-soft pt-4">
+        <div className="mt-6 flex items-center justify-between border-t border-[#E8E6E1] dark:border-[#2E2B22] pt-4">
           {page > 1 ? (
-            <Link href={href({ page: page - 1 })} className="btn-ghost">
-              الأحدث
+            <Link
+              href={href({ page: page - 1 })}
+              className="inline-flex items-center gap-1 rounded-full border border-[#E8E6E1] dark:border-[#2E2B22] px-3.5 py-1.5 text-xs font-semibold text-[#1A1814] dark:text-[#F5F2EB] hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors"
+            >
+              <ChevronRight className="w-3.5 h-3.5" />
+              <span>الأحدث</span>
             </Link>
           ) : (
             <span />
           )}
 
-          <span className="num text-xs2 text-ink-60">
+          <span className="num text-xs font-semibold text-[#736B5E] dark:text-[#A8A296]">
             صفحة {num(page)} من {num(pages)}
           </span>
 
           {page < pages ? (
-            <Link href={href({ page: page + 1 })} className="btn-ghost">
-              الأقدم
+            <Link
+              href={href({ page: page + 1 })}
+              className="inline-flex items-center gap-1 rounded-full border border-[#E8E6E1] dark:border-[#2E2B22] px-3.5 py-1.5 text-xs font-semibold text-[#1A1814] dark:text-[#F5F2EB] hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors"
+            >
+              <span>الأقدم</span>
+              <ChevronLeft className="w-3.5 h-3.5" />
             </Link>
           ) : (
             <span />
@@ -255,13 +265,17 @@ export default async function OrdersPage({ searchParams }) {
   })();
 
   return (
-    <>
+    <AnimateIn>
       <PageHead
         title="الأوردرات"
         hint="متابعة وتأكيد طلبات المتجر مع تحديث فوري للحالة"
       >
-        <a href={exportHref} className="btn-ghost">
-          نزّل Excel
+        <a
+          href={exportHref}
+          className="inline-flex items-center gap-2 rounded-full border border-[#E8E6E1] dark:border-[#2E2B22] bg-white dark:bg-[#1A1814] px-4 py-2 text-xs font-semibold text-[#1A1814] dark:text-[#F5F2EB] shadow-sm hover:border-[#C9A84C] hover:text-[#C9A84C] transition-all"
+        >
+          <FileSpreadsheet className="w-4 h-4 text-[#C9A84C]" />
+          <span>تصدير Excel</span>
         </a>
       </PageHead>
 
@@ -276,6 +290,6 @@ export default async function OrdersPage({ searchParams }) {
       <Suspense key={JSON.stringify(sp)} fallback={<OrdersTableSkeleton />}>
         <OrdersTable sp={sp} />
       </Suspense>
-    </>
+    </AnimateIn>
   );
 }

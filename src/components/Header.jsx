@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ShoppingBag } from 'lucide-react';
 import Logo from '@/components/Logo';
 import ThemeToggle from '@/components/ThemeToggle';
 import { useCart } from '@/lib/cart';
@@ -84,13 +85,15 @@ export default function Header({ settings, announcement = '', freeShipThreshold 
 
       <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#1C1A14]/90 backdrop-blur-md border-b border-[#E8E6E1] dark:border-[#2E2B22]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-          {/* Logo (RTL: Visual Right / End) */}
-          <Link href="/" aria-label="الصفحة الرئيسية" className="shrink-0 flex items-center">
-            <Logo size={36} tone="onLight" />
-          </Link>
+          {/* Logo (RTL: Visual Right / Start) */}
+          <div className="flex-1 flex justify-start">
+            <Link href="/" aria-label="الصفحة الرئيسية" className="shrink-0 flex items-center">
+              <Logo size={36} tone="onLight" />
+            </Link>
+          </div>
 
           {/* Desktop Nav Links (Center) */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center justify-center gap-8">
             {NAV_LINKS.map((n) => {
               const active = n.href === '/' ? pathname === '/' : pathname.startsWith(n.href);
               return (
@@ -114,27 +117,23 @@ export default function Header({ settings, announcement = '', freeShipThreshold 
             })}
           </nav>
 
-          {/* Cart & Theme Toggle (RTL: Visual Left / Start) */}
-          <div className="flex items-center gap-3">
+          {/* Cart & Theme Toggle (RTL: Visual Left / End) */}
+          <div className="flex-1 flex items-center justify-end gap-2.5">
             <ThemeToggle />
 
             <button
               type="button"
               onClick={() => setOpen(true)}
-              aria-label="فتح عربة التسوق"
-              className="relative inline-flex items-center justify-center gap-2 bg-[#1A1814] hover:bg-[#2D2921] text-white text-sm font-semibold px-4 py-2 rounded-lg transition-colors duration-150 active:scale-[0.97] min-h-[44px]"
+              aria-label="سلة المشتريات"
+              title="سلة المشتريات"
+              className="relative grid h-9 w-9 place-items-center rounded-lg border border-[#E8E6E1] dark:border-[#2E2B22] text-[#1A1814] dark:text-[#F5F2EB] hover:text-[#C9A84C] dark:hover:text-[#C9A84C] hover:border-[#C9A84C]/50 hover:bg-[#C9A84C]/10 dark:hover:bg-[#C9A84C]/15 transition-all duration-200 active:scale-95"
             >
-              <span>العربة</span>
-              <span className="relative flex items-center justify-center">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                </svg>
-                {count > 0 ? (
-                  <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#C9A84C] text-white text-[10px] font-semibold rounded-full flex items-center justify-center num">
-                    {count}
-                  </span>
-                ) : null}
-              </span>
+              <ShoppingBag strokeWidth={1.6} className="w-4 h-4" />
+              {count > 0 ? (
+                <span className="absolute -top-1.5 -end-1.5 min-w-[18px] h-[18px] px-1 bg-gradient-to-r from-[#C9A84C] to-[#8B6914] text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm num">
+                  {count}
+                </span>
+              ) : null}
             </button>
           </div>
         </div>

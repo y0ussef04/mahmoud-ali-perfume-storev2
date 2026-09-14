@@ -10,6 +10,7 @@
 
 import { useMemo, useState } from 'react';
 import ProductCard from '@/components/ProductCard';
+import AnimateIn from '@/components/AnimateIn';
 import { egp, num } from '@/lib/money';
 import { COUNTRY, FAMILY, GENDER } from '@/lib/labels';
 
@@ -214,7 +215,7 @@ export default function Catalog({ products, brands, initialFamily = '' }) {
 
       {/* ─── شبكة الكروت (2 للموبايل / 3 للتابلت / 4 للكمبيوتر) ─── */}
       {shown.length === 0 ? (
-        <div className="bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl p-12 text-center space-y-3">
+        <AnimateIn direction="up" className="bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl p-12 text-center space-y-3">
           <p className="text-lg font-semibold text-[#1A1814] dark:text-white">لا توجد عطور مطابقة للبحث</p>
           <p className="text-sm text-[#6B6760] dark:text-[#A09C94]">
             جرب إعادة ضبط الفلاتر للحصول على جميع العطور المتاحة.
@@ -226,11 +227,13 @@ export default function Catalog({ products, brands, initialFamily = '' }) {
           >
             عرض كافة العطور
           </button>
-        </div>
+        </AnimateIn>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {shown.map((p) => (
-            <ProductCard key={p.id} product={p} />
+          {shown.map((p, idx) => (
+            <AnimateIn key={p.id} direction="up" delay={(idx % 12) * 0.05}>
+              <ProductCard product={p} />
+            </AnimateIn>
           ))}
         </div>
       )}

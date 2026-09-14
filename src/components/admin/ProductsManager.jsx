@@ -5,6 +5,7 @@ import { useMemo, useState } from 'react';
 import { Panel, Empty } from '@/components/admin/ui';
 import { egp, num } from '@/lib/money';
 import { FAMILY, GENDER } from '@/lib/labels';
+import { Search, RotateCcw, ExternalLink } from 'lucide-react';
 
 const LOW_AT = 5;
 
@@ -80,19 +81,7 @@ export default function ProductsManager({ initialProducts = [], brands = [] }) {
                 className="field ps-9"
                 placeholder="ابحث بالاسم العربي أو الإنجليزي (مثال: خمرة)..."
               />
-              <svg
-                className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-42 pointer-events-none"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#736B5E] dark:text-[#A8A296] pointer-events-none" />
             </div>
           </div>
 
@@ -135,9 +124,10 @@ export default function ProductsManager({ initialProducts = [], brands = [] }) {
             <button
               type="button"
               onClick={resetFilters}
-              className="btn-quiet text-garnet font-medium h-[2.9rem] flex items-center gap-1.5"
+              className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-3.5 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition-colors"
             >
-              <span>صفّر الفلتر</span>
+              <RotateCcw className="w-3 h-3" />
+              <span>إعادة ضبط</span>
             </button>
           ) : null}
         </div>
@@ -166,17 +156,17 @@ export default function ProductsManager({ initialProducts = [], brands = [] }) {
               : 'مافيش عطور لسه. ابدأ بـ أضف عطر.'}
           </Empty>
         ) : (
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
             <table className="tbl">
               <thead>
                 <tr>
                   <th>العطر</th>
-                  <th>العائلة</th>
-                  <th className="text-end">الأحجام</th>
-                  <th className="text-end">أرخص سعر</th>
-                  <th className="text-end">المخزون</th>
-                  <th>الحالة</th>
-                  <th />
+                  <th className="w-28 text-start">العائلة</th>
+                  <th className="w-20 text-center">الأحجام</th>
+                  <th className="w-28 text-end">أرخص سعر</th>
+                  <th className="w-32 text-center">المخزون</th>
+                  <th className="w-24 text-center">الحالة</th>
+                  <th className="w-24 text-end">معاينة</th>
                 </tr>
               </thead>
               <tbody>
@@ -185,64 +175,65 @@ export default function ProductsManager({ initialProducts = [], brands = [] }) {
                     <td>
                       <Link
                         href={`/admin/products/${p.id}`}
-                        className="text-brass underline underline-offset-4 hover:text-brass-light font-medium"
+                        className="font-medium text-[#1A1814] dark:text-[#F5F2EB] hover:text-[#C9A84C] transition-colors block"
                       >
                         {p.name_ar}
                       </Link>
-                      <span className="block text-xs2 text-ink-42">
+                      <span className="block text-[11px] text-[#736B5E] dark:text-[#A8A296] mt-0.5">
                         {p.brand?.name_ar || '—'}
                         {p.gender ? ` · ${GENDER[p.gender] || p.gender}` : ''}
                       </span>
                     </td>
 
-                    <td className="text-xs2">{FAMILY[p.family] || p.family}</td>
+                    <td className="w-28 text-xs text-[#736B5E] dark:text-[#A8A296]">{FAMILY[p.family] || p.family}</td>
 
-                    <td className="num text-end">{num(p.variantCount)}</td>
+                    <td className="num w-20 text-center font-medium">{num(p.variantCount)}</td>
 
-                    <td className="num text-end">
+                    <td className="num w-28 text-end font-semibold text-[#C9A84C]">
                       {p.minPrice > 0 ? egp(p.minPrice) : '—'}
                     </td>
 
-                    <td className="num text-end">
+                    <td className="w-32 text-center">
                       <span
-                        className={
+                        className={`inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
                           p.totalStock === 0
-                            ? 'text-garnet font-semibold'
+                            ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
                             : p.lowCount > 0
-                            ? 'text-brass font-semibold'
-                            : 'text-oud'
-                        }
+                            ? 'bg-[#C9A84C]/15 text-[#C9A84C]'
+                            : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                        }`}
                       >
                         {num(p.totalStock)}
                       </span>
                       {p.offCount > 0 ? (
-                        <span className="num mt-0.5 block text-xs2 text-garnet">
-                          {num(p.offCount)} حجم خلص
+                        <span className="num mt-1 block text-[10px] text-rose-600 dark:text-rose-400">
+                          {num(p.offCount)} حجم نفد
                         </span>
                       ) : p.lowCount > 0 ? (
-                        <span className="num mt-0.5 block text-xs2 text-brass">
-                          {num(p.lowCount)} حجم قرّب يخلص
+                        <span className="num mt-1 block text-[10px] text-[#C9A84C]">
+                          {num(p.lowCount)} حجم أوشك
                         </span>
                       ) : null}
                     </td>
 
-                    <td>
-                      <span className="chip" data-on={p.is_active ? '1' : '0'}>
+                    <td className="w-24 text-center">
+                      <span className="chip text-[11px] px-2 py-0.5 rounded-full" data-on={p.is_active ? '1' : '0'}>
                         {p.is_active ? 'معروض' : 'مخفي'}
                       </span>
                       {p.is_featured ? (
-                        <span className="chip mt-1 block w-fit">مميّز</span>
+                        <span className="chip mt-1 text-[10px] px-2 py-0.2 rounded-full block w-fit mx-auto">مميّز</span>
                       ) : null}
                     </td>
 
-                    <td className="text-end">
+                    <td className="w-24 text-end">
                       <Link
                         href={`/products/${p.slug}`}
                         target="_blank"
-                        className="btn-quiet"
+                        className="inline-flex items-center gap-1 text-xs text-[#736B5E] dark:text-[#A8A296] hover:text-[#C9A84C] transition-colors font-medium"
                         prefetch={false}
                       >
-                        شوفه في المتجر
+                        <span>المتجر</span>
+                        <ExternalLink className="w-3 h-3" />
                       </Link>
                     </td>
                   </tr>

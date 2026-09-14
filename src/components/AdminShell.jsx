@@ -3,18 +3,32 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import {
+  LayoutDashboard,
+  ShoppingBag,
+  Package,
+  MessageSquareQuote,
+  Tag,
+  Truck,
+  ShieldCheck,
+  Menu,
+  X,
+  LogOut,
+  ExternalLink,
+  User,
+} from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Mark } from '@/components/Logo';
 import ThemeToggle from '@/components/ThemeToggle';
 
 const NAV = [
-  { href: '/admin', label: 'نظرة عامة', hint: 'الأرقام والرسوم', perm: 'dashboard.view' },
-  { href: '/admin/orders', label: 'الأوردرات', hint: 'المتابعة والتأكيد', perm: 'orders.view' },
-  { href: '/admin/products', label: 'العطور والمخزون', hint: 'الأسعار والكميات', perm: 'products.view' },
-  { href: '/admin/reviews', label: 'آراء العملاء', hint: 'اسكرينات الشات والتقييمات', perm: 'products.view' },
-  { href: '/admin/coupons', label: 'أكواد الخصم', hint: 'العروض', perm: 'coupons.view' },
-  { href: '/admin/shipping', label: 'الشحن والإعدادات', hint: 'أسعار الشحن والشريط المتحرك', perm: 'shipping.view' },
-  { href: '/admin/admins', label: 'مديرو المتجر', hint: 'الحسابات والصلاحيات', perm: 'admins.view' },
+  { href: '/admin', label: 'نظرة عامة', hint: 'الأرقام والرسوم', perm: 'dashboard.view', icon: LayoutDashboard },
+  { href: '/admin/orders', label: 'الأوردرات', hint: 'المتابعة والتأكيد', perm: 'orders.view', icon: ShoppingBag },
+  { href: '/admin/products', label: 'العطور والمخزون', hint: 'الأسعار والكميات', perm: 'products.view', icon: Package },
+  { href: '/admin/reviews', label: 'آراء العملاء', hint: 'اسكرينات الشات والتقييمات', perm: 'products.view', icon: MessageSquareQuote },
+  { href: '/admin/coupons', label: 'أكواد الخصم', hint: 'العروض', perm: 'coupons.view', icon: Tag },
+  { href: '/admin/shipping', label: 'الشحن والإعدادات', hint: 'أسعار الشحن والشريط المتحرك', perm: 'shipping.view', icon: Truck },
+  { href: '/admin/admins', label: 'مديرو المتجر', hint: 'الحسابات والصلاحيات', perm: 'admins.view', icon: ShieldCheck },
 ];
 
 export default function AdminShell({ admin, pending = 0, children }) {
@@ -48,8 +62,9 @@ export default function AdminShell({ admin, pending = 0, children }) {
   }
 
   const nav = (
-    <nav className="space-y-1">
+    <nav className="space-y-1.5 px-3">
       {visibleNav.map((item) => {
+        const Icon = item.icon;
         const active =
           item.href === '/admin'
             ? pathname === '/admin'
@@ -67,25 +82,34 @@ export default function AdminShell({ admin, pending = 0, children }) {
               if (pathname !== item.href) setNavigatingTo(item.href);
             }}
             aria-current={active ? 'page' : undefined}
-            className={`flex items-center justify-between gap-2 border-s-2 px-4 py-3
-                        transition-colors ${
-                          active
-                            ? 'border-brass bg-brass/12 text-brass-gilt'
-                            : 'border-transparent text-frost/70 hover:bg-white/5 hover:text-frost'
-                        } ${isPending ? 'opacity-75 bg-brass/10 border-s-brass animate-pulse' : ''}`}
+            className={`group relative flex items-center justify-between gap-3 px-3.5 py-3 rounded-xl transition-all duration-200 ${
+              active
+                ? 'bg-gradient-to-r from-[#C9A84C]/25 to-[#C9A84C]/10 text-[#C9A84C] font-semibold border border-[#C9A84C]/30 shadow-sm'
+                : 'text-[#FAF9F5]/70 hover:text-white hover:bg-white/[0.06] border border-transparent'
+            } ${isPending ? 'opacity-75 animate-pulse' : ''}`}
           >
-            <span>
-              <span className="block text-xs1 flex items-center gap-1.5">
-                {item.label}
-                {isPending ? (
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-brass animate-ping" />
-                ) : null}
-              </span>
-              <span className="mt-0.5 block text-xs2 text-frost/35">{item.hint}</span>
-            </span>
+            <div className="flex items-center gap-3 min-w-0">
+              <Icon
+                className={`w-4 h-4 shrink-0 transition-transform duration-200 group-hover:scale-110 ${
+                  active ? 'text-[#C9A84C]' : 'text-[#FAF9F5]/50 group-hover:text-white'
+                }`}
+                strokeWidth={1.75}
+              />
+              <div className="truncate">
+                <span className="block text-xs font-semibold leading-tight flex items-center gap-1.5">
+                  {item.label}
+                  {isPending ? (
+                    <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#C9A84C] animate-ping" />
+                  ) : null}
+                </span>
+                <span className="mt-0.5 block text-[11px] text-[#FAF9F5]/40 truncate">
+                  {item.hint}
+                </span>
+              </div>
+            </div>
 
             {item.href === '/admin/orders' && pending > 0 ? (
-              <span className="num shrink-0 bg-brass px-2 py-0.5 text-xs2 text-lacquer">
+              <span className="num shrink-0 rounded-full bg-gradient-to-r from-[#C9A84C] to-[#E5C773] text-[#1A1814] font-bold text-[11px] px-2 py-0.5 shadow-sm">
                 {pending}
               </span>
             ) : null}
@@ -96,78 +120,92 @@ export default function AdminShell({ admin, pending = 0, children }) {
   );
 
   const foot = (
-    <div className="border-t border-brass/20 px-4 py-4 space-y-2">
+    <div className="border-t border-[#C9A84C]/15 px-4 py-4 space-y-3 bg-black/20">
       <div className="flex items-center justify-between gap-2">
-        <span className="font-semibold text-xs1 text-frost truncate">
-          {admin?.full_name || (isManager ? 'المدير العام' : 'مشرف')}
-        </span>
+        <div className="flex items-center gap-2 min-w-0">
+          <div className="w-8 h-8 rounded-full bg-[#C9A84C]/15 border border-[#C9A84C]/30 flex items-center justify-center shrink-0 text-[#C9A84C]">
+            <User className="w-4 h-4" />
+          </div>
+          <div className="truncate">
+            <span className="font-semibold text-xs text-white truncate block">
+              {admin?.full_name || (isManager ? 'المدير العام' : 'مشرف')}
+            </span>
+            <p className="truncate text-[10px] text-[#FAF9F5]/50 font-mono" dir="ltr">
+              {admin?.email}
+            </p>
+          </div>
+        </div>
+
         <span
-          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold ${
+          className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold ${
             isManager
-              ? 'bg-brass/20 text-brass-light border border-brass/40'
-              : 'bg-white/10 text-frost/80 border border-white/20'
+              ? 'bg-[#C9A84C]/20 text-[#E5C773] border border-[#C9A84C]/40'
+              : 'bg-white/10 text-white/80 border border-white/20'
           }`}
         >
           {isManager ? 'مدير عام' : 'مشرف'}
         </span>
       </div>
-      <p className="truncate text-xs2 text-frost/50 font-mono" dir="ltr">
-        {admin?.email}
-      </p>
-      <div className="pt-2 flex items-center gap-3">
+
+      <div className="pt-2 flex items-center justify-between border-t border-white/5 text-xs">
         <button
           type="button"
           onClick={signOut}
           disabled={busy}
-          className="text-xs2 tracking-wide2 text-brass hover:text-brass-gilt disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 text-xs text-[#C9A84C] hover:text-[#E5C773] disabled:opacity-50 transition-colors"
         >
-          {busy ? 'بيخرج…' : 'خروج'}
+          <LogOut className="w-3.5 h-3.5" />
+          <span>{busy ? 'جاري الخروج…' : 'تسجيل الخروج'}</span>
         </button>
-        <span aria-hidden="true" className="text-brass/30">·</span>
+
         <Link
           href="/"
-          className="text-xs2 tracking-wide2 text-frost/50 hover:text-frost"
+          target="_blank"
+          className="inline-flex items-center gap-1 text-xs text-[#FAF9F5]/50 hover:text-white transition-colors"
         >
-          المتجر
+          <span>المتجر</span>
+          <ExternalLink className="w-3 h-3" />
         </Link>
       </div>
     </div>
   );
 
   return (
-    <div className="relative min-h-screen lg:grid lg:grid-cols-[16rem_1fr] print:block">
+    <div className="relative min-h-screen lg:grid lg:grid-cols-[17rem_1fr] print:block bg-[#FBFBF9] dark:bg-[#12110F] text-[#1A1814] dark:text-[#F5F2EB]">
       {navigatingTo ? (
         <div
           role="progressbar"
           aria-label="جاري التحميل"
-          className="fixed top-0 inset-x-0 h-[2px] bg-brass shadow-[0_0_8px_rgba(201,168,76,0.8)] z-50 animate-pulse pointer-events-none"
+          className="fixed top-0 inset-x-0 h-[2px] bg-gradient-to-r from-[#C9A84C] via-[#E5C773] to-[#C9A84C] shadow-[0_0_10px_rgba(201,168,76,0.8)] z-50 animate-pulse pointer-events-none"
         />
       ) : null}
 
-      <aside className="no-print hidden bg-lacquer lg:flex lg:h-screen lg:flex-col lg:sticky lg:top-0">
-        <div className="flex items-center gap-3 px-4 py-5">
+      {/* شريط المنيو الجانبي للشاشات الكبيرة */}
+      <aside className="no-print hidden bg-[#1A1814] border-e border-[#2A2720] lg:flex lg:h-screen lg:flex-col lg:sticky lg:top-0">
+        <div className="flex items-center gap-3 px-5 py-6 border-b border-[#2A2720]">
           <Mark size={36} />
-          <span className="flex flex-col leading-none">
-            <span className="font-mark text-xs2 tracking-wide3 text-brass-gilt">
-              MAHMOUD&nbsp;ALI
+          <div className="flex flex-col leading-none">
+            <span className="font-mark text-xs tracking-widest text-[#E5C773] font-bold">
+              MAHMOUD ALI
             </span>
-            <span className="mt-1 font-display text-xs2 text-brass">لوحة التحكم</span>
-          </span>
-          <span className="ms-auto">
+            <span className="mt-1 font-display text-[11px] text-[#C9A84C]">لوحة التحكم</span>
+          </div>
+          <div className="ms-auto">
             <ThemeToggle />
-          </span>
+          </div>
         </div>
 
-        <div className="mt-2 flex-1 overflow-y-auto">{nav}</div>
+        <div className="mt-3 flex-1 overflow-y-auto py-2">{nav}</div>
         {foot}
       </aside>
 
+      {/* شريط التنقل للهواتف */}
       <div className="no-print lg:hidden">
-        <div className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-lacquer px-4 py-3">
-          <span className="flex items-center gap-2.5">
+        <div className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-[#1A1814] border-b border-[#2A2720] px-4 py-3 shadow-md">
+          <div className="flex items-center gap-2.5">
             <Mark size={30} />
-            <span className="font-display text-xs1 text-brass">لوحة التحكم</span>
-          </span>
+            <span className="font-display text-xs font-bold text-[#E5C773]">لوحة التحكم</span>
+          </div>
 
           <div className="flex items-center gap-2">
             <ThemeToggle />
@@ -176,25 +214,28 @@ export default function AdminShell({ admin, pending = 0, children }) {
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-controls="admin-nav"
-              className="border border-brass/40 px-3 py-1.5 text-xs2 tracking-wide2 text-brass"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#C9A84C]/40 bg-[#C9A84C]/10 px-3 py-1.5 text-xs font-semibold text-[#E5C773] active:scale-95 transition-all"
             >
-              {open ? 'اقفل' : 'القائمة'}
+              {open ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+              <span>{open ? 'إغلاق' : 'القائمة'}</span>
               {pending > 0 && !open ? (
-                <span className="num ms-2 bg-brass px-1.5 text-lacquer">{pending}</span>
+                <span className="num ms-1 rounded-full bg-[#C9A84C] text-[#1A1814] px-1.5 py-0.2 text-[10px] font-bold">
+                  {pending}
+                </span>
               ) : null}
             </button>
           </div>
         </div>
 
         {open ? (
-          <div id="admin-nav" className="bg-lacquer pb-2">
-            {nav}
+          <div id="admin-nav" className="bg-[#1A1814] border-b border-[#2A2720] shadow-xl animate-in slide-in-from-top-2 duration-200">
+            <div className="py-3">{nav}</div>
             {foot}
           </div>
         ) : null}
       </div>
 
-      <main className="min-w-0 px-4 py-6 sm:px-7 sm:py-9 print:p-0">{children}</main>
+      <main className="min-w-0 px-4 py-6 sm:px-8 sm:py-8 print:p-0">{children}</main>
     </div>
   );
 }

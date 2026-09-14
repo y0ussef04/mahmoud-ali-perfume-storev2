@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { useEffect, useRef } from 'react';
 import { useCart } from '@/lib/cart';
 import { egp } from '@/lib/money';
+import { X, ShoppingBag } from 'lucide-react';
 
 export default function CartDrawer({ freeShipThreshold = 1500 }) {
   const { items, subtotal, count, setQty, remove, open, setOpen } = useCart();
@@ -111,18 +112,14 @@ export default function CartDrawer({ freeShipThreshold = 1500 }) {
             className="p-2 text-[#6B6760] hover:text-[#1A1814] dark:hover:text-white rounded-lg transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="إغلاق العربة"
           >
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <X strokeWidth={2} className="w-5 h-5" />
           </button>
         </header>
 
         {items.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 text-center">
             <div className="w-12 h-12 rounded-full bg-[#FAFAF8] dark:bg-[#111009] border border-[#E8E6E1] dark:border-[#2E2B22] flex items-center justify-center text-[#6B6760]">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
+              <ShoppingBag strokeWidth={1.5} className="w-6 h-6" />
             </div>
             <p className="text-base font-semibold text-[#1A1814] dark:text-white">العربة فارغة حالياً</p>
             <p className="text-xs text-[#6B6760] dark:text-[#A09C94]">

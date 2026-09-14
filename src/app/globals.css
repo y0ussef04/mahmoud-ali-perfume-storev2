@@ -162,18 +162,28 @@
 
   /* ─── جداول الأدمن ───────────────────────────────────────── */
   .tbl {
-    @apply w-full border-collapse text-sm;
+    @apply w-full border-collapse text-xs text-right;
+  }
+  .tbl thead {
+    @apply bg-[#FBFBFA] dark:bg-[#1C1A14];
   }
   .tbl th {
-    @apply border-b border-hair bg-glass px-4 py-3 text-start text-xs font-semibold
-           text-[#1A1814] dark:text-white;
-    white-space: nowrap;
+    @apply border-b border-[#E8E6E1] dark:border-[#2E2B22] px-4 py-3.5 text-xs font-semibold text-[#736B5E] dark:text-[#A8A296] whitespace-nowrap bg-[#FBFBFA] dark:bg-[#1C1A14];
   }
   .tbl td {
-    @apply border-b border-hair-soft px-4 py-3.5 align-middle text-oud;
+    @apply border-b border-[#F0EFEA] dark:border-[#24211A] px-4 py-3.5 align-middle text-[#1A1814] dark:text-[#F5F2EB];
+  }
+  .tbl tbody tr {
+    @apply transition-colors duration-150;
+  }
+  .tbl tbody tr:last-child td {
+    @apply border-b-0;
+  }
+  .tbl tbody tr:nth-child(even) {
+    @apply bg-[#FAF9F5]/40 dark:bg-[#181611]/40;
   }
   .tbl tbody tr:hover {
-    background: rgba(201, 168, 76, 0.04);
+    @apply bg-[#C9A84C]/[0.05] dark:bg-[#C9A84C]/[0.08];
   }
 
   .num {

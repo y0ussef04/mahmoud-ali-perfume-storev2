@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { requirePermission } from '@/lib/admin-guard';
 import ShippingManager from '@/components/admin/ShippingManager';
 import { PageHead } from '@/components/admin/ui';
+import AnimateIn from '@/components/AnimateIn';
 
 export const dynamic = 'force-dynamic';
 
@@ -10,19 +11,19 @@ export const metadata = { title: 'الشحن والإعدادات' };
 function ShippingSkeleton() {
   return (
     <div className="animate-pulse space-y-6">
-      <div className="surface p-6 space-y-4">
-        <div className="h-5 w-40 bg-hair/50 rounded" />
+      <div className="rounded-2xl border border-[#E8E6E1] dark:border-[#2E2B22] bg-white dark:bg-[#1A1814] p-6 space-y-4">
+        <div className="h-5 w-40 bg-black/10 dark:bg-white/10 rounded" />
         <div className="grid sm:grid-cols-2 gap-4">
-          <div className="h-12 bg-hair/20 rounded border border-hair/30" />
-          <div className="h-12 bg-hair/20 rounded border border-hair/30" />
+          <div className="h-12 bg-black/5 dark:bg-white/5 rounded-xl border border-[#E8E6E1]/50 dark:border-[#2E2B22]/50" />
+          <div className="h-12 bg-black/5 dark:bg-white/5 rounded-xl border border-[#E8E6E1]/50 dark:border-[#2E2B22]/50" />
         </div>
       </div>
-      <div className="surface p-6 space-y-3">
-        <div className="h-5 w-48 bg-hair/50 rounded mb-4" />
+      <div className="rounded-2xl border border-[#E8E6E1] dark:border-[#2E2B22] bg-white dark:bg-[#1A1814] p-6 space-y-3">
+        <div className="h-5 w-48 bg-black/10 dark:bg-white/10 rounded mb-4" />
         {[...Array(5)].map((_, i) => (
           <div
             key={i}
-            className="h-12 w-full bg-hair/20 rounded border border-hair/30"
+            className="h-12 w-full bg-black/5 dark:bg-white/5 rounded-xl border border-[#E8E6E1]/50 dark:border-[#2E2B22]/50"
           />
         ))}
       </div>
@@ -42,9 +43,9 @@ async function ShippingData() {
 
   if (error) {
     return (
-      <p className="border border-garnet bg-garnet/8 px-4 py-3 text-xs1 text-garnet">
+      <div className="rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-xs text-rose-700 dark:text-rose-400">
         {error.message}
-      </p>
+      </div>
     );
   }
 
@@ -53,15 +54,15 @@ async function ShippingData() {
 
 export default function ShippingPage() {
   return (
-    <>
+    <AnimateIn>
       <PageHead
         title="الشحن والإعدادات"
-        hint="أسعار المحافظات، الشريط الإعلاني المتحرك، وأرقام التحويل"
+        hint="أسعار توصيل المحافظات، الشريط الإعلاني المتحرك، وأرقام التحويل"
       />
 
       <Suspense fallback={<ShippingSkeleton />}>
         <ShippingData />
       </Suspense>
-    </>
+    </AnimateIn>
   );
 }

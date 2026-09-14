@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { Panel } from '@/components/admin/ui';
 import { ORDER_STATUS, PAYMENT_STATUS } from '@/lib/labels';
+import { Search, Filter, RotateCcw } from 'lucide-react';
 
 const STATUSES = ['new', 'confirmed', 'packed', 'shipped', 'delivered', 'cancelled', 'returned'];
 const PAY_STATUSES = ['unpaid', 'pending_review', 'paid', 'refunded'];
@@ -73,19 +74,7 @@ export default function OrdersFilter({
               className="field ps-9"
               placeholder="اكتب واضغط Enter أو زر فلتر..."
             />
-            <svg
-              className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ink-42 pointer-events-none"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            <Search className="absolute start-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#736B5E] dark:text-[#A8A296] pointer-events-none" />
           </div>
         </div>
 
@@ -130,15 +119,19 @@ export default function OrdersFilter({
         <button
           type="submit"
           disabled={isPending}
-          className="btn-solid min-h-[2.9rem] flex items-center justify-center gap-1.5 min-w-[5rem]"
+          className="group/btn relative overflow-hidden bg-gradient-to-r from-[#1A1814] to-[#2D2921] dark:from-[#C9A84C] dark:to-[#8B6914] text-white text-xs font-semibold px-5 py-3 rounded-full transition-all duration-300 active:scale-[0.97] min-h-[42px] flex items-center justify-center gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#C9A84C]/20"
         >
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]" />
           {isPending ? (
             <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
             </svg>
           ) : (
-            'فلتر'
+            <>
+              <Filter className="w-3.5 h-3.5 relative" />
+              <span className="relative">تطبيق</span>
+            </>
           )}
         </button>
 
@@ -150,9 +143,10 @@ export default function OrdersFilter({
               setStatus('');
               setPayment('');
             }}
-            className="btn-quiet text-garnet font-medium h-[2.9rem] flex items-center"
+            className="inline-flex items-center gap-1 rounded-full border border-rose-500/30 bg-rose-500/10 px-3.5 py-2 text-xs font-semibold text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 transition-colors"
           >
-            صفّر
+            <RotateCcw className="w-3 h-3" />
+            <span>إعادة ضبط</span>
           </Link>
         ) : null}
       </form>

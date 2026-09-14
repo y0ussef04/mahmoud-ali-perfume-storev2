@@ -12,6 +12,8 @@ import {
   PAYMENT_STATUS_STYLE,
   STATUS_STYLE,
 } from '@/lib/labels';
+import AnimateIn from '@/components/AnimateIn';
+import { ArrowRight, Printer, Phone, ExternalLink } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -68,27 +70,31 @@ export default async function OrderPage({ params }) {
     .join('\n');
 
   return (
-    <>
+    <AnimateIn className="space-y-6">
       {/* ── الرأس ── */}
-      <header className="mb-7">
-        <Link href="/admin/orders" className="btn-quiet">
-          ← كل الأوردرات
+      <header>
+        <Link
+          href="/admin/orders"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#736B5E] dark:text-[#A8A296] hover:text-[#C9A84C] transition-colors"
+        >
+          <ArrowRight className="w-4 h-4" />
+          <span>كل الأوردرات</span>
         </Link>
 
         <div className="mt-4 flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="num font-mark text-d3" dir="ltr">
+            <h1 className="num font-mark text-2xl sm:text-3xl font-bold tracking-tight text-[#1A1814] dark:text-[#F5F2EB]" dir="ltr">
               {order.order_no}
             </h1>
-            <p className="mt-1.5 text-xs2 text-ink-60">
-              اتسجّل {dateTimeAr(order.created_at)}
+            <p className="mt-1.5 text-xs text-[#736B5E] dark:text-[#A8A296]">
+              تم التسجيل {dateTimeAr(order.created_at)}
               {order.updated_at && order.updated_at !== order.created_at
                 ? ` · آخر تحديث ${dateTimeAr(order.updated_at)}`
                 : ''}
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2.5">
             <span className={`chip ${STATUS_STYLE[order.status] || ''}`}>
               {ORDER_STATUS[order.status]}
             </span>
@@ -97,18 +103,19 @@ export default async function OrderPage({ params }) {
             </span>
             <Link
               href={`/admin/orders/${order.id}/invoice`}
-              className="btn-ghost"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#E8E6E1] dark:border-[#2E2B22] bg-white dark:bg-[#1A1814] px-4 py-1.5 text-xs font-semibold text-[#1A1814] dark:text-[#F5F2EB] shadow-sm hover:border-[#C9A84C] hover:text-[#C9A84C] transition-all"
               prefetch={false}
             >
-              اطبع الفاتورة
+              <Printer className="w-3.5 h-3.5" />
+              <span>طباعة الفاتورة</span>
             </Link>
           </div>
         </div>
 
         {order.status === 'cancelled' && order.cancel_reason ? (
-          <p className="mt-4 border border-garnet bg-garnet/8 px-4 py-3 text-xs1 text-garnet">
+          <div className="mt-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-xs text-rose-700 dark:text-rose-400">
             سبب الإلغاء: {order.cancel_reason}
-          </p>
+          </div>
         ) : null}
       </header>
 
@@ -117,30 +124,30 @@ export default async function OrderPage({ params }) {
         <div className="space-y-5">
           {/* البنود */}
           <Panel title="البنود" hint="الأسماء والأسعار محفوظة من وقت الأوردر">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
               <table className="tbl">
                 <thead>
                   <tr>
                     <th>العطر</th>
-                    <th>الحجم</th>
-                    <th className="text-end">السعر</th>
-                    <th className="text-end">الكمية</th>
-                    <th className="text-end">الإجمالي</th>
+                    <th className="w-28 text-start">الحجم</th>
+                    <th className="w-28 text-end">السعر</th>
+                    <th className="w-20 text-center">الكمية</th>
+                    <th className="w-32 text-end">الإجمالي</th>
                   </tr>
                 </thead>
                 <tbody>
                   {(order.order_items || []).map((l) => (
                     <tr key={l.id}>
                       <td>
-                        <span className="block">{l.product_name}</span>
+                        <span className="block font-medium">{l.product_name}</span>
                         <span className="block text-xs2 text-ink-42">
                           {l.brand_name || '—'}
                         </span>
                       </td>
-                      <td>{l.variant_label}</td>
-                      <td className="num text-end">{egp(l.unit_price)}</td>
-                      <td className="num text-end">{num(l.qty)}</td>
-                      <td className="num text-end">{egp(l.line_total)}</td>
+                      <td className="w-28 text-xs text-[#736B5E] dark:text-[#A8A296]">{l.variant_label || 'الأساسي'}</td>
+                      <td className="num w-28 text-end">{egp(l.unit_price)}</td>
+                      <td className="num w-20 text-center">{num(l.qty)}</td>
+                      <td className="num w-32 text-end font-semibold text-[#C9A84C]">{egp(l.line_total)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -238,7 +245,7 @@ export default async function OrderPage({ params }) {
           </Panel>
         </div>
       </div>
-    </>
+    </AnimateIn>
   );
 }
 

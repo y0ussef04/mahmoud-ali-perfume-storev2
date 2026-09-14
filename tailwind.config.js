@@ -73,6 +73,14 @@ module.exports = {
         wrap: '74rem',
         '6xl': '72rem',
       },
+      animation: {
+        shimmer: 'shimmer 1.5s infinite',
+      },
+      keyframes: {
+        shimmer: {
+          '100%': { transform: 'translateX(100%)' },
+        },
+      },
     },
   },
   plugins: [],

@@ -4,9 +4,10 @@ import { requireAdmin } from '@/lib/admin-guard';
 import ProductForm from '@/components/admin/ProductForm';
 import { PageHead } from '@/components/admin/ui';
 import { dateAr } from '@/lib/money';
-
 import { cache } from 'react';
 import { getBrands } from '@/lib/queries';
+import AnimateIn from '@/components/AnimateIn';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -47,24 +48,35 @@ export default async function EditProductPage({ params }) {
   if (!product) notFound();
 
   return (
-    <>
+    <AnimateIn className="space-y-6">
+      <div className="mb-2">
+        <Link
+          href="/admin/products"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#736B5E] dark:text-[#A8A296] hover:text-[#C9A84C] transition-colors"
+        >
+          <ArrowRight className="w-4 h-4" />
+          <span>كل العطور</span>
+        </Link>
+      </div>
+
       <PageHead
         title={product.name_ar}
-        hint={`اتسجّل ${dateAr(product.created_at)} · ${
-          product.is_active ? 'معروض في المتجر' : 'مخفي عن المتجر'
+        hint={`تم التسجيل ${dateAr(product.created_at)} · ${
+          product.is_active ? 'معروض في المتجر للزوار' : 'مخفي عن المتجر حالياً'
         }`}
       >
         <Link
           href={`/products/${product.slug}`}
           target="_blank"
           prefetch={false}
-          className="btn-ghost"
+          className="inline-flex items-center gap-1.5 rounded-full border border-[#E8E6E1] dark:border-[#2E2B22] bg-white dark:bg-[#1A1814] px-4 py-2 text-xs font-semibold text-[#1A1814] dark:text-[#F5F2EB] shadow-sm hover:border-[#C9A84C] hover:text-[#C9A84C] transition-all"
         >
-          شوفه في المتجر
+          <ExternalLink className="w-3.5 h-3.5 text-[#C9A84C]" />
+          <span>معاينة في المتجر</span>
         </Link>
       </PageHead>
 
       <ProductForm product={product} brands={brands || []} />
-    </>
+    </AnimateIn>
   );
 }

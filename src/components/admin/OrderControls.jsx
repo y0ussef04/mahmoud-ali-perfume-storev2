@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { ORDER_STATUS, PAYMENT_STATUS, STATUS_NEXT } from '@/lib/labels';
 import { egp } from '@/lib/money';
 import { invalidateCacheTag } from '@/lib/actions/revalidate';
+import { CheckCircle2, AlertCircle, MessageCircle, Save, Check } from 'lucide-react';
 
 /** 01012345678 → 201012345678 عشان wa.me */
 function waNumber(phone) {
@@ -14,11 +15,11 @@ function waNumber(phone) {
 }
 
 const NOTE_FOR = {
-  confirmed: (o) => `أهلاً بك! تم تأكيد طلبك رقم ${o.order_no} بنجاح ✅ وجاري تجهيزه للشحن بعناية.`,
+  confirmed: (o) => `أهلاً بك! تم تأكيد طلبك رقم ${o.order_no} بنجاح، وجاري تجهيزه للشحن بعناية فائقة.`,
   packed: (o) => `طلبك رقم ${o.order_no} تم تغليفه وتجهيزه بعناية وهو جاهز للتسليم لشركة الشحن.`,
   shipped: (o) =>
-    `شحنتك للطلب رقم ${o.order_no} في الطريق إليك مع مندوب الشحن 🚚. المبلغ المطلوب عند الاستلام: ${o.total} ج.م.`,
-  delivered: (o) => `تم تسليم طلبك رقم ${o.order_no} بنجاح. نتمنى أن تحظى بتجربة عطرية استثنائية 🌿✨`,
+    `شحنتك للطلب رقم ${o.order_no} في الطريق إليك مع مندوب الشحن. المبلغ المطلوب عند الاستلام: ${o.total} ج.م.`,
+  delivered: (o) => `تم تسليم طلبك رقم ${o.order_no} بنجاح. نتمنى لك تجربة عطرية استثنائية من محمود علي.`,
   cancelled: (o) => `تم إلغاء الطلب رقم ${o.order_no}. إذا كان لديك أي استفسار يسعدنا تواصلك معنا دائماً.`,
 };
 
@@ -62,8 +63,8 @@ export default function OrderControls({ order }) {
 
       reset(
         data?.stock_restored
-          ? `الحالة بقت "${ORDER_STATUS[status]}" والمخزون رجع مكانه.`
-          : `الحالة بقت "${ORDER_STATUS[status]}".`
+          ? `الحالة أصبحت "${ORDER_STATUS[status]}" وتمت استعادة المخزون.`
+          : `الحالة أصبحت "${ORDER_STATUS[status]}".`
       );
       await invalidateCacheTag('orders');
       router.refresh();
@@ -187,7 +188,7 @@ export default function OrderControls({ order }) {
             </div>
           </div>
         ) : (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2.5">
             {next.map((s) => {
               const danger = s === 'cancelled' || s === 'returned';
               return (
@@ -196,9 +197,14 @@ export default function OrderControls({ order }) {
                   type="button"
                   onClick={() => setAsking(s)}
                   disabled={!!busy}
-                  className={danger ? 'btn-ghost' : 'btn-solid'}
+                  className={
+                    danger
+                      ? 'rounded-full border border-rose-500/30 bg-rose-500/10 text-rose-600 dark:text-rose-400 hover:bg-rose-500/20 px-4 py-2 text-xs font-semibold transition-colors'
+                      : 'group/btn relative overflow-hidden bg-gradient-to-r from-[#1A1814] to-[#2D2921] dark:from-[#C9A84C] dark:to-[#8B6914] text-white text-xs font-semibold px-4 py-2 rounded-full transition-all duration-300 active:scale-[0.97] shadow-sm hover:shadow-md hover:shadow-[#C9A84C]/20'
+                  }
                 >
-                  {ORDER_STATUS[s]}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+                  <span className="relative">{ORDER_STATUS[s]}</span>
                 </button>
               );
             })}
@@ -255,19 +261,19 @@ export default function OrderControls({ order }) {
 
       {/* ── واتساب ── */}
       {waMsg ? (
-        <div className="border-t border-hair-soft pt-6">
-          <h3 className="label">كلّم العميل</h3>
+        <div className="border-t border-[#E8E6E1] dark:border-[#2E2B22] pt-6">
+          <h3 className="label mb-2">تواصل مع العميل</h3>
           <a
             href={`https://wa.me/${waNumber(order.phone)}?text=${encodeURIComponent(waMsg)}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="btn-ghost"
+            className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/20 px-4 py-2 text-xs font-semibold transition-colors shadow-sm"
           >
-            ابعت تحديث الحالة على واتساب
+            <MessageCircle className="w-4 h-4" />
+            <span>إرسال تحديث الحالة عبر واتساب</span>
           </a>
-          <p className="mt-2 text-xs2 leading-relaxed text-ink-42">
-            الرسالة مكتوبة جاهزة على حسب حالة الأوردر الحالية — تقدر تعدّلها قبل
-            ما تبعتها.
+          <p className="mt-2 text-xs leading-relaxed text-[#736B5E] dark:text-[#A8A296]">
+            الرسالة جاهزة ومصاغة وفق حالة الطلب الحالية — يمكنك مراجعتها قبل الإرسال.
           </p>
         </div>
       ) : null}

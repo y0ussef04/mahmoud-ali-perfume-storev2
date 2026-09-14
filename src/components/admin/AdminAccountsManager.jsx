@@ -11,24 +11,35 @@ import {
   listAuditLogs,
 } from '@/lib/actions/admin-accounts';
 import { dateTimeAr } from '@/lib/money';
+import {
+  Users,
+  FileText,
+  KeyRound,
+  Crown,
+  Shield,
+  Sparkles,
+  Plus,
+  AlertCircle,
+  CheckCircle2,
+} from 'lucide-react';
 
 // تصنيف الصلاحيات لمجموعات واضحة وسهلة الفهم
 const PERMISSION_GROUPS = [
   {
-    category: '📊 لوحة التحكم والمؤشرات',
+    category: 'لوحة التحكم والمؤشرات',
     items: [
       { id: 'dashboard.view', label: 'عرض الإحصائيات والأرقام والرسوم البيانية' },
     ],
   },
   {
-    category: '📦 الأوردرات والمبيعات',
+    category: 'الأوردرات والمبيعات',
     items: [
       { id: 'orders.view', label: 'عرض قائمة الأوردرات وتفاصيل الفواتير' },
       { id: 'orders.update', label: 'تحديث حالة الطلب والدفع وبيانات الشحن' },
     ],
   },
   {
-    category: '🧴 العطور والكاتالوج والمخزون',
+    category: 'العطور والكاتالوج والمخزون',
     items: [
       { id: 'products.view', label: 'استعراض المنتجات والأسعار والمخزون' },
       { id: 'products.create', label: 'إضافة عطور ومنتجات جديدة' },
@@ -37,7 +48,7 @@ const PERMISSION_GROUPS = [
     ],
   },
   {
-    category: '🚚 الشحن والإعدادات والشريط المتحرك',
+    category: 'الشحن والإعدادات والشريط المتحرك',
     items: [
       { id: 'shipping.view', label: 'عرض أسعار الشحن والشريط الإعلاني والإعدادات' },
       { id: 'shipping.update', label: 'تعديل مصاريف الشحن للمحافظات' },
@@ -46,7 +57,7 @@ const PERMISSION_GROUPS = [
     ],
   },
   {
-    category: '🎟️ أكواد الخصم والعروض',
+    category: 'أكواد الخصم والعروض',
     items: [
       { id: 'coupons.view', label: 'عرض أكواد الخصم ونسب التخفيض' },
       { id: 'coupons.create', label: 'إنشاء كود خصم جديد' },
@@ -55,7 +66,7 @@ const PERMISSION_GROUPS = [
     ],
   },
   {
-    category: '👥 إدارة الحسابات وسجل التدقيق (حساس)',
+    category: 'إدارة الحسابات وسجل التدقيق (حساس)',
     items: [
       { id: 'admins.view', label: 'عرض قائمة مديري المتجر' },
       { id: 'audit_logs.view', label: 'استعراض سجل العمليات الإدارية الحساسة' },
@@ -337,17 +348,18 @@ export default function AdminAccountsManager({
       ) : null}
 
       {/* شريط التبويبات الرئيسي */}
-      <div className="flex border-b border-hair-soft gap-2">
+      <div className="flex border-b border-[#E8E6E1] dark:border-[#2E2B22] gap-3">
         <button
           type="button"
           onClick={() => setActiveTab('admins')}
-          className={`pb-3 px-4 text-xs1 font-semibold border-b-2 transition-colors ${
+          className={`flex items-center gap-2 pb-3 px-4 text-xs font-semibold border-b-2 transition-all duration-200 ${
             activeTab === 'admins'
-              ? 'border-brass text-brass-gilt'
-              : 'border-transparent text-ink-60 hover:text-oud'
+              ? 'border-[#C9A84C] text-[#C9A84C]'
+              : 'border-transparent text-[#736B5E] dark:text-[#A8A296] hover:text-[#1A1814] dark:hover:text-white'
           }`}
         >
-          👥 الحسابات والرتب ({admins.length})
+          <Users className="w-4 h-4" />
+          <span>الحسابات والرتب ({admins.length})</span>
         </button>
 
         <button
@@ -356,25 +368,27 @@ export default function AdminAccountsManager({
             setActiveTab('logs');
             refreshLogs();
           }}
-          className={`pb-3 px-4 text-xs1 font-semibold border-b-2 transition-colors ${
+          className={`flex items-center gap-2 pb-3 px-4 text-xs font-semibold border-b-2 transition-all duration-200 ${
             activeTab === 'logs'
-              ? 'border-brass text-brass-gilt'
-              : 'border-transparent text-ink-60 hover:text-oud'
+              ? 'border-[#C9A84C] text-[#C9A84C]'
+              : 'border-transparent text-[#736B5E] dark:text-[#A8A296] hover:text-[#1A1814] dark:hover:text-white'
           }`}
         >
-          📜 سجل العمليات الحساسة (Audit)
+          <FileText className="w-4 h-4" />
+          <span>سجل العمليات الحساسة (Audit)</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab('password')}
-          className={`pb-3 px-4 text-xs1 font-semibold border-b-2 transition-colors ${
+          className={`flex items-center gap-2 pb-3 px-4 text-xs font-semibold border-b-2 transition-all duration-200 ${
             activeTab === 'password'
-              ? 'border-brass text-brass-gilt'
-              : 'border-transparent text-ink-60 hover:text-oud'
+              ? 'border-[#C9A84C] text-[#C9A84C]'
+              : 'border-transparent text-[#736B5E] dark:text-[#A8A296] hover:text-[#1A1814] dark:hover:text-white'
           }`}
         >
-          🔑 أمان حسابك وكلمة المرور
+          <KeyRound className="w-4 h-4" />
+          <span>أمان حسابك وكلمة المرور</span>
         </button>
       </div>
 
@@ -399,9 +413,11 @@ export default function AdminAccountsManager({
                   setNewSuccess('');
                   setShowCreateModal(true);
                 }}
-                className="btn-solid text-xs1 px-4 py-2"
+                className="group/btn relative overflow-hidden bg-gradient-to-r from-[#1A1814] to-[#2D2921] dark:from-[#C9A84C] dark:to-[#8B6914] text-white text-xs font-semibold px-4 py-2.5 rounded-full transition-all duration-300 active:scale-[0.97] flex items-center gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#C9A84C]/20"
               >
-                + إضافة مشرف جديد
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+                <Plus className="w-3.5 h-3.5 relative" />
+                <span className="relative">إضافة مشرف جديد</span>
               </button>
             ) : null}
           </div>
@@ -442,16 +458,16 @@ export default function AdminAccountsManager({
           </div>
 
           {/* جدول الحسابات */}
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
             <table className="tbl">
               <thead>
                 <tr>
                   <th>المستخدم / البريد</th>
-                  <th>الرتبة</th>
-                  <th>الحالة</th>
-                  <th>الصلاحيات الممنوحة</th>
-                  <th>تاريخ الإضافة</th>
-                  <th className="text-end">الإجراءات</th>
+                  <th className="w-36 text-start">الرتبة</th>
+                  <th className="w-24 text-center">الحالة</th>
+                  <th className="w-36 text-start">الصلاحيات</th>
+                  <th className="w-36 text-start">تاريخ الإضافة</th>
+                  <th className="w-36 text-end">الإجراءات</th>
                 </tr>
               </thead>
               <tbody>
@@ -489,13 +505,17 @@ export default function AdminAccountsManager({
 
                         <td>
                           <span
-                            className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold border ${
+                            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border ${
                               isRowManager
-                                ? 'bg-brass/12 text-brass border-brass/30'
-                                : 'bg-elevated text-ink-60 border-hair'
+                                ? 'bg-[#C9A84C]/15 text-[#C9A84C] border-[#C9A84C]/30'
+                                : 'bg-black/5 dark:bg-white/5 text-[#736B5E] dark:text-[#A8A296] border-[#E8E6E1] dark:border-[#2E2B22]'
                             }`}
                           >
-                            <span>{isRowManager ? '👑' : '🛡️'}</span>
+                            {isRowManager ? (
+                              <Crown className="w-3.5 h-3.5 text-[#C9A84C]" />
+                            ) : (
+                              <Shield className="w-3.5 h-3.5 text-[#736B5E] dark:text-[#A8A296]" />
+                            )}
                             <span>{isRowManager ? 'مدير عام (Manager)' : 'مشرف (Admin)'}</span>
                           </span>
                         </td>
@@ -504,13 +524,13 @@ export default function AdminAccountsManager({
                           <span
                             className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
                               isRowDisabled
-                                ? 'bg-garnet/10 text-garnet border border-garnet/20'
-                                : 'bg-sage/10 text-sage border border-sage/20'
+                                ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/20'
+                                : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20'
                             }`}
                           >
                             <span
                               className={`w-1.5 h-1.5 rounded-full ${
-                                isRowDisabled ? 'bg-garnet' : 'bg-sage animate-pulse'
+                                isRowDisabled ? 'bg-rose-500' : 'bg-emerald-500 animate-pulse'
                               }`}
                             />
                             <span>{isRowDisabled ? 'معطّل' : 'نشط'}</span>
@@ -519,8 +539,9 @@ export default function AdminAccountsManager({
 
                         <td>
                           {isRowManager ? (
-                            <span className="text-xs2 text-brass font-semibold">
-                              ✨ كامل الصلاحيات
+                            <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#C9A84C]">
+                              <Sparkles className="w-3.5 h-3.5" />
+                              <span>كامل الصلاحيات</span>
                             </span>
                           ) : (
                             <div className="flex items-center gap-2">
@@ -640,15 +661,15 @@ export default function AdminAccountsManager({
             </button>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
             <table className="tbl">
               <thead>
                 <tr>
-                  <th>الوقت والتاريخ</th>
-                  <th>المنفّذ (Actor)</th>
-                  <th>العملية</th>
-                  <th>الهدف (Target)</th>
-                  <th>التفاصيل الإضافية</th>
+                  <th className="w-36 text-start">الوقت والتاريخ</th>
+                  <th className="w-36 text-start">المنفّذ (Actor)</th>
+                  <th className="w-32 text-center">العملية</th>
+                  <th className="w-36 text-start">الهدف (Target)</th>
+                  <th className="text-start">التفاصيل الإضافية</th>
                 </tr>
               </thead>
               <tbody>

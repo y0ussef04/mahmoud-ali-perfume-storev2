@@ -11,6 +11,9 @@ import {
 } from '@/lib/labels';
 import { normalizePhone } from '@/lib/validate';
 
+import AnimateIn from '@/components/AnimateIn';
+import { PackageSearch } from 'lucide-react';
+
 /** المسار الطبيعي للأوردر — الإلغاء والمرتجع بره المسار */
 const TRACK = ['new', 'confirmed', 'packed', 'shipped', 'delivered'];
 
@@ -60,61 +63,67 @@ export default function TrackOrder() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <header className="text-center">
-        <p className="text-xs2 tracking-wide3 text-brass">تتبع الشحنة</p>
-        <h1 className="mt-3 font-display text-d4">تتبع حالة الطلب</h1>
-        <p className="mt-3 text-xs1 leading-relaxed text-ink-60">
+      <AnimateIn direction="down" className="text-center">
+        <p className="text-xs2 tracking-wide3 text-[#C9A84C]">تتبع الشحنة</p>
+        <h1 className="mt-3 font-display text-3xl font-semibold text-[#1A1814] dark:text-white">تتبع حالة الطلب</h1>
+        <p className="mt-3 text-sm leading-relaxed text-[#6B6760] dark:text-[#A09C94]">
           أدخل رقم الطلب ورقم الهاتف المسجل لديك لمتابعة حالة شحنتك فوراً بدون الحاجة لتسجيل حساب.
         </p>
-      </header>
+      </AnimateIn>
 
-      <form onSubmit={submit} className="surface mt-9 grid gap-5 p-6 sm:grid-cols-2 sm:p-8">
-        <div>
-          <label htmlFor="t-order" className="label">رقم الطلب</label>
-          <input
-            id="t-order"
-            value={orderNo}
-            onChange={(e) => setOrderNo(e.target.value.toUpperCase())}
-            dir="ltr"
-            required
-            minLength={5}
-            pattern="[A-Za-z0-9-]+"
-            className="field num text-start font-mark"
-            placeholder="MA-260909-0001"
-          />
-        </div>
+      <AnimateIn direction="up" delay={0.2}>
+        <form onSubmit={submit} className="bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl mt-9 grid gap-5 p-6 sm:grid-cols-2 sm:p-8 shadow-sm">
+          <div>
+            <label htmlFor="t-order" className="block text-xs font-semibold text-[#6B6760] dark:text-[#A09C94] mb-1.5">رقم الطلب</label>
+            <input
+              id="t-order"
+              value={orderNo}
+              onChange={(e) => setOrderNo(e.target.value.toUpperCase())}
+              dir="ltr"
+              required
+              minLength={5}
+              pattern="[A-Za-z0-9-]+"
+              className="w-full bg-[#FAFAF8] dark:bg-[#111009] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-lg px-4 py-2.5 text-sm text-[#1A1814] dark:text-white placeholder-[#6B6760] focus:outline-none focus:border-[#C9A84C] min-h-[44px] num text-start"
+              placeholder="MA-260909-0001"
+            />
+          </div>
 
-        <div>
-          <label htmlFor="t-phone" className="label">رقم الهاتف</label>
-          <input
-            id="t-phone"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            dir="ltr"
-            inputMode="numeric"
-            required
-            pattern="^01[0125][0-9]{8}$"
-            maxLength={11}
-            className="field text-start"
-            placeholder="01xxxxxxxxx"
-          />
-        </div>
+          <div>
+            <label htmlFor="t-phone" className="block text-xs font-semibold text-[#6B6760] dark:text-[#A09C94] mb-1.5">رقم الهاتف</label>
+            <input
+              id="t-phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              dir="ltr"
+              inputMode="numeric"
+              required
+              pattern="^01[0125][0-9]{8}$"
+              maxLength={11}
+              className="w-full bg-[#FAFAF8] dark:bg-[#111009] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-lg px-4 py-2.5 text-sm text-[#1A1814] dark:text-white placeholder-[#6B6760] focus:outline-none focus:border-[#C9A84C] min-h-[44px] num text-start"
+              placeholder="01xxxxxxxxx"
+            />
+          </div>
 
-        <div className="sm:col-span-2">
-          <button type="submit" disabled={busy} className="btn-solid w-full py-3.5">
-            {busy ? 'جاري البحث…' : 'عرض تفاصيل الطلب'}
-          </button>
-        </div>
+          <div className="sm:col-span-2 pt-2">
+            <button type="submit" disabled={busy} className="group/btn relative overflow-hidden w-full bg-gradient-to-r from-[#1A1814] to-[#2D2921] dark:from-[#C9A84C] dark:to-[#8B6914] text-white text-sm font-semibold py-3.5 rounded-full transition-all duration-300 active:scale-[0.97] min-h-[44px] flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:shadow-[#C9A84C]/20">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+              <div className="relative z-10 flex items-center gap-2">
+                <PackageSearch className="w-4 h-4" strokeWidth={1.5} />
+                <span>{busy ? 'جاري البحث…' : 'عرض تفاصيل الطلب'}</span>
+              </div>
+            </button>
+          </div>
 
-        {error ? (
-          <p
-            role="alert"
-            className="sm:col-span-2 border border-garnet bg-garnet/8 px-4 py-3 text-xs1 text-garnet"
-          >
-            {error}
-          </p>
-        ) : null}
-      </form>
+          {error ? (
+            <p
+              role="alert"
+              className="sm:col-span-2 rounded-lg border border-[#9B1C1C]/20 bg-[#9B1C1C]/5 px-4 py-3 text-sm text-[#9B1C1C]"
+            >
+              {error}
+            </p>
+          ) : null}
+        </form>
+      </AnimateIn>
 
       {order ? <OrderView order={order} /> : null}
     </div>

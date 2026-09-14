@@ -12,6 +12,7 @@ import { useRef, useState } from 'react';
 import ProductPhoto from '@/components/ProductPhoto';
 import { useCart } from '@/lib/cart';
 import { egp } from '@/lib/money';
+import { ShoppingBag } from 'lucide-react';
 
 export default function ProductCard({ product: p }) {
   const { add } = useCart();
@@ -127,42 +128,51 @@ export default function ProductCard({ product: p }) {
           </div>
         ) : null}
 
-        {/* زر الإجراء السريع */}
+        {/* زر الإجراء السريع (Premium Pill Button) */}
         {allOut ? (
           <button
             type="button"
             disabled
-            className="w-full bg-[#E8E6E1] dark:bg-[#2E2B22] text-[#8C877D] text-xs sm:text-sm font-semibold py-2.5 rounded-lg min-h-[44px] cursor-not-allowed"
+            className="w-full bg-[#E8E6E1] dark:bg-[#2E2B22] text-[#8C877D] text-xs font-semibold py-2.5 rounded-full min-h-[40px] cursor-not-allowed flex items-center justify-center gap-2"
           >
-            غير متاح حالياً
+            <ShoppingBag className="w-4 h-4 opacity-50" strokeWidth={1.5} />
+            <span>غير متاح حالياً</span>
           </button>
         ) : (
           <button
             type="button"
             onClick={(e) => handleAdd(selectedVariant, e)}
             disabled={addingState?.id === selectedVariant?.id}
-            className="w-full bg-[#1A1814] hover:bg-[#2D2921] dark:bg-[#25221B] dark:hover:bg-[#332F26] text-white text-xs sm:text-sm font-semibold py-2.5 rounded-lg transition-all duration-150 active:scale-[0.97] min-h-[44px] flex items-center justify-center gap-2"
+            className="w-full group/btn relative overflow-hidden bg-gradient-to-r from-[#1A1814] to-[#2D2921] dark:from-[#C9A84C] dark:to-[#8B6914] text-white text-xs font-semibold py-2.5 rounded-full transition-all duration-300 active:scale-[0.97] min-h-[40px] flex items-center justify-center shadow-md hover:shadow-lg hover:shadow-[#C9A84C]/20"
           >
-            {addingState?.id === selectedVariant?.id ? (
-              addingState.state === 'loading' ? (
-                <span className="inline-flex items-center gap-2">
-                  <svg className="animate-spin h-4 w-4 text-white" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-                  </svg>
-                  <span>جاري الإضافة...</span>
-                </span>
+            {/* لمعة خفيفة عند المرور */}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+            
+            <div className="relative flex items-center justify-center gap-2">
+              {addingState?.id === selectedVariant?.id ? (
+                addingState.state === 'loading' ? (
+                  <span className="inline-flex items-center gap-2">
+                    <svg className="animate-spin h-3.5 w-3.5 text-white" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                    </svg>
+                    <span>جاري الإضافة...</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1.5 text-white font-semibold">
+                    <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>تمت الإضافة</span>
+                  </span>
+                )
               ) : (
-                <span className="inline-flex items-center gap-1.5 text-[#C9A84C] font-semibold">
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span>تمت الإضافة</span>
+                <span className="inline-flex items-center gap-2">
+                  <ShoppingBag className="w-4 h-4 transition-transform duration-300 group-hover/btn:scale-110" strokeWidth={1.5} />
+                  <span>أضف للعربة</span>
                 </span>
-              )
-            ) : (
-              <span>أضف للعربة</span>
-            )}
+              )}
+            </div>
           </button>
         )}
       </div>

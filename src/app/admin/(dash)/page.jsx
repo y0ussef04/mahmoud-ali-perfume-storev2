@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import { Suspense } from 'react';
 import { requirePermission } from '@/lib/admin-guard';
-import { BrandBars, MethodSplit, RevenueChart } from '@/components/admin/Charts';
 import { Broken, Empty, Kpi, PageHead, Panel, RangeTabs } from '@/components/admin/ui';
 import { dateAr, delta, egp, num } from '@/lib/money';
 import { PAYMENT_METHOD } from '@/lib/labels';
+import AnimateIn from '@/components/AnimateIn';
+import { Bell, ArrowUpRight, ArrowLeft } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,47 +15,49 @@ const ALLOWED_DAYS = [7, 30, 90];
 const LOW_STOCK_AT = 5;
 const STALE_AFTER = 60;
 
+import { BrandBars, MethodSplit, RevenueChart } from '@/components/admin/Charts';
+
 function DashboardSkeleton() {
   return (
     <div className="animate-pulse space-y-6">
-      {/* الـ 5 كروت KPI */}
+      {/* كروت KPI */}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="surface p-5 space-y-3">
-            <div className="h-3 w-16 bg-hair/50 rounded" />
-            <div className="h-7 w-28 bg-hair/70 rounded" />
-            <div className="h-3 w-20 bg-hair/30 rounded" />
+          <div key={i} className="rounded-2xl border border-[#E8E6E1] dark:border-[#2E2B22] bg-white dark:bg-[#1A1814] p-5 space-y-3">
+            <div className="h-3 w-16 bg-black/5 dark:bg-white/5 rounded" />
+            <div className="h-7 w-28 bg-black/10 dark:bg-white/10 rounded" />
+            <div className="h-3 w-20 bg-black/5 dark:bg-white/5 rounded" />
           </div>
         ))}
       </div>
 
       {/* الرسوم البيانية */}
       <div className="grid gap-4 xl:grid-cols-[2fr_1fr]">
-        <div className="surface p-5 sm:p-6 space-y-4">
-          <div className="h-5 w-32 bg-hair/50 rounded" />
-          <div className="h-64 w-full bg-hair/20 rounded-lg border border-hair/30" />
+        <div className="rounded-2xl border border-[#E8E6E1] dark:border-[#2E2B22] bg-white dark:bg-[#1A1814] p-6 space-y-4">
+          <div className="h-5 w-32 bg-black/10 dark:bg-white/10 rounded" />
+          <div className="h-64 w-full bg-black/5 dark:bg-white/5 rounded-xl" />
         </div>
-        <div className="surface p-5 sm:p-6 space-y-4">
-          <div className="h-5 w-24 bg-hair/50 rounded" />
-          <div className="h-64 w-full bg-hair/20 rounded-lg border border-hair/30" />
+        <div className="rounded-2xl border border-[#E8E6E1] dark:border-[#2E2B22] bg-white dark:bg-[#1A1814] p-6 space-y-4">
+          <div className="h-5 w-24 bg-black/10 dark:bg-white/10 rounded" />
+          <div className="h-64 w-full bg-black/5 dark:bg-white/5 rounded-xl" />
         </div>
       </div>
 
-      {/* الجداول السفلية */}
+      {/* الجداول */}
       <div className="grid gap-4 xl:grid-cols-2">
-        <div className="surface p-5 sm:p-6 space-y-4">
-          <div className="h-5 w-36 bg-hair/50 rounded" />
+        <div className="rounded-2xl border border-[#E8E6E1] dark:border-[#2E2B22] bg-white dark:bg-[#1A1814] p-6 space-y-4">
+          <div className="h-5 w-36 bg-black/10 dark:bg-white/10 rounded" />
           <div className="space-y-2 pt-2">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-10 w-full bg-hair/20 rounded border border-hair/30" />
+              <div key={i} className="h-11 w-full bg-black/5 dark:bg-white/5 rounded-xl" />
             ))}
           </div>
         </div>
-        <div className="surface p-5 sm:p-6 space-y-4">
-          <div className="h-5 w-36 bg-hair/50 rounded" />
+        <div className="rounded-2xl border border-[#E8E6E1] dark:border-[#2E2B22] bg-white dark:bg-[#1A1814] p-6 space-y-4">
+          <div className="h-5 w-36 bg-black/10 dark:bg-white/10 rounded" />
           <div className="space-y-2 pt-2">
             {[...Array(4)].map((_, i) => (
-              <div key={i} className="h-10 w-full bg-hair/20 rounded border border-hair/30" />
+              <div key={i} className="h-11 w-full bg-black/5 dark:bg-white/5 rounded-xl" />
             ))}
           </div>
         </div>
@@ -105,27 +108,34 @@ async function DashboardData({ days }) {
   const stale = (staleRes.data || []).filter((r) => Number(r.total_stock) > 0);
 
   return (
-    <>
+    <AnimateIn className="space-y-6">
       {/* ── محتاج انتباه ── */}
       {(k.new_orders > 0 || k.pending_review > 0) ? (
-        <div className="mb-7 flex flex-wrap items-center gap-3 border border-brass bg-brass/8 px-4 py-3.5">
-          <span className="text-xs2 tracking-wide2 text-brass">محتاج انتباه</span>
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-[#C9A84C]/40 bg-gradient-to-r from-[#C9A84C]/15 via-[#C9A84C]/5 to-transparent px-5 py-3.5 shadow-sm">
+          <div className="flex items-center gap-2 text-xs font-bold text-[#C9A84C]">
+            <Bell className="w-4 h-4 animate-bounce" />
+            <span>محتاج انتباه:</span>
+          </div>
 
           {k.new_orders > 0 ? (
             <Link
               href="/admin/orders?status=new"
-              className="text-xs1 text-oud underline decoration-brass underline-offset-4"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white dark:bg-[#1A1814] px-3.5 py-1 text-xs font-semibold text-[#1A1814] dark:text-[#F5F2EB] shadow-sm hover:border-[#C9A84C] border border-[#E8E6E1] dark:border-[#2E2B22] transition-colors"
             >
-              <span className="num">{num(k.new_orders)}</span> أوردر جديد مستنّي تأكيد
+              <span className="num font-bold text-[#C9A84C]">{num(k.new_orders)}</span>
+              <span>أوردر جديد مستنّي تأكيد</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-[#C9A84C]" />
             </Link>
           ) : null}
 
           {k.pending_review > 0 ? (
             <Link
               href="/admin/orders?payment=pending_review"
-              className="text-xs1 text-oud underline decoration-brass underline-offset-4"
+              className="inline-flex items-center gap-1.5 rounded-full bg-white dark:bg-[#1A1814] px-3.5 py-1 text-xs font-semibold text-[#1A1814] dark:text-[#F5F2EB] shadow-sm hover:border-[#C9A84C] border border-[#E8E6E1] dark:border-[#2E2B22] transition-colors"
             >
-              <span className="num">{num(k.pending_review)}</span> تحويل مستنّي مراجعة
+              <span className="num font-bold text-[#C9A84C]">{num(k.pending_review)}</span>
+              <span>تحويل مستنّي مراجعة</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-[#C9A84C]" />
             </Link>
           ) : null}
         </div>
@@ -133,18 +143,18 @@ async function DashboardData({ days }) {
 
       {/* ── الأرقام ── */}
       {kpisRes.error ? (
-        <Broken>مانقدرناش نجيب الأرقام: {kpisRes.error.message}</Broken>
+        <Broken>تعذر جلب الأرقام والإحصائيات: {kpisRes.error.message}</Broken>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
           <Kpi
             label="الإيراد"
             value={egp(k.revenue)}
             trend={revTrend}
-            sub="مقارنة بالفترة اللي قبلها"
+            sub="مقارنة بالفترة السابقة"
           />
           <Kpi label="الأوردرات" value={num(k.orders)} trend={ordTrend} />
           <Kpi label="متوسط الأوردر" value={egp(k.aov)} />
-          <Kpi label="القطع المبيعة" value={num(k.units)} />
+          <Kpi label="القطع المباعة" value={num(k.units)} />
           <Kpi
             label="الملغي"
             value={num(k.cancelled)}
@@ -154,9 +164,9 @@ async function DashboardData({ days }) {
         </div>
       )}
 
-      {/* ── الإيراد يوم بيوم ── */}
-      <div className="mt-6 grid gap-4 xl:grid-cols-[2fr_1fr]">
-        <Panel title="الإيراد يوم بيوم" hint="الأوردرات المؤكّدة بس — الجديد والملغي مش محسوب">
+      {/* ── الإيراد يوم بيوم + طرق الدفع ── */}
+      <div className="grid gap-5 xl:grid-cols-[2fr_1fr]">
+        <Panel title="الإيراد يوم بيوم" hint="الأوردرات المؤكّدة فقط — الجديد والملغي غير محسوب">
           {seriesRes.error ? (
             <Broken>{seriesRes.error.message}</Broken>
           ) : (
@@ -164,39 +174,41 @@ async function DashboardData({ days }) {
           )}
         </Panel>
 
-        <Panel title="طرق الدفع" hint={`كل الأوردرات في آخر ${days} يوم`}>
+        <Panel title="طرق الدفع" hint={`جميع الأوردرات في آخر ${days} يوم`}>
           <MethodSplit data={methods} />
-
-          <p className="mt-5 border-t border-hair-soft pt-4 text-xs2 leading-relaxed text-ink-42">
-            لو نسبة الدفع عند الاستلام عالية جداً، ده بيزوّد خطر الإلغاء ورسوم
-            التحصيل.
+          <p className="mt-5 border-t border-[#F0EFEA] dark:border-[#26231C] pt-4 text-xs leading-relaxed text-[#736B5E] dark:text-[#A8A296]">
+            ارتفاع نسبة الدفع عند الاستلام يزيد من مخاطر الإلغاء ومرتجعات الشحن.
           </p>
         </Panel>
       </div>
 
       {/* ── الأكثر مبيعاً + البراندات ── */}
-      <div className="mt-6 grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-5 xl:grid-cols-2">
         <Panel
-          title="أكتر عطور مبيعة"
+          title="أكثر العطور مبيعاً"
           hint={`آخر ${days} يوم · الترتيب حسب الإيراد`}
           action={
-            <Link href="/admin/products" className="btn-quiet">
-              كل العطور
+            <Link
+              href="/admin/products"
+              className="inline-flex items-center gap-1 rounded-full border border-[#E8E6E1] dark:border-[#2E2B22] px-3 py-1 text-xs font-semibold text-[#736B5E] dark:text-[#A8A296] hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors"
+            >
+              <span>كل العطور</span>
+              <ArrowLeft className="w-3 h-3" />
             </Link>
           }
         >
           {topRes.error ? (
             <Broken>{topRes.error.message}</Broken>
           ) : (topRes.data || []).length === 0 ? (
-            <Empty>مافيش مبيعات في الفترة دي.</Empty>
+            <Empty>لا توجد مبيعات مسجلة في هذه الفترة.</Empty>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
               <table className="tbl">
                 <thead>
                   <tr>
                     <th>العطر</th>
-                    <th className="text-end">القطع</th>
-                    <th className="text-end">الإيراد</th>
+                    <th className="w-24 text-center">القطع</th>
+                    <th className="w-32 text-end">الإيراد</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -205,16 +217,16 @@ async function DashboardData({ days }) {
                       <td>
                         <Link
                           href={`/admin/products/${r.product_id}`}
-                          className="text-oud underline decoration-brass underline-offset-4"
+                          className="font-medium text-[#1A1814] dark:text-[#F5F2EB] hover:text-[#C9A84C] transition-colors block"
                         >
                           {r.product_name}
                         </Link>
-                        <span className="block text-xs2 text-ink-42">
+                        <span className="block text-[11px] text-[#736B5E] dark:text-[#A8A296] mt-0.5">
                           {r.brand_name || '—'}
                         </span>
                       </td>
-                      <td className="num text-end">{num(r.units_sold)}</td>
-                      <td className="num text-end">{egp(r.revenue)}</td>
+                      <td className="num w-24 text-center font-semibold">{num(r.units_sold)}</td>
+                      <td className="num w-32 text-end font-semibold text-[#C9A84C]">{egp(r.revenue)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -236,37 +248,40 @@ async function DashboardData({ days }) {
       </div>
 
       {/* ── المخزون: ناقص + راكد ── */}
-      <div className="mt-6 grid gap-4 xl:grid-cols-2">
+      <div className="grid gap-5 xl:grid-cols-2">
         <Panel
           title="تنبيهات المخزون"
-          hint={`عطور خلصت أو فاضل منها ${LOW_STOCK_AT} قطع أو أقل`}
+          hint={`عطور نفدت أو متبقي منها ${LOW_STOCK_AT} قطع أو أقل`}
           action={
-            <Link href="/admin/products?only=low" className="btn-quiet">
-              كل النواقص
+            <Link
+              href="/admin/products?only=low"
+              className="inline-flex items-center gap-1 rounded-full border border-[#E8E6E1] dark:border-[#2E2B22] px-3 py-1 text-xs font-semibold text-[#736B5E] dark:text-[#A8A296] hover:border-[#C9A84C] hover:text-[#C9A84C] transition-colors"
+            >
+              <span>كل النواقص</span>
+              <ArrowLeft className="w-3 h-3" />
             </Link>
           }
         >
           {lowRes.error ? (
             <Broken>{lowRes.error.message}</Broken>
           ) : low.length === 0 ? (
-            <Empty>المخزون مظبوط — مافيش نواقص حرجة.</Empty>
+            <Empty>المخزون ممتاز — لا توجد نواقص حرجة.</Empty>
           ) : (
             <>
               {outOfStock.length > 0 ? (
-                <p className="mb-3 border border-garnet bg-garnet/8 px-3.5 py-2 text-xs2 text-garnet">
-                  فيه <span className="num font-bold">{num(outOfStock.length)}</span> أحجام
-                  خلصت تماماً ولازم تتجدد.
-                </p>
+                <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-2.5 text-xs font-semibold text-rose-700 dark:text-rose-400">
+                  يوجد <span className="num font-bold">{num(outOfStock.length)}</span> أحجام نفدت تماماً ويجب تجديد المخزون.
+                </div>
               ) : null}
 
-              <div className="overflow-x-auto">
+              <div className="overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
                 <table className="tbl">
                   <thead>
                     <tr>
                       <th>العطر</th>
-                      <th>الحجم</th>
-                      <th className="text-end">المتبقي</th>
-                      <th className="text-end">السعر</th>
+                      <th className="w-28 text-start">الحجم</th>
+                      <th className="w-24 text-center">المتبقي</th>
+                      <th className="w-28 text-end">السعر</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -275,27 +290,27 @@ async function DashboardData({ days }) {
                         <td>
                           <Link
                             href={`/admin/products/${r.product_id}`}
-                            className="text-oud underline decoration-brass underline-offset-4"
+                            className="font-medium text-[#1A1814] dark:text-[#F5F2EB] hover:text-[#C9A84C] transition-colors block"
                           >
                             {r.product_name}
                           </Link>
-                          <span className="block text-xs2 text-ink-42">
+                          <span className="block text-[11px] text-[#736B5E] dark:text-[#A8A296] mt-0.5">
                             {r.brand_name || '—'}
                           </span>
                         </td>
-                        <td>{r.variant_label}</td>
-                        <td className="num text-end">
+                        <td className="w-28 text-xs text-[#736B5E] dark:text-[#A8A296]">{r.variant_label || 'الأساسي'}</td>
+                        <td className="num w-24 text-center">
                           <span
-                            className={
+                            className={`inline-flex items-center justify-center px-2.5 py-0.5 rounded-full text-xs font-bold ${
                               r.stock === 0
-                                ? 'text-garnet font-bold'
-                                : 'text-brass font-bold'
-                            }
+                                ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                                : 'bg-[#C9A84C]/15 text-[#C9A84C]'
+                            }`}
                           >
                             {num(r.stock)}
                           </span>
                         </td>
-                        <td className="num text-end">{egp(r.price)}</td>
+                        <td className="num w-28 text-end font-semibold">{egp(r.price)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -307,34 +322,34 @@ async function DashboardData({ days }) {
 
         <Panel
           title="عطور راكدة"
-          hint={`مفيهاش مبيعات بقالها أكتر من ${STALE_AFTER} يوم مع وجود مخزون`}
+          hint={`لم تسجل مبيعات منذ أكثر من ${STALE_AFTER} يوماً مع توفر المخزون`}
         >
           {staleRes.error ? (
             <Broken>{staleRes.error.message}</Broken>
           ) : stale.length === 0 ? (
-            <Empty>مافيش عطر راكد — كله بيتحرّك.</Empty>
+            <Empty>حركة المبيعات ممتازة — لا توجد عطور راكدة.</Empty>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
               <table className="tbl">
                 <thead>
                   <tr>
                     <th>العطر</th>
-                    <th className="text-end">المخزون</th>
-                    <th className="text-end">آخر بيعة</th>
+                    <th className="w-28 text-center">المخزون</th>
+                    <th className="w-36 text-end">آخر طلب</th>
                   </tr>
                 </thead>
                 <tbody>
                   {stale.slice(0, 12).map((r) => (
                     <tr key={r.product_id}>
                       <td>
-                        <span className="block">{r.product_name}</span>
-                        <span className="block text-xs2 text-ink-42">
+                        <span className="block font-medium">{r.product_name}</span>
+                        <span className="block text-[11px] text-[#736B5E] dark:text-[#A8A296] mt-0.5">
                           {r.brand_name || '—'}
                         </span>
                       </td>
-                      <td className="num text-end">{num(r.total_stock)}</td>
-                      <td className="num text-end text-ink-60">
-                        {r.last_sold ? dateAr(r.last_sold) : 'ولا مرة'}
+                      <td className="num w-28 text-center font-semibold text-[#C9A84C]">{num(r.total_stock)}</td>
+                      <td className="w-36 text-end text-xs text-[#736B5E] dark:text-[#A8A296]">
+                        {r.last_sold ? dateAr(r.last_sold) : 'لم يُطلب بعد'}
                       </td>
                     </tr>
                   ))}
@@ -347,37 +362,36 @@ async function DashboardData({ days }) {
 
       {/* ── التوزيع الجغرافي ── */}
       <Panel
-        title="التوزيع الجغرافي ومشاكل الدفع عند الاستلام"
-        hint={`آخر ${days} يوم · نسبة الإلغاء محسوبة على أوردرات الدفع عند الاستلام بس`}
-        className="mt-6"
+        title="التوزيع الجغرافي ومؤشرات الدفع عند الاستلام"
+        hint={`آخر ${days} يوم · نسبة الإلغاء محسوبة على طلبات الدفع عند الاستلام`}
       >
         {geoRes.error ? (
           <Broken>{geoRes.error.message}</Broken>
         ) : geo.length === 0 ? (
-          <Empty>مافيش أوردرات في الفترة دي.</Empty>
+          <Empty>لا توجد طلبات في هذه الفترة.</Empty>
         ) : (
           <>
             {codRisk.length > 0 ? (
-              <p className="mb-4 border border-garnet bg-garnet/8 px-4 py-3 text-xs1 leading-relaxed text-garnet">
-                محافظات نسبة الإلغاء فيها عالية:{' '}
+              <div className="mb-4 rounded-xl border border-rose-500/30 bg-rose-500/10 px-4 py-3 text-xs leading-relaxed text-rose-700 dark:text-rose-400">
+                محافظات تسجل نسبة إلغاء مرتفعة:{' '}
                 {codRisk
                   .slice(0, 4)
                   .map((g) => `${g.governorate} (${num(g.cod_cancel_rate)}%)`)
                   .join(' · ')}
-                . فكّر تطلب دفع مقدّم فيها، أو أكّد بمكالمة قبل الشحن.
-              </p>
+                . يُوصى بتأكيد الطلبات عبر اتصال هاتفي أو طلب سداد مسبق.
+              </div>
             ) : null}
 
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
               <table className="tbl">
                 <thead>
                   <tr>
                     <th>المحافظة</th>
-                    <th className="text-end">الأوردرات</th>
-                    <th className="text-end">الإيراد</th>
-                    <th className="text-end">عند الاستلام</th>
-                    <th className="text-end">اتلغى</th>
-                    <th className="text-end">نسبة الإلغاء</th>
+                    <th className="w-24 text-center">الأوردرات</th>
+                    <th className="w-32 text-end">الإيراد</th>
+                    <th className="w-28 text-center">عند الاستلام</th>
+                    <th className="w-24 text-center">الملغي</th>
+                    <th className="w-28 text-center">نسبة الإلغاء</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -386,17 +400,23 @@ async function DashboardData({ days }) {
                     const hot = g.cod_orders >= 3 && rate >= 20;
                     return (
                       <tr key={g.governorate}>
-                        <td>{g.governorate}</td>
-                        <td className="num text-end">{num(g.orders)}</td>
-                        <td className="num text-end">{egp(g.revenue)}</td>
-                        <td className="num text-end">{num(g.cod_orders)}</td>
-                        <td className="num text-end">{num(g.cod_cancelled)}</td>
-                        <td
-                          className={`num text-end ${
-                            hot ? 'text-garnet' : rate > 0 ? 'text-brass' : 'text-ink-42'
-                          }`}
-                        >
-                          {num(rate)}%
+                        <td className="font-medium">{g.governorate}</td>
+                        <td className="num w-24 text-center">{num(g.orders)}</td>
+                        <td className="num w-32 text-end font-semibold text-[#C9A84C]">{egp(g.revenue)}</td>
+                        <td className="num w-28 text-center">{num(g.cod_orders)}</td>
+                        <td className="num w-24 text-center">{num(g.cod_cancelled)}</td>
+                        <td className="num w-28 text-center">
+                          <span
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold ${
+                              hot
+                                ? 'bg-rose-500/10 text-rose-600 dark:text-rose-400'
+                                : rate > 0
+                                ? 'bg-[#C9A84C]/15 text-[#C9A84C]'
+                                : 'text-[#736B5E] dark:text-[#A8A296]'
+                            }`}
+                          >
+                            {num(rate)}%
+                          </span>
                         </td>
                       </tr>
                     );
@@ -407,7 +427,7 @@ async function DashboardData({ days }) {
           </>
         )}
       </Panel>
-    </>
+    </AnimateIn>
   );
 }
 
@@ -418,8 +438,8 @@ export default async function DashboardPage({ searchParams }) {
 
   return (
     <>
-      {/* ── رأس الصفحة وتبويبات المدة (تظهر فوراً بدون أي تأخير) ── */}
-      <PageHead title="نظرة عامة" hint={`آخر ${days} يوم · محدَّث الآن`}>
+      {/* ── رأس الصفحة وتبويبات المدة الفاخرة ── */}
+      <PageHead title="نظرة عامة" hint={`آخر ${days} يوم · تحديث فوري ولحظي`}>
         <RangeTabs days={days} base="/admin" />
       </PageHead>
 

@@ -6,6 +6,8 @@ import { getBrands } from '@/lib/queries';
 import { unstable_cache } from 'next/cache';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import ProductsManager from '@/components/admin/ProductsManager';
+import AnimateIn from '@/components/AnimateIn';
+import { Plus } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -70,19 +72,24 @@ async function ProductsContent() {
 
 export default function AdminProductsPage() {
   return (
-    <>
+    <AnimateIn>
       <PageHead
         title="العطور والمخزون"
         hint="الأسعار والكميات وحالات العرض في المتجر"
       >
-        <Link href="/admin/products/new" className="btn-solid">
-          أضف عطر
+        <Link
+          href="/admin/products/new"
+          className="group/btn relative overflow-hidden bg-gradient-to-r from-[#1A1814] to-[#2D2921] dark:from-[#C9A84C] dark:to-[#8B6914] text-white text-xs font-semibold px-5 py-2.5 rounded-full transition-all duration-300 active:scale-[0.97] flex items-center gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#C9A84C]/20"
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+          <Plus className="w-4 h-4 relative" />
+          <span className="relative">إضافة عطر جديد</span>
         </Link>
       </PageHead>
 
       <Suspense fallback={<ProductsTableSkeleton />}>
         <ProductsContent />
       </Suspense>
-    </>
+    </AnimateIn>
   );
 }

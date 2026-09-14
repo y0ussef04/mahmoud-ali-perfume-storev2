@@ -548,18 +548,18 @@ function VariantEditor({ productId, initial }) {
         <p className="mt-4 border border-sage bg-sage/8 px-4 py-2.5 text-xs2 text-sage">{ok}</p>
       ) : null}
 
-      <div className="mt-5 overflow-x-auto">
+      <div className="mt-5 overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
         <table className="tbl">
           <thead>
             <tr>
-              <th>الحجم</th>
-              <th className="w-20">مل</th>
-              <th className="w-28">السعر</th>
-              <th className="w-28">قبل الخصم</th>
-              <th className="w-20">المخزون</th>
-              <th className="w-32">SKU</th>
-              <th className="w-16">معروض</th>
-              <th />
+              <th className="text-start">الحجم</th>
+              <th className="w-20 text-center">مل</th>
+              <th className="w-28 text-end">السعر</th>
+              <th className="w-28 text-end">قبل الخصم</th>
+              <th className="w-24 text-center">المخزون</th>
+              <th className="w-32 text-start">SKU</th>
+              <th className="w-16 text-center">معروض</th>
+              <th className="w-24 text-end">الإجراء</th>
             </tr>
           </thead>
           <tbody>

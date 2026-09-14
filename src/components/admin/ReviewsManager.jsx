@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/client';
 import { checkImageFile } from '@/lib/validate';
+import { Plus, Trash2, AlertTriangle, CheckCircle2, Save } from 'lucide-react';
 
 const DEFAULT_REVIEWS = [
   {
@@ -161,7 +162,7 @@ export default function ReviewsManager({ initialReviews = [] }) {
 
       if (dbErr) throw dbErr;
 
-      setOk('تم حفظ آراء العملاء بنجاح ✨');
+      setOk('تم حفظ آراء العملاء بنجاح');
       router.refresh();
     } catch (err) {
       setError(`تعذر الحفظ: ${err.message}`);
@@ -185,30 +186,35 @@ export default function ReviewsManager({ initialReviews = [] }) {
           <button
             type="button"
             onClick={addReview}
-            className="btn-ghost border-brass text-brass-gilt hover:bg-brass/20 text-xs1"
+            className="rounded-full border border-[#C9A84C]/40 bg-[#C9A84C]/10 text-[#C9A84C] hover:bg-[#C9A84C]/20 px-4 py-2 text-xs font-semibold flex items-center gap-1.5 transition-colors"
           >
-            + إضافة رأي/اسكرين جديد
+            <Plus className="w-3.5 h-3.5" />
+            <span>إضافة رأي/اسكرين جديد</span>
           </button>
           <button
             type="button"
             onClick={saveAll}
             disabled={busy}
-            className="btn-solid border-brass-gilt bg-brass-gilt text-lacquer font-bold text-xs1"
+            className="group/btn relative overflow-hidden bg-gradient-to-r from-[#1A1814] to-[#2D2921] dark:from-[#C9A84C] dark:to-[#8B6914] text-white text-xs font-semibold px-5 py-2 rounded-full transition-all duration-300 active:scale-[0.97] flex items-center gap-2 shadow-sm hover:shadow-md hover:shadow-[#C9A84C]/20"
           >
-            {busy ? 'جاري الحفظ…' : 'حفظ التعديلات'}
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+            <Save className="w-3.5 h-3.5 relative" />
+            <span className="relative">{busy ? 'جاري الحفظ…' : 'حفظ التعديلات'}</span>
           </button>
         </div>
       </div>
 
       {error && (
-        <div className="border border-garnet/50 bg-garnet/10 p-3 text-xs1 text-garnet rounded-xs">
-          ⚠️ {error}
+        <div className="flex items-center gap-2 border border-rose-500/30 bg-rose-500/10 p-3 text-xs text-rose-700 dark:text-rose-400 rounded-xl">
+          <AlertTriangle className="w-4 h-4 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {ok && (
-        <div className="border border-emerald-500/50 bg-emerald-500/10 p-3 text-xs1 text-emerald-400 rounded-xs">
-          ✓ {ok}
+        <div className="flex items-center gap-2 border border-emerald-500/30 bg-emerald-500/10 p-3 text-xs text-emerald-700 dark:text-emerald-400 rounded-xl">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <span>{ok}</span>
         </div>
       )}
 
@@ -217,17 +223,17 @@ export default function ReviewsManager({ initialReviews = [] }) {
         {reviews.map((r, index) => (
           <div
             key={r.id}
-            className="surface p-5 border border-hair-soft space-y-4 relative group"
-            style={{ borderRadius: 4 }}
+            className="surface p-5 border border-[#E8E6E1] dark:border-[#2E2B22] rounded-2xl space-y-4 relative group shadow-sm"
           >
-            <div className="flex items-center justify-between border-b border-hair-soft pb-2">
-              <span className="num font-bold text-brass text-xs1">رأي #{index + 1}</span>
+            <div className="flex items-center justify-between border-b border-[#E8E6E1] dark:border-[#2E2B22] pb-3">
+              <span className="num font-bold text-[#C9A84C] text-xs">رأي #{index + 1}</span>
               <button
                 type="button"
                 onClick={() => removeReview(r.id)}
-                className="text-xs2 text-garnet hover:underline"
+                className="inline-flex items-center gap-1 text-xs text-rose-600 dark:text-rose-400 hover:underline"
               >
-                حذف 🗑️
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>حذف</span>
               </button>
             </div>
 

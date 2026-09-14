@@ -17,6 +17,8 @@ import { getProduct, getProductSlugs, getRelated, getSettings } from '@/lib/quer
 import { egp } from '@/lib/money';
 import { settingNum } from '@/lib/totals';
 import { COUNTRY, FAMILY, GENDER } from '@/lib/labels';
+import AnimateIn from '@/components/AnimateIn';
+import { CheckCircle } from 'lucide-react';
 
 export const revalidate = 60;
 
@@ -62,7 +64,7 @@ export default async function ProductPage({ params }) {
         <span className="text-[#1A1814] dark:text-white font-semibold">{p.name_ar}</span>
       </nav>
 
-      <div className="grid gap-8 lg:grid-cols-2 items-start">
+      <AnimateIn direction="down" className="grid gap-8 lg:grid-cols-2 items-start">
         {/* ══════════ العمود الأول: الهوية والنوتات ══════════ */}
         <div className="space-y-6">
           <div className="space-y-2">
@@ -139,42 +141,36 @@ export default async function ProductPage({ params }) {
 
             <ul className="space-y-3 pt-4 border-t border-[#E8E6E1] dark:border-[#2E2B22] text-xs text-[#6B6760] dark:text-[#A09C94]">
               <li className="flex items-center gap-2.5">
-                <svg className="w-4 h-4 text-[#2D6A4F] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <CheckCircle className="w-4 h-4 text-[#C9A84C] shrink-0" strokeWidth={1.5} />
                 <span>عطور أصلية ١٠٠٪ من موزعين معتمدين بالخليج.</span>
               </li>
               {threshold > 0 ? (
                 <li className="flex items-center gap-2.5">
-                  <svg className="w-4 h-4 text-[#2D6A4F] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                  </svg>
+                  <CheckCircle className="w-4 h-4 text-[#C9A84C] shrink-0" strokeWidth={1.5} />
                   <span>
                     شحن مجاني عند الطلب بقيمة <span className="num font-semibold text-[#1A1814] dark:text-white">{egp(threshold)}</span> فأكثر.
                   </span>
                 </li>
               ) : null}
               <li className="flex items-center gap-2.5">
-                <svg className="w-4 h-4 text-[#2D6A4F] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                </svg>
+                <CheckCircle className="w-4 h-4 text-[#C9A84C] shrink-0" strokeWidth={1.5} />
                 <span>الدفع عند الاستلام نقداً، أو إلكترونياً بالبطاقات والمحافظ وإنستاباي.</span>
               </li>
             </ul>
           </div>
         </div>
-      </div>
+      </AnimateIn>
 
       {/* ══════════ عطور شبيهة ══════════ */}
       {related.length ? (
-        <section className="pt-12 border-t border-[#E8E6E1] dark:border-[#2E2B22] space-y-6">
+        <AnimateIn direction="up" className="pt-12 border-t border-[#E8E6E1] dark:border-[#2E2B22] space-y-6">
           <h2 className="text-xl sm:text-2xl font-semibold text-[#1A1814] dark:text-white">عطور مشابهة قد تعجبك</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {related.map((r) => (
               <ProductCard key={r.id} product={r} />
             ))}
           </div>
-        </section>
+        </AnimateIn>
       ) : null}
     </div>
   );

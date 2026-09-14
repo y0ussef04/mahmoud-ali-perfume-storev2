@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { invalidateCacheTag } from '@/lib/actions/revalidate';
 import { parseStrictPositiveNumber, toPositiveInt, toPositiveNumber } from '@/lib/validate';
 import { egp, num } from '@/lib/money';
+import { Sparkles, Megaphone, Tag, Eye, EyeOff, Save } from 'lucide-react';
 
 export default function ShippingManager({ rates, settings }) {
   return (
@@ -53,9 +54,9 @@ const GENERAL_FIELDS = [
 ];
 
 const PRESETS = [
-  '🔥 تخفيضات لفترة محدودة على تشكيلة العطور الأكثر طلباً — تسوق الآن!',
-  '✨ كود خصم حصري: استخدم MAHMOUD10 واحصل على خصم 10% فوراً',
-  '📦 تغليف هدايا فاخر وشحن سريع لجميع محافظات مصر',
+  'تخفيضات لفترة محدودة على تشكيلة العطور الأكثر طلباً — تسوق الآن!',
+  'كود خصم حصري: استخدم MAHMOUD10 واحصل على خصم 10% فوراً',
+  'تغليف هدايا فاخر وشحن سريع لجميع محافظات مصر',
 ];
 
 function SettingsPanel({ initial }) {
@@ -98,8 +99,8 @@ function SettingsPanel({ initial }) {
   // جمل المعاينة الحية
   const thresholdVal = Number(vals.free_ship_threshold) || 0;
   const shipText = thresholdVal > 0 
-    ? `🚚 شحن مجاني لجميع المحافظات للطلبات بقيمة ${egp(thresholdVal)} فأكثر` 
-    : '🚚 شحن مجاني لكل المحافظات';
+    ? `شحن مجاني لجميع المحافظات للطلبات بقيمة ${egp(thresholdVal)} فأكثر` 
+    : 'شحن مجاني لكل المحافظات';
 
   const previewPhrases = useMemo(() => {
     if (!announcementEnabled) return [];
@@ -110,18 +111,18 @@ function SettingsPanel({ initial }) {
     if (announcementMode === 'features_only') {
       return [
         shipText,
-        '💵 خيارات دفع مرنة: عند الاستلام، الفيزا، المحافظ، وإنستاباي',
-        '📦 تغليف فاخر وضمان وصول آمن للشحنة',
-        '✨ عطور إماراتية وسعودية أصلية ١٠٠٪ في مصر',
+        'خيارات دفع مرنة: عند الاستلام، الفيزا، المحافظ، وإنستاباي',
+        'تغليف فاخر وضمان وصول آمن للشحنة',
+        'عطور إماراتية وسعودية أصلية ١٠٠٪ في مصر',
       ];
     }
     // custom_and_features
     return [
-      custom ? `✨ ${custom}` : null,
+      custom ? custom : null,
       shipText,
-      '💵 خيارات دفع مرنة: عند الاستلام، الفيزا، المحافظ، وإنستاباي',
-      '📦 تغليف فاخر وضمان وصول آمن للشحنة',
-      '✨ عطور إماراتية وسعودية أصلية ١٠٠٪ في مصر',
+      'خيارات دفع مرنة: عند الاستلام، الفيزا، المحافظ، وإنستاباي',
+      'تغليف فاخر وضمان وصول آمن للشحنة',
+      'عطور إماراتية وسعودية أصلية ١٠٠٪ في مصر',
     ].filter(Boolean);
   }, [announcementEnabled, announcementMode, announcementText, shipText]);
 
@@ -255,22 +256,23 @@ function SettingsPanel({ initial }) {
                     id: 'custom_and_features',
                     title: 'إعلان مخصص + مزايا المتجر',
                     desc: 'يعرض نص إعلانك متبوعاً بالشحن والتغليف والدفع',
-                    icon: '✨',
+                    icon: Sparkles,
                   },
                   {
                     id: 'custom_only',
                     title: 'إعلاني المخصص فقط',
                     desc: 'يعرض فقط النص المكتوب أدناه بدون المزايا الأخرى',
-                    icon: '📢',
+                    icon: Megaphone,
                   },
                   {
                     id: 'features_only',
                     title: 'مزايا المتجر التلقائية فقط',
                     desc: 'يعرض الشحن المجاني والتغليف والدفع بدون نص مخصص',
-                    icon: '🏷️',
+                    icon: Tag,
                   },
                 ].map((m) => {
                   const active = announcementMode === m.id;
+                  const Icon = m.icon;
                   return (
                     <button
                       key={m.id}
@@ -281,15 +283,15 @@ function SettingsPanel({ initial }) {
                       }}
                       className={`text-start p-3.5 rounded-xl border transition-all text-xs leading-relaxed ${
                         active
-                          ? 'border-brass bg-brass/8 text-oud shadow-sm'
-                          : 'border-hair bg-elevated text-ink-60 hover:border-hair-soft'
+                          ? 'border-[#C9A84C] bg-[#C9A84C]/10 text-[#C9A84C] shadow-sm'
+                          : 'border-[#E8E6E1] dark:border-[#2E2B22] bg-white dark:bg-[#1A1814] text-[#736B5E] dark:text-[#A8A296] hover:border-[#C9A84C]/40'
                       }`}
                     >
-                      <div className="font-semibold text-sm flex items-center gap-1.5 text-oud">
-                        <span>{m.icon}</span>
+                      <div className="font-semibold text-sm flex items-center gap-2">
+                        <Icon className="w-4 h-4 text-[#C9A84C]" />
                         <span>{m.title}</span>
                       </div>
-                      <p className="mt-1 text-ink-60 text-xs2">{m.desc}</p>
+                      <p className="mt-1 text-xs text-[#736B5E] dark:text-[#A8A296]">{m.desc}</p>
                     </button>
                   );
                 })}
@@ -355,13 +357,13 @@ function SettingsPanel({ initial }) {
             {/* المعاينة الحية للشريط المتحرك */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-ink-60 flex items-center gap-1.5">
-                  <span>👁️</span>
+                <span className="text-xs font-semibold text-[#1A1814] dark:text-[#F5F2EB] flex items-center gap-1.5">
+                  <Eye className="w-4 h-4 text-[#C9A84C]" />
                   <span>معاينة حية ومباشرة للشريط كما يراه الزائر في أعلى الموقع:</span>
                 </span>
-                <span className="text-xs2 text-ink-42">(قف بالماوس لإيقاف الحركة مؤقتاً)</span>
+                <span className="text-xs text-[#736B5E] dark:text-[#A8A296]">(قف بالماوس لإيقاف الحركة مؤقتاً)</span>
               </div>
-              <div className="rounded-lg overflow-hidden border border-[#2E2B22] shadow-inner bg-[#1A1814] text-xs py-2 text-[#C9A84C] font-semibold select-none">
+              <div className="rounded-xl overflow-hidden border border-[#2E2B22] shadow-inner bg-[#1A1814] text-xs py-2 text-[#C9A84C] font-semibold select-none">
                 <div className="animate-marquee gap-8 items-center whitespace-nowrap">
                   <span className="inline-flex items-center gap-6 px-4">
                     {previewPhrases.map((phrase, idx) => (
@@ -384,12 +386,13 @@ function SettingsPanel({ initial }) {
             </div>
           </div>
         ) : (
-          <div className="mt-5 rounded-xl border border-hair-soft bg-elevated/50 p-4 text-center">
-            <p className="text-xs font-semibold text-ink-60">
-              🚫 الشريط الإعلاني معطّل حالياً — لن يظهر أي شريط أعلى المتجر للزوار.
+          <div className="mt-5 rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22] bg-[#FAF9F5] dark:bg-[#171512] p-5 text-center">
+            <p className="text-xs font-semibold text-[#736B5E] dark:text-[#A8A296] flex items-center justify-center gap-1.5">
+              <EyeOff className="w-4 h-4 text-[#736B5E]" />
+              <span>الشريط الإعلاني معطّل حالياً — لن يظهر أي شريط أعلى المتجر للزوار.</span>
             </p>
-            <p className="mt-1 text-xs2 text-ink-42">
-              اضغط على السويتش بالأعلى في أي وقت لتفعيله وعرض إعلاناتك ومزايا متجرك.
+            <p className="mt-1 text-xs text-[#A8A296]">
+              اضغط على زر التفعيل بالأعلى في أي وقت لتشغيله وعرض إعلاناتك ومزايا متجرك.
             </p>
           </div>
         )}
@@ -433,11 +436,18 @@ function SettingsPanel({ initial }) {
           ))}
         </div>
 
-        <div className="mt-6 pt-4 border-t border-hair-soft flex items-center justify-between">
-          <button type="button" onClick={save} disabled={busy} className="btn-solid px-8">
-            {busy ? 'جارٍ الحفظ…' : 'حفظ الإعدادات والشريط'}
+        <div className="mt-6 pt-4 border-t border-[#E8E6E1] dark:border-[#2E2B22] flex items-center justify-between">
+          <button
+            type="button"
+            onClick={save}
+            disabled={busy}
+            className="group/btn relative overflow-hidden bg-gradient-to-r from-[#1A1814] to-[#2D2921] dark:from-[#C9A84C] dark:to-[#8B6914] text-white text-xs font-semibold px-6 py-2.5 rounded-full transition-all duration-300 active:scale-[0.97] flex items-center gap-2 shadow-sm hover:shadow-md hover:shadow-[#C9A84C]/20"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+            <Save className="w-4 h-4 relative" />
+            <span className="relative">{busy ? 'جارٍ الحفظ…' : 'حفظ الإعدادات والشريط'}</span>
           </button>
-          <span className="text-xs2 text-ink-42">تحديث فوري للمتجر بمجرد الحفظ</span>
+          <span className="text-xs text-[#736B5E] dark:text-[#A8A296]">تحديث فوري للمتجر بمجرد الحفظ</span>
         </div>
       </section>
     </div>
@@ -554,25 +564,29 @@ function RatesPanel({ initial }) {
           type="button"
           onClick={saveAll}
           disabled={busy === 'all' || dirty.length === 0}
-          className="btn-solid"
+          className="group/btn relative overflow-hidden bg-gradient-to-r from-[#1A1814] to-[#2D2921] dark:from-[#C9A84C] dark:to-[#8B6914] text-white text-xs font-semibold px-6 py-2.5 rounded-full transition-all duration-300 active:scale-[0.97] flex items-center gap-2 shadow-sm hover:shadow-md hover:shadow-[#C9A84C]/20 disabled:opacity-50"
         >
-          {busy === 'all'
-            ? 'بيتسجّل…'
-            : dirty.length > 0
-              ? `اسجّل التعديلات (${num(dirty.length)})`
-              : 'مافيش تعديلات'}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+          <Save className="w-4 h-4 relative" />
+          <span className="relative">
+            {busy === 'all'
+              ? 'بيتسجّل…'
+              : dirty.length > 0
+              ? `اسجّل ${num(dirty.length)} محافظة متعدّلة`
+              : 'مافيش تعديل'}
+          </span>
         </button>
       </div>
 
-      <div className="mt-5 overflow-x-auto">
+      <div className="mt-5 overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
         <table className="tbl">
           <thead>
             <tr>
-              <th>المحافظة</th>
-              <th className="w-32">السعر</th>
-              <th className="w-24">من (يوم)</th>
-              <th className="w-24">لـ (يوم)</th>
-              <th className="w-20">بنشحن</th>
+              <th className="text-start">المحافظة</th>
+              <th className="w-32 text-end">السعر (ج.م)</th>
+              <th className="w-24 text-center">من (يوم)</th>
+              <th className="w-24 text-center">لـ (يوم)</th>
+              <th className="w-24 text-center">التوصيل متاح</th>
             </tr>
           </thead>
           <tbody>

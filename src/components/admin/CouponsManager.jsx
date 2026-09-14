@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { COUPON_KIND } from '@/lib/labels';
 import { dateAr, egp, num } from '@/lib/money';
 import { toPositiveInt, toPositiveNumber, validateCouponData } from '@/lib/validate';
+import { Plus, Tag, Edit, Trash2 } from 'lucide-react';
 
 /* الكود لاتيني/أرقام/شرطة بس وبالكابيتال — كده مافيش لبس بين أشكال متشابهة */
 const cleanCode = (v) =>
@@ -205,9 +206,11 @@ export default function CouponsManager({ initial }) {
           type="button"
           onClick={create}
           disabled={busy === 'add'}
-          className="btn-solid mt-5 px-8"
+          className="group/btn relative overflow-hidden bg-gradient-to-r from-[#1A1814] to-[#2D2921] dark:from-[#C9A84C] dark:to-[#8B6914] text-white text-xs font-semibold px-6 py-2.5 rounded-full transition-all duration-300 active:scale-[0.97] flex items-center gap-1.5 shadow-sm hover:shadow-md hover:shadow-[#C9A84C]/20 mt-5"
         >
-          {busy === 'add' ? 'بيتسجّل…' : 'أنشئ الكود'}
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover/btn:animate-[shimmer_1.5s_infinite]" />
+          <Plus className="w-4 h-4 relative" />
+          <span className="relative">{busy === 'add' ? 'جاري الإنشاء…' : 'إنشاء الكود'}</span>
         </button>
       </section>
 
@@ -218,18 +221,18 @@ export default function CouponsManager({ initial }) {
         {rows.length === 0 ? (
           <p className="mt-4 text-xs1 text-ink-42">مافيش أكواد لسه.</p>
         ) : (
-          <div className="mt-5 overflow-x-auto">
+          <div className="mt-5 overflow-x-auto rounded-xl border border-[#E8E6E1] dark:border-[#2E2B22]">
             <table className="tbl">
               <thead>
                 <tr>
-                  <th>الكود</th>
-                  <th>النوع</th>
-                  <th className="text-end">القيمة</th>
-                  <th className="text-end">أقل مجموع</th>
-                  <th className="text-end">الاستخدام</th>
-                  <th>المدة</th>
-                  <th>الحالة</th>
-                  <th />
+                  <th className="w-32 text-start">الكود</th>
+                  <th className="w-28 text-start">النوع</th>
+                  <th className="w-28 text-end">القيمة</th>
+                  <th className="w-28 text-end">أقل مجموع</th>
+                  <th className="w-28 text-center">الاستخدام</th>
+                  <th className="text-start">المدة</th>
+                  <th className="w-24 text-center">الحالة</th>
+                  <th className="w-36 text-end">الإجراءات</th>
                 </tr>
               </thead>
               <tbody>
@@ -237,21 +240,21 @@ export default function CouponsManager({ initial }) {
                   const st = liveState(c);
                   return (
                     <tr key={c.id}>
-                      <td className="num font-mark" dir="ltr">
+                      <td className="num font-mark w-32 font-bold text-[#C9A84C]" dir="ltr">
                         {c.code}
                       </td>
-                      <td className="text-xs2">{COUPON_KIND[c.kind]}</td>
-                      <td className="num text-end">
+                      <td className="text-xs2 w-28">{COUPON_KIND[c.kind]}</td>
+                      <td className="num w-28 text-end font-semibold">
                         {c.kind === 'percent'
                           ? `${num(c.value)}٪`
                           : c.kind === 'fixed'
                             ? egp(c.value)
                             : '—'}
                       </td>
-                      <td className="num text-end">
+                      <td className="num w-28 text-end">
                         {Number(c.min_subtotal) > 0 ? egp(c.min_subtotal) : '—'}
                       </td>
-                      <td className="num text-end">
+                      <td className="num w-28 text-center">
                         {num(c.used_count)}
                         {c.max_uses != null ? ` / ${num(c.max_uses)}` : ''}
                       </td>
@@ -266,9 +269,9 @@ export default function CouponsManager({ initial }) {
                           'مفتوح'
                         )}
                       </td>
-                      <td>
+                      <td className="w-24 text-center">
                         <span
-                          className={`chip ${
+                          className={`chip text-[11px] px-2.5 py-0.5 rounded-full inline-flex ${
                             st.tone === 'on'
                               ? 'bg-sage/12 text-sage border-sage/45'
                               : st.tone === 'wait'
@@ -279,7 +282,7 @@ export default function CouponsManager({ initial }) {
                           {st.text}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap text-end">
+                      <td className="w-36 whitespace-nowrap text-end">
                         <button
                           type="button"
                           onClick={() =>
