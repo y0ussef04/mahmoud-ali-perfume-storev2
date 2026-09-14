@@ -19,7 +19,7 @@ export default async function HomePage() {
   const list = featured.length ? featured : products.slice(0, 8);
 
   return (
-    <div className="pb-16 md:pb-8">
+    <div className="pb-16 md:pb-8 overflow-x-hidden w-full max-w-full">
       
       {/* ══════════════ 1. الهيرو الفاخر مع خلفية عطور عربية راقية ══════════════ */}
       <section className="relative overflow-hidden border-b border-[#E8E6E1] dark:border-[#2E2B22] py-20 sm:py-32 bg-[#FAF9F5] dark:bg-[#0E0D09]">
@@ -112,7 +112,7 @@ export default async function HomePage() {
 
       {/* ══════════════ 3. المنتجات الأكثر طلباً (Featured Products) ══════════════ */}
       {list.length > 0 && (
-        <section className="relative max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-12 sm:py-24 space-y-6 sm:space-y-8">
+        <section className="relative overflow-hidden max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-12 sm:py-24 space-y-6 sm:space-y-8">
           {/* Subtle ambient lighting behind products */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[#C9A84C]/5 rounded-full blur-[140px] pointer-events-none -z-10" />
 

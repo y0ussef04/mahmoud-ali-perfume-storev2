@@ -73,32 +73,47 @@ export default function MobileQuickBar({ waNumber = '201000000000' }) {
   ];
 
   return (
-    <div className="fixed bottom-0 inset-x-0 z-50 bg-white/95 dark:bg-[#1C1A14]/95 backdrop-blur-md border-t border-[#E8E6E1] dark:border-[#2E2B22] md:hidden h-16 pb-safe">
-      <nav className="h-full max-w-md mx-auto grid grid-cols-5 items-center px-1">
+    <aside
+      aria-label="شريط التنقل السفلي"
+      className="fixed bottom-0 inset-x-0 z-50 w-full bg-white/95 dark:bg-[#15140F]/95 backdrop-blur-xl border-t border-[#E8E6E1] dark:border-[#2E2B22] md:hidden shadow-[0_-4px_20px_rgba(0,0,0,0.05)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)]"
+      style={{ paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 6px)' }}
+    >
+      <nav className="h-14 w-full flex items-center justify-around px-1">
         {tabs.map((t) => {
           const content = (
-            <span className="flex flex-col items-center justify-center gap-1">
+            <span className="flex flex-col items-center justify-center gap-0.5 relative py-1">
               <span className="relative">
                 {t.icon}
                 {t.badge > 0 ? (
-                  <span className="absolute -top-1 -right-2 w-4 h-4 bg-[#C9A84C] text-white text-[10px] font-semibold rounded-full flex items-center justify-center num">
+                  <span className="absolute -top-1.5 -end-2 min-w-[17px] h-[17px] px-1 bg-[#C9A84C] text-white text-[9px] font-bold rounded-full flex items-center justify-center num shadow-sm">
                     {t.badge}
                   </span>
                 ) : null}
               </span>
-              <span className="text-[11px] font-semibold leading-none">{t.label}</span>
+              <span className="text-[10px] font-semibold tracking-tight leading-tight">
+                {t.label}
+              </span>
+              {t.active && (
+                <span className="absolute -bottom-1 w-1 h-1 rounded-full bg-[#C9A84C]" />
+              )}
             </span>
           );
 
-          const className = `flex flex-col items-center justify-center h-full min-h-[44px] transition-colors duration-150 active:scale-[0.95] ${
+          const className = `flex-1 flex flex-col items-center justify-center h-full min-h-[44px] transition-all duration-200 active:scale-[0.93] select-none ${
             t.active
-              ? 'text-[#1A1814] dark:text-white font-semibold'
-              : 'text-[#6B6760] dark:text-[#A09C94] hover:text-[#1A1814]'
+              ? 'text-[#C9A84C] font-bold'
+              : 'text-[#8C877D] dark:text-[#A09C94] hover:text-[#1A1814] dark:hover:text-white'
           }`;
 
           if (t.onClick) {
             return (
-              <button key={t.id} type="button" onClick={t.onClick} className={className}>
+              <button
+                key={t.id}
+                type="button"
+                onClick={t.onClick}
+                className={className}
+                aria-label={t.label}
+              >
                 {content}
               </button>
             );
@@ -106,19 +121,32 @@ export default function MobileQuickBar({ waNumber = '201000000000' }) {
 
           if (t.external) {
             return (
-              <a key={t.id} href={t.href} target="_blank" rel="noopener noreferrer" className={className}>
+              <a
+                key={t.id}
+                href={t.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={className}
+                aria-label={t.label}
+              >
                 {content}
               </a>
             );
           }
 
           return (
-            <Link key={t.id} href={t.href} prefetch={true} className={className}>
+            <Link
+              key={t.id}
+              href={t.href}
+              prefetch={true}
+              className={className}
+              aria-label={t.label}
+            >
               {content}
             </Link>
           );
         })}
       </nav>
-    </div>
+    </aside>
   );
 }
