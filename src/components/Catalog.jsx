@@ -229,7 +229,7 @@ export default function Catalog({ products, brands, initialFamily = '' }) {
           </button>
         </AnimateIn>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-md md:max-w-none mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
           {shown.map((p, idx) => (
             <AnimateIn key={p.id} direction="up" delay={(idx % 12) * 0.05}>
               <ProductCard product={p} />

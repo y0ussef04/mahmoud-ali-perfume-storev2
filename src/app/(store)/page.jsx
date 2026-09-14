@@ -69,40 +69,40 @@ export default async function HomePage() {
 
       {/* ══════════════ 2. شريط الأصالة والضمان (Luxury Trust Bar) ══════════════ */}
       <section className="relative z-10 border-b border-[#E8E6E1] dark:border-[#2E2B22] bg-white/70 dark:bg-[#12110C]/80 backdrop-blur-md py-6">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5 md:gap-4 max-w-md md:max-w-none mx-auto">
+        <div className="max-w-4xl mx-auto px-2 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-4">
+            <AnimateIn direction="up" delay={0.05} className="w-full">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-1 sm:gap-3.5 p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 transition-all duration-300">
+                <span className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/25 flex items-center justify-center text-[#C9A84C] shrink-0">
+                  <ShieldCheck strokeWidth={1.75} className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
+                </span>
+                <div>
+                  <p className="text-[10px] sm:text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">أصالة ١٠٠٪</p>
+                  <p className="text-[11px] text-[#8C887B] dark:text-[#A09C94] hidden sm:block mt-0.5">عطور أصلية ومفحوصة</p>
+                </div>
+              </div>
+            </AnimateIn>
+
             <AnimateIn direction="up" delay={0.1} className="w-full">
-              <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 hover:shadow-md transition-all duration-300">
-                <span className="w-10 h-10 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/25 flex items-center justify-center text-[#C9A84C] shrink-0">
-                  <ShieldCheck strokeWidth={1.75} className="w-5 h-5" />
+              <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-1 sm:gap-3.5 p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 transition-all duration-300">
+                <span className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/25 flex items-center justify-center text-[#C9A84C] shrink-0">
+                  <Truck strokeWidth={1.75} className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                 </span>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">أصالة مضمونة ١٠٠٪</p>
-                  <p className="text-xs text-[#8C887B] dark:text-[#A09C94] mt-0.5">عطور أصلية ومفحوصة بالكامل</p>
+                <div>
+                  <p className="text-[10px] sm:text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">شحن سريع</p>
+                  <p className="text-[11px] text-[#8C887B] dark:text-[#A09C94] hidden sm:block mt-0.5">توصيل آمن لباب بيتك</p>
                 </div>
               </div>
             </AnimateIn>
 
-            <AnimateIn direction="up" delay={0.2} className="w-full">
-              <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 hover:shadow-md transition-all duration-300">
-                <span className="w-10 h-10 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/25 flex items-center justify-center text-[#C9A84C] shrink-0">
-                  <Truck strokeWidth={1.75} className="w-5 h-5" />
+            <AnimateIn direction="up" delay={0.15} className="w-full">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-right gap-1 sm:gap-3.5 p-2 sm:p-3.5 rounded-xl sm:rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 transition-all duration-300">
+                <span className="w-7 h-7 sm:w-10 sm:h-10 rounded-lg sm:rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/25 flex items-center justify-center text-[#C9A84C] shrink-0">
+                  <Banknote strokeWidth={1.75} className="w-3.5 h-3.5 sm:w-5 sm:h-5" />
                 </span>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">شحن سريع لجميع المحافظات</p>
-                  <p className="text-xs text-[#8C887B] dark:text-[#A09C94] mt-0.5">توصيل آمن حتى باب بيتك</p>
-                </div>
-              </div>
-            </AnimateIn>
-
-            <AnimateIn direction="up" delay={0.3} className="w-full">
-              <div className="flex items-center gap-3.5 p-4 rounded-2xl bg-white/85 dark:bg-[#1A1814]/85 border border-[#E8E6E1] dark:border-[#2E2B22] shadow-xs hover:border-[#C9A84C]/40 hover:shadow-md transition-all duration-300">
-                <span className="w-10 h-10 rounded-xl bg-[#C9A84C]/10 border border-[#C9A84C]/25 flex items-center justify-center text-[#C9A84C] shrink-0">
-                  <Banknote strokeWidth={1.75} className="w-5 h-5" />
-                </span>
-                <div className="text-right">
-                  <p className="text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">الدفع عند الاستلام</p>
-                  <p className="text-xs text-[#8C887B] dark:text-[#A09C94] mt-0.5">عاين طلبك وادفع بكل راحة</p>
+                <div>
+                  <p className="text-[10px] sm:text-sm font-bold text-[#1A1814] dark:text-[#F5F5F0]">الدفع بالاستلام</p>
+                  <p className="text-[11px] text-[#8C887B] dark:text-[#A09C94] hidden sm:block mt-0.5">عاين طلبك ثم ادفع</p>
                 </div>
               </div>
             </AnimateIn>
@@ -112,13 +112,13 @@ export default async function HomePage() {
 
       {/* ══════════════ 3. المنتجات الأكثر طلباً (Featured Products) ══════════════ */}
       {list.length > 0 && (
-        <section className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24 space-y-8">
+        <section className="relative max-w-6xl mx-auto px-3 sm:px-6 lg:px-8 py-12 sm:py-24 space-y-6 sm:space-y-8">
           {/* Subtle ambient lighting behind products */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[#C9A84C]/5 rounded-full blur-[140px] pointer-events-none -z-10" />
 
           <div className="flex flex-wrap items-end justify-between gap-4 border-b border-[#E8E6E1]/60 dark:border-[#2E2B22]/60 pb-4">
             <div>
-              <h2 className="text-2xl sm:text-3xl font-semibold text-[#1A1814] dark:text-white">
+              <h2 className="text-xl sm:text-3xl font-semibold text-[#1A1814] dark:text-white">
                 الأكثر طلباً ورواجاً
               </h2>
             </div>
@@ -132,9 +132,9 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-md md:max-w-none mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
             {list.map((p, idx) => (
-              <AnimateIn key={p.id} direction="up" delay={idx * 0.1}>
+              <AnimateIn key={p.id} direction="up" delay={idx * 0.05}>
                 <ProductCard product={p} />
               </AnimateIn>
             ))}

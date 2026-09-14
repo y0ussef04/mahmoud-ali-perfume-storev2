@@ -27,15 +27,15 @@ export default function ProductsLoading() {
         </div>
       </div>
 
-      {/* شبكة الكروت التمهيدية (1 بالموبايل، 2 بالتابلت، 4 بالكمبيوتر) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-md md:max-w-none mx-auto">
+      {/* شبكة الكروت التمهيدية */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2.5 sm:gap-4 md:gap-6">
         {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
           <div
             key={i}
-            className="bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl p-4 space-y-3"
+            className="bg-white dark:bg-[#1C1A14] border border-[#E8E6E1] dark:border-[#2E2B22] rounded-xl sm:rounded-2xl p-2.5 sm:p-4 space-y-2 sm:space-y-3"
           >
             {/* مكان الصورة */}
-            <div className="aspect-[3/4] w-full rounded-lg bg-[#FAFAF8] dark:bg-[#151410] border border-[#E8E6E1]/60 dark:border-[#2E2B22]" />
+            <div className="aspect-square sm:aspect-[4/5] w-full rounded-lg bg-[#FAFAF8] dark:bg-[#151410] border border-[#E8E6E1]/60 dark:border-[#2E2B22]" />
             {/* الماركة */}
             <div className="h-3 w-1/3 bg-[#C9A84C]/25 rounded" />
             {/* اسم العطر */}
