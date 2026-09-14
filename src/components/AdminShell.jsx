@@ -171,7 +171,7 @@ export default function AdminShell({ admin, pending = 0, children }) {
   );
 
   return (
-    <div className="relative min-h-screen lg:grid lg:grid-cols-[17rem_1fr] print:block bg-[#FBFBF9] dark:bg-[#12110F] text-[#1A1814] dark:text-[#F5F2EB]">
+    <div className="relative min-h-screen print:block bg-[#FBFBF9] dark:bg-[#12110F] text-[#1A1814] dark:text-[#F5F2EB]">
       {navigatingTo ? (
         <div
           role="progressbar"
@@ -180,9 +180,9 @@ export default function AdminShell({ admin, pending = 0, children }) {
         />
       ) : null}
 
-      {/* شريط المنيو الجانبي للشاشات الكبيرة */}
-      <aside className="no-print hidden bg-[#1A1814] border-e border-[#2A2720] lg:flex lg:h-screen lg:flex-col lg:sticky lg:top-0">
-        <div className="flex items-center gap-3 px-5 py-6 border-b border-[#2A2720]">
+      {/* شريط المنيو الجانبي للشاشات الكبيرة - ثابت بشكل دائم أثناء السكرول */}
+      <aside className="no-print hidden bg-[#1A1814] border-l border-[#2A2720] lg:flex lg:flex-col lg:fixed lg:top-0 lg:right-0 lg:bottom-0 lg:w-[17rem] lg:h-screen lg:z-40 shadow-xl">
+        <div className="flex items-center gap-3 px-5 py-6 border-b border-[#2A2720] shrink-0">
           <Mark size={36} />
           <div className="flex flex-col leading-none">
             <span className="font-mark text-xs tracking-widest text-[#E5C773] font-bold">
@@ -196,12 +196,12 @@ export default function AdminShell({ admin, pending = 0, children }) {
         </div>
 
         <div className="mt-3 flex-1 overflow-y-auto py-2">{nav}</div>
-        {foot}
+        <div className="shrink-0">{foot}</div>
       </aside>
 
-      {/* شريط التنقل للهواتف */}
-      <div className="no-print lg:hidden">
-        <div className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-[#1A1814] border-b border-[#2A2720] px-4 py-3 shadow-md">
+      {/* شريط التنقل للهواتف - مثبت بالأعلى أثناء السكرول */}
+      <div className="no-print lg:hidden sticky top-0 z-30">
+        <div className="flex items-center justify-between gap-3 bg-[#1A1814] border-b border-[#2A2720] px-4 py-3 shadow-md">
           <div className="flex items-center gap-2.5">
             <Mark size={30} />
             <span className="font-display text-xs font-bold text-[#E5C773]">لوحة التحكم</span>
@@ -228,14 +228,14 @@ export default function AdminShell({ admin, pending = 0, children }) {
         </div>
 
         {open ? (
-          <div id="admin-nav" className="bg-[#1A1814] border-b border-[#2A2720] shadow-xl animate-in slide-in-from-top-2 duration-200">
+          <div id="admin-nav" className="bg-[#1A1814] border-b border-[#2A2720] shadow-xl animate-in slide-in-from-top-2 duration-200 max-h-[85vh] overflow-y-auto">
             <div className="py-3">{nav}</div>
             {foot}
           </div>
         ) : null}
       </div>
 
-      <main className="min-w-0 px-4 py-6 sm:px-8 sm:py-8 print:p-0">{children}</main>
+      <main className="min-w-0 px-4 py-6 sm:px-8 sm:py-8 print:p-0 lg:mr-[17rem]">{children}</main>
     </div>
   );
 }
